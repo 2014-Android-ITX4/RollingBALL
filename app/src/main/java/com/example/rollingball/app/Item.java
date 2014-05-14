@@ -5,4 +5,5 @@ package com.example.rollingball.app;
  */
 public enum Item
 {
+  nothing
 }
