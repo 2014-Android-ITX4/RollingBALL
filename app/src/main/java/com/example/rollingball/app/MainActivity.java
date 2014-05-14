@@ -10,6 +10,8 @@ public class MainActivity
   extends ActionBarActivity
 {
 
+  private MainView _view;
+
   @Override
   protected void onCreate( Bundle savedInstanceState )
   {
