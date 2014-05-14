@@ -5,11 +5,11 @@ package com.example.rollingball.app;
  */
 public class Scene
 {
-  public GameObject[] game_object;
+  public GameObject[] game_objects;
   public Camera camera;
   public InputManager input_manager;
   public SceneManager scene_manager;
-  private Messege[] _massage;
+  private Messege[] _massages;
 
   void push(GameObject game_object){
 
