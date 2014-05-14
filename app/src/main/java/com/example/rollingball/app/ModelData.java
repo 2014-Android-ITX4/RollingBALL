@@ -27,7 +27,7 @@ public class ModelData
     return null;
   }
 
-  public void draw( Mat4 trasformation)
+  public void draw( Mat4 trasformation )
   {
 
   }
