@@ -9,7 +9,7 @@ public class Scene
   public Camera camera;
   public InputManager input_manager;
   public SceneManager scene_manager;
-  private Messege[] _massages;
+  private Message[] _messages;
 
   void push(GameObject game_object){
 
