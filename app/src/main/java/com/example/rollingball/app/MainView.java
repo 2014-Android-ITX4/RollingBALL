@@ -10,4 +10,10 @@ public class MainView
   private MainRenderer _renderer;
   public SceneManager scene_manager;
   public MainActivity activity;
+
+  MainView( MainActivity arg_activity )
+  {
+    activity = arg_activity;
+  }
+
 }
