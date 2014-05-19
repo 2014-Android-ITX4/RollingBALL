@@ -41,7 +41,7 @@ public class InputManager implements IUpdatetable
   private void update_from_gyroscope()
   {
     // キーボード入力状態なら何もせず抜ける
-    if( _keyboard_mode )
+    if( _keyboard_mode == true )
       return;
   }
 
