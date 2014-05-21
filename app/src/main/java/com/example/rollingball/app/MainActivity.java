@@ -89,14 +89,14 @@ public class MainActivity
      final int MATRIX_SIZE = 16;
 
     // 回転行列
-    float[] _in_r = new float[ MATRIX_SIZE ];
-    float[] _out_r = new float[ MATRIX_SIZE ];
-    float[] _i = new float[ MATRIX_SIZE ];
+    float[] in_r = new float[ MATRIX_SIZE ];
+    float[] out_r = new float[ MATRIX_SIZE ];
+    float[] i = new float[ MATRIX_SIZE ];
 
     // センサーの値
-    float[] _orientation_values = new float[ 3 ];
-    float[] _magnetic_values = new float[ 3 ];
-    float[] _accelerometer_values = new float[ 3 ];
+    float[] orientation_values = new float[ 3 ];
+    float[] magnetic_values = new float[ 3 ];
+    float[] accelerometer_values = new float[ 3 ];
 
     if ( event.accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE )
       return;
@@ -104,25 +104,25 @@ public class MainActivity
     switch ( event.sensor.getType() )
     {
       case Sensor.TYPE_MAGNETIC_FIELD:
-        _magnetic_values = event.values.clone();
+        magnetic_values = event.values.clone();
         break;
 
       case Sensor.TYPE_ACCELEROMETER:
-        _accelerometer_values = event.values.clone();
+        accelerometer_values = event.values.clone();
         break;
     }
 
-    if ( _magnetic_values != null && _accelerometer_values != null )
+    if ( magnetic_values != null && accelerometer_values != null )
     {
-      SensorManager.getRotationMatrix( _in_r, _i, _accelerometer_values, _magnetic_values );
+      SensorManager.getRotationMatrix( in_r, i, accelerometer_values, magnetic_values );
 
       // Activity表示が縦の場合。横になるか縦になるか決まったら修正の必要あり。
-      SensorManager.remapCoordinateSystem( _in_r, SensorManager.AXIS_X, SensorManager.AXIS_Z,
-                                           _out_r
+      SensorManager.remapCoordinateSystem( in_r, SensorManager.AXIS_X, SensorManager.AXIS_Z,
+                                           out_r
       );
-      SensorManager.getOrientation( _out_r, _orientation_values );
+      SensorManager.getOrientation( out_r, orientation_values );
 
-      orientation = new Vec3( _orientation_values[ 0 ], _orientation_values[ 1 ], _orientation_values[ 2 ] );
+      orientation = new Vec3( orientation_values[ 0 ], orientation_values[ 1 ], orientation_values[ 2 ] );
 
     }
   }
