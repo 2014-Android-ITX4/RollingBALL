@@ -40,13 +40,6 @@ public class Scene implements IUpdatetable
   }
 
   public void update( long delta_time_in_ns ){
-    if ( to_exit == true )
-    {
-      for ( int i = 0; i < game_objects.size(); i++ )
-      {
-        update( delta_time_in_ns );
-      }
-      to_exit = false;
-    }
+      for ( GameObject g : game_objects ) update(delta_time_in_ns);
   }
 }
