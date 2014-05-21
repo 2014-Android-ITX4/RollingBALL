@@ -14,7 +14,7 @@ public class Scene implements IUpdatetable
   public Camera camera;
   public InputManager input_manager;
   public SceneManager scene_manager;
-  private Message[] _massages;
+  protected Message[] _massages;
   public boolean to_exit;
 
   Scene(){
