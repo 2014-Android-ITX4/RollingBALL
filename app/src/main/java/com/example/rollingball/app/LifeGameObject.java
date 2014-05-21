@@ -5,5 +5,5 @@ package com.example.rollingball.app;
  */
 public class LifeGameObject
 {
-  public Real life;
+  public float life;
 }

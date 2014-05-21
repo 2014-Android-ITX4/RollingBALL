@@ -1,9 +1,9 @@
 package com.example.rollingball.app;
 
-/**
- * Created by sakamoto on 2014/05/14.
- */
-public class PlayerGameObject extends RigitBodyGameObject
+import java.util.LinkedList;
+
+public class PlayerGameObject extends RigidBodyGameObject
 {
-  public Item item;
+  public LinkedList< Item > items;
+  public double invincible_time;
 }
