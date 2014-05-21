@@ -1,8 +1,5 @@
 package com.example.rollingball.app;
 
-/**
- * Created by Tukasa on 2014/05/14.
- */
 public class ModelManager
 {
 
@@ -10,17 +7,17 @@ public class ModelManager
 
   public ModelData find( String name )
   {
-    return null;
+    throw new NotImplementedException();
   }
 
   public void add( String name , ModelData model )
   {
-
+    throw new NotImplementedException();
   }
 
   public void remove( String name )
   {
-    
+    throw new NotImplementedException();
   }
 
 }
