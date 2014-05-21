@@ -30,7 +30,7 @@ public class MainActivity
   private float[] _i = new float[ MATRIX_SIZE ];
 
   // センサーの値
-  public float[] orientation_values = new float[ 3 ];
+  private float[] _orientation_values = new float[ 3 ];
   private float[] _magnetic_values = new float[ 3 ];
   private float[] _accelerometer_values = new float[ 3 ];
 
@@ -119,7 +119,9 @@ public class MainActivity
       SensorManager.remapCoordinateSystem( _in_r, SensorManager.AXIS_X, SensorManager.AXIS_Z,
                                            _out_r
       );
-      SensorManager.getOrientation( _out_r, orientation_values );
+      SensorManager.getOrientation( _out_r, _orientation_values );
+
+      orientation = new Vec3( _orientation_values[ 0 ], _orientation_values[ 1 ], _orientation_values[ 2 ] );
 
     }
   }

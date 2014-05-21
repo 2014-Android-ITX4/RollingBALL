@@ -10,7 +10,6 @@ public class InputManager implements IUpdatetable
 
   public Vec3 rotation;
   private Scene _scene;
-  private float _orientation[];
 
   InputManager(Scene arg_scene)
   {
@@ -20,8 +19,7 @@ public class InputManager implements IUpdatetable
   @Override
   public void update( final long delta_time_in_ns )
   {
-    _orientation = _scene.scene_manager.view.activity.orientation_values;
-    rotation = new Vec3( _orientation[ 0 ], _orientation[ 1 ], _orientation[ 2 ] );
+    rotation = _scene.scene_manager.view.activity.orientation;
   }
 
 }
