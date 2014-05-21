@@ -8,10 +8,9 @@ import com.hackoeur.jglm.Vec3;
 public class InputManager implements IUpdatetable
 {
 
-  private boolean _keyboard_mode = false;
-  public Vec3 rotation = new Vec3();
+  public Vec3 rotation;
   private Scene _scene;
-  private float orientation;
+  private float orientation[];
 
   InputManager(Scene arg_scene)
   {
@@ -21,28 +20,8 @@ public class InputManager implements IUpdatetable
   @Override
   public void update( final long delta_time_in_ns )
   {
-    update_from_keyboard();
-    update_from_orientation();
-  }
-
-  private void update_from_keyboard()
-  {
-    // 傾き入力状態なら何もせず抜ける
-    if( _keyboard_mode == false)
-      return;
-    // 未実装
-    throw new NotImplementedException();
-  }
-
-  private void update_from_orientation()
-  {
-    // キーボード入力状態なら何もせず抜ける
-    if( _keyboard_mode == true )
-      return;
-
-    // 未実装
     orientation = _scene.scene_manager.view.activity.orientation_values;
+    rotation = new Vec3( orientation[ 0 ], orientation[ 1 ], orientation[ 2 ] );
   }
-
 
 }
