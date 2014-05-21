@@ -27,12 +27,12 @@ class MainRenderer implements GLSurfaceView.Renderer
   public void onDrawFrame(GL10 gl){
     final long delta_time_in_ns = System.nanoTime() - _before_time_in_ns;
 
-    _view.scene_maneger.update( delta_time_in_ns );
+    _main_view.scene_maneger.update( delta_time_in_ns );
 
     GLES20.glClearColor( 0.9f, 0.9f, 1.0f, 1.0f );
     GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
-    _view.scene_manager.draw();
+    _main_view.scene_manager.draw();
 
     _before_time_in_ns = System.nanoTime();
   }
@@ -70,7 +70,7 @@ class MainRenderer implements GLSurfaceView.Renderer
     GLES20.glCompileShader( vertex_shader );
 
     final int[] vertex_shader_result = new int[ 1 ];
-    GLES20.glGetShaderiv( vertex_shader, GLES20.GL_COMPILE_STATUS, fragment_shader_result, 0 );
+    GLES20.glGetShaderiv( vertex_shader, GLES20.GL_COMPILE_STATUS, vertex_shader_result, 0 );
     if ( vertex_shader_result[ 0 ] == 0 )
       throw new RuntimeException( GLES20.glGetShaderInfoLog( vertex_shader ) );
 
@@ -121,7 +121,7 @@ class MainRenderer implements GLSurfaceView.Renderer
 
     // shader program
     int program = GLES20.glCreateProgram();
-    if (mProgram == 0)
+    if ( program == 0 )
       throw new RuntimeException();
 
     GLES20.glAttachShader( program, vertex_shader );
@@ -129,8 +129,8 @@ class MainRenderer implements GLSurfaceView.Renderer
 
     GLES20.glLinkProgram( program );
     final int[] linkStatus = new int[1];
-    GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, linkStatus, DEFAULT_OFFSET);
-    if (linkStatus[FIRST_INDEX] != GLES20.GL_TRUE)
+    GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, linkStatus, 0);
+    if (linkStatus[0] != GLES20.GL_TRUE)
       throw new RuntimeException( GLES20.glGetProgramInfoLog( program ) );
 
     GLES20.glUseProgram( program );
