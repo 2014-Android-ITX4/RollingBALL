@@ -78,7 +78,7 @@ public class MainActivity
   @Override
   public void onAccuracyChanged( final Sensor sensor, final int i )
   {
-    //現状Stub
+    //現状は使いません
   }
 
   // センサーの値が変更された時に呼び出されるメソッド
