@@ -1,23 +1,30 @@
 package com.example.rollingball.app;
 
+import java.util.Map;
+
 public class ModelManager
 {
 
-  private ModelData _models;
+  private Map< String, ModelData > _models;
 
   public ModelData find( String name )
   {
-    throw new NotImplementedException();
+    ModelData model = _models.get( name );
+
+    if ( model == null )
+      throw new NullPointerException( "model data ( name: " + name + " ) is not found." );
+    
+    return model;
   }
 
   public void add( String name , ModelData model )
   {
-    throw new NotImplementedException();
+    _models.put( name, model );
   }
 
   public void remove( String name )
   {
-    throw new NotImplementedException();
+    _models.remove( name );
   }
 
 }
