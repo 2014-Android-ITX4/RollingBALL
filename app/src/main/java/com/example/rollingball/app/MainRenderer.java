@@ -27,7 +27,7 @@ class MainRenderer implements GLSurfaceView.Renderer
   public void onDrawFrame(GL10 gl){
     final long delta_time_in_ns = System.nanoTime() - _before_time_in_ns;
 
-    _main_view.scene_maneger.update( delta_time_in_ns );
+    _main_view.scene_manager.update( delta_time_in_ns );
 
     GLES20.glClearColor( 0.9f, 0.9f, 1.0f, 1.0f );
     GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
