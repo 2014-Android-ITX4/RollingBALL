@@ -1,10 +1,7 @@
 package com.example.rollingball.app;
 
-import android.hardware.input.InputManager;
-
 import java.util.InputMismatchException;
 import java.util.LinkedList;
-
 /**
  * Created by sakamoto on 2014/05/14.
  */
@@ -21,8 +18,8 @@ public class Scene implements IUpdatetable
   {
     scene_manager = s;
     camera = new Camera();
-    input_manager = new InputManager();
-  }
+    input_manager = new InputManager( this );
+}
 
   void push( GameObject game_object ){
 
