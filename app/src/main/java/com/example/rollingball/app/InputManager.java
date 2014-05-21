@@ -1,13 +1,6 @@
 package com.example.rollingball.app;
 
-import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.view.KeyEvent;
 import com.hackoeur.jglm.Vec3;
-import android.hardware.SensorManager;
-import android.os.Bundle;
 
 /**
  * Created by Tukasa on 2014/05/14.
@@ -18,6 +11,7 @@ public class InputManager implements IUpdatetable
   private boolean _keyboard_mode = false;
   public Vec3 rotation = new Vec3();
   private Scene _scene;
+  private float orientation;
 
   InputManager(Scene arg_scene)
   {
@@ -28,21 +22,26 @@ public class InputManager implements IUpdatetable
   public void update( final long delta_time_in_ns )
   {
     update_from_keyboard();
-    update_from_gyroscope();
+    update_from_orientation();
   }
 
   private void update_from_keyboard()
   {
-    // ジャイロ入力状態なら何もせず抜ける
+    // 傾き入力状態なら何もせず抜ける
     if( _keyboard_mode == false)
       return;
+    // 未実装
+    throw new NotImplementedException();
   }
 
-  private void update_from_gyroscope()
+  private void update_from_orientation()
   {
     // キーボード入力状態なら何もせず抜ける
     if( _keyboard_mode == true )
       return;
+
+    // 未実装
+    orientation = _scene.scene_manager.view.activity.orientation_values;
   }
 
 

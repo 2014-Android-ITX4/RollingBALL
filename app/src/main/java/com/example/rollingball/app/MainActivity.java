@@ -6,7 +6,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -26,14 +25,14 @@ public class MainActivity
   private static final int MATRIX_SIZE = 16;
 
   // 回転行列
-  float[] in_r = new float[ MATRIX_SIZE ];
-  float[] out_r = new float[ MATRIX_SIZE ];
-  float[] i = new float[ MATRIX_SIZE ];
+  private float[] _in_r = new float[ MATRIX_SIZE ];
+  private float[] _out_r = new float[ MATRIX_SIZE ];
+  private float[] _i = new float[ MATRIX_SIZE ];
 
   // センサーの値
-  float[] orientation_values = new float[ 3 ];
-  float[] magnetic_values = new float[ 3 ];
-  float[] accelerometer_values = new float[ 3 ];
+  public float[] orientation_values = new float[ 3 ];
+  private float[] _magnetic_values = new float[ 3 ];
+  private float[] _accelerometer_values = new float[ 3 ];
 
 
   @Override
@@ -104,21 +103,23 @@ public class MainActivity
     switch ( event.sensor.getType() )
     {
       case Sensor.TYPE_MAGNETIC_FIELD:
-        magnetic_values = event.values.clone();
+        _magnetic_values = event.values.clone();
         break;
 
       case Sensor.TYPE_ACCELEROMETER:
-        accelerometer_values = event.values.clone();
+        _accelerometer_values = event.values.clone();
         break;
     }
 
-    if ( magnetic_values != null && accelerometer_values != null )
+    if ( _magnetic_values != null && _accelerometer_values != null )
     {
-      SensorManager.getRotationMatrix( in_r, i, accelerometer_values, magnetic_values );
+      SensorManager.getRotationMatrix( _in_r, _i, _accelerometer_values, _magnetic_values );
 
       // Activity表示が縦の場合。横になるか縦になるか決まったら修正の必要あり。
-      SensorManager.remapCoordinateSystem( in_r, SensorManager.AXIS_X, SensorManager.AXIS_Z, out_r );
-      SensorManager.getOrientation( out_r, orientation_values );
+      SensorManager.remapCoordinateSystem( _in_r, SensorManager.AXIS_X, SensorManager.AXIS_Z,
+                                           _out_r
+      );
+      SensorManager.getOrientation( _out_r, orientation_values );
 
     }
   }
