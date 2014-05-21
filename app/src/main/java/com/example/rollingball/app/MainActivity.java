@@ -22,18 +22,6 @@ public class MainActivity
   public SensorManager sensor_manager;
   public Vec3 orientation;
   private boolean _is_magnetic_sensor, _is_accelerometer_sensor;
-  private static final int MATRIX_SIZE = 16;
-
-  // 回転行列
-  private float[] _in_r = new float[ MATRIX_SIZE ];
-  private float[] _out_r = new float[ MATRIX_SIZE ];
-  private float[] _i = new float[ MATRIX_SIZE ];
-
-  // センサーの値
-  private float[] _orientation_values = new float[ 3 ];
-  private float[] _magnetic_values = new float[ 3 ];
-  private float[] _accelerometer_values = new float[ 3 ];
-
 
   @Override
   protected void onCreate( Bundle savedInstanceState )
@@ -97,6 +85,19 @@ public class MainActivity
   @Override
   public void onSensorChanged( final SensorEvent event )
   {
+
+     final int MATRIX_SIZE = 16;
+
+    // 回転行列
+    float[] _in_r = new float[ MATRIX_SIZE ];
+    float[] _out_r = new float[ MATRIX_SIZE ];
+    float[] _i = new float[ MATRIX_SIZE ];
+
+    // センサーの値
+    float[] _orientation_values = new float[ 3 ];
+    float[] _magnetic_values = new float[ 3 ];
+    float[] _accelerometer_values = new float[ 3 ];
+
     if ( event.accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE )
       return;
 
