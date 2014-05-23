@@ -6,22 +6,13 @@ import android.opengl.GLSurfaceView;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-
-/**
- * Created by sakamoto on 2014/05/14.
- */
 class MainRenderer implements GLSurfaceView.Renderer
-//public class MainRenderer extends GLSurfaceView.Renderer
 {
-  //final private MainView _main_view;
   private MainView _main_view;
   private long _before_time_in_ns;
 
-  //public MainRender( final MainView main_view )
-  public MainView MainRender( final MainView main_view )
-  {
-    _main_view = main_view;
-  }
+  public MainRenderer( final MainView main_view )
+  { _main_view = main_view; }
 
   @Override
   public void onDrawFrame(GL10 gl){
