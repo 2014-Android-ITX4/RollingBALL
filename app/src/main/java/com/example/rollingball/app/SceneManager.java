@@ -10,14 +10,11 @@ public class SceneManager implements IUpdatable
 {
   private ArrayDeque< Scene > _scenes = new ArrayDeque< Scene >();
 
-  public static void main( String[] args ) throws java.lang.Exception
-  {
-    _scenes.addScene(  );
-    _scenes.addScene(  );
-    _scenes.addScene(  );
-    _scenes.addScene(  );
-    _scenes.addScene(  );
-  }
+    _scenes.addFirst();
+    _scenes.addFirst();
+    _scenes.addFirst();
+    _scenes.addFirst();
+    _scenes.addFirst();
 
   // MainView 参照コンストラクタ
   private MainView view;
@@ -37,28 +34,33 @@ public class SceneManager implements IUpdatable
     _scenes.push( scene );
   }
 
-  void update( Scene scene )
+ @Override
+ public void update( final long delta_time_in_ns )
   {
-    scene = _scenes.peek();
-    update( scene );
+    // _scenesが空のとき
+    if (_scenes.isEmpty() == true)
+    {
+      Scene TestScene = new Scene();
+      _scenes.addFirst( TestScene );
 
-    //シーンの bool to_exit が true ならばそのシーンをpopする
-    boolean to_exit  = false;
-    if (scene == exit){
-      to_exit = true;
+      // TODO: version-0.2.0 レベルで作成される BlandLogoScene の自動push
+      //  _scenes.push(BlandLogoScene);
     }
-    if (to_exit == true)
+
+   // bool to_exit が true ならばそのシーンをpop
+  do
+  {
+    Scene scene = _scenes.peek();
+
+    scene.update( delta_time_in_ns );
+
+    if ( scene.to_exit )
     {
       _scenes.pop();
-      update( scene );
+      continue;
     }
+  }
+  while ( false );
 
-    if ( _scenes == null )
-    {
-      Scene TestScene = new TestScene;
-      _scenes.push( TestScene );
-      // TODO: version-0.2.0 レベルで作成される BlandLogoScene の自動push
-      _scenes.push(BlandLogoScene);
-    }
   }
 }
