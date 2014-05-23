@@ -1,4 +1,7 @@
 package com.example.rollingball.app;
+import android.annotation.TargetApi;
+import android.os.Build;
+
 import java.util.*;
 import java.lang.*;
 import java.io.*;
@@ -7,7 +10,7 @@ public class SceneManager implements IUpdatable, IDrawable
 {
   private ArrayDeque< Scene > _scenes = new ArrayDeque< Scene >();
 
-  private MainView view;
+  public MainView view;
 
   // MainView 参照コンストラクタ
   SceneManager( final MainView view_ )
