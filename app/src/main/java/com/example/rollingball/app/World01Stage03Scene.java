@@ -1,7 +1,9 @@
 package com.example.rollingball.app;
 
-/**
- * Created by watanabeshiho on 2014/05/23.
- */
 public class World01Stage03Scene extends StageScene
-{}
+{
+  World01Stage03Scene( final SceneManager s )
+  {
+    super( s );
+  }
+}
