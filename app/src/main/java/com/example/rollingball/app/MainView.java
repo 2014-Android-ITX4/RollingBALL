@@ -8,5 +8,12 @@ import android.opengl.GLSurfaceView;
 public class MainView
 {
   private MainRenderer _renderer;
-  private SceneManager _scene_manager;
+  public SceneManager scene_manager;
+  public MainActivity activity;
+
+  MainView( MainActivity arg_activity )
+  {
+    activity = arg_activity;
+  }
+
 }

@@ -1,21 +1,46 @@
 package com.example.rollingball.app;
 
-/**
- * Created by sakamoto on 2014/05/14.
- */
-public class Scene
+import java.util.InputMismatchException;
+import java.util.LinkedList;
+
+public class Scene implements IUpdatable, IDrawable
 {
-  public GameObject[] game_objects;
+  public LinkedList<GameObject> game_objects;
   public Camera camera;
   public InputManager input_manager;
   public SceneManager scene_manager;
-  private Messege[] _massages;
+  protected Message[] _massages;
+  public boolean to_exit;
 
-  void push(GameObject game_object){
+  Scene( SceneManager s )
+  {
+    scene_manager = s;
+    camera = new Camera();
+    input_manager = new InputManager( this );
+}
+
+  void push( GameObject game_object ){
 
   }
 
-  void message(Message message){
+  void message( Message message ){
 
   }
+
+  public SceneManager getScene_manager(){
+    return scene_manager;
+  }
+
+  @Override
+  public void update( long delta_time_in_ns ){
+    for ( GameObject g : game_objects )
+      g.update( delta_time_in_ns );
+  }
+
+  @Override
+  public void draw()
+  {
+
+  }
+
 }
