@@ -2,10 +2,8 @@ package com.example.rollingball.app;
 
 import java.util.InputMismatchException;
 import java.util.LinkedList;
-/**
- * Created by sakamoto on 2014/05/14.
- */
-public class Scene implements IUpdatetable
+
+public class Scene implements IUpdatable, IDrawable
 {
   public LinkedList<GameObject> game_objects;
   public Camera camera;
@@ -33,8 +31,16 @@ public class Scene implements IUpdatetable
     return scene_manager;
   }
 
+  @Override
   public void update( long delta_time_in_ns ){
     for ( GameObject g : game_objects )
-      update(delta_time_in_ns);
+      g.update( delta_time_in_ns );
   }
+
+  @Override
+  public void draw()
+  {
+
+  }
+
 }
