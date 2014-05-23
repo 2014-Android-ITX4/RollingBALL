@@ -5,7 +5,7 @@ import com.hackoeur.jglm.Vec3;
 /**
  * Created by Tukasa on 2014/05/14.
  */
-public class InputManager implements IUpdatetable
+public class InputManager implements IUpdatable
 {
 
   public Vec3 rotation;
