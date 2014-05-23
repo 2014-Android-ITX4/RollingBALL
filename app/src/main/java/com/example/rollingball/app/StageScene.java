@@ -18,7 +18,7 @@ public class StageScene extends Scene
   @Override
   public void update( final long delta_time_in_ns )
   {
-    if ( _pause ) _stage_time++;
+    if ( ! _pause ) _stage_time++;
     super.update( delta_time_in_ns );
   }
 
