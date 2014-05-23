@@ -3,64 +3,60 @@ import java.util.*;
 import java.lang.*;
 import java.io.*;
 
-/**
- * Created by sakamoto on 2014/05/14.
- */
-public class SceneManager implements IUpdatable
+public class SceneManager implements IUpdatable, IDrawable
 {
   private ArrayDeque< Scene > _scenes = new ArrayDeque< Scene >();
 
-    _scenes.addFirst();
-    _scenes.addFirst();
-    _scenes.addFirst();
-    _scenes.addFirst();
-    _scenes.addFirst();
+  private MainView view;
 
   // MainView 参照コンストラクタ
-  private MainView view;
-  SceneManager( MainView view_ ){
-    view = view_;
-  }
+  SceneManager( final MainView view_ )
+  { view = view_; }
 
   void push( Scene scene )
   {
-    _scenes.push( scene );
     scene.scene_manager = this;
+    _scenes.push( scene );
   }
 
   void replace( Scene scene )
   {
     _scenes.pop();
-    _scenes.push( scene );
+    push( scene );
   }
 
- @Override
- public void update( final long delta_time_in_ns )
+  @Override
+  public void update( final long delta_time_in_ns )
   {
-    // _scenesが空のとき
-    if (_scenes.isEmpty() == true)
+    do
     {
-      Scene TestScene = new Scene();
-      _scenes.addFirst( TestScene );
+      Scene scene = _scenes.peek();
 
-      // TODO: version-0.2.0 レベルで作成される BlandLogoScene の自動push
-      //  _scenes.push(BlandLogoScene);
+      scene.update( delta_time_in_ns );
+
+      // bool to_exit が true ならばそのシーンをpop
+      if ( scene.to_exit )
+      {
+        _scenes.pop();
+
+        // _scenesが空のとき
+        if ( _scenes.isEmpty() == true )
+        {
+          // TODO: version-0.2.0 レベルで作成される BlandLogoScene の自動push
+          // push( new BlandLogoScene(  ) );
+          push( new TestScene( this ) );
+
+        }
+
+        continue;
+      }
     }
-
-   // bool to_exit が true ならばそのシーンをpop
-  do
-  {
-    Scene scene = _scenes.peek();
-
-    scene.update( delta_time_in_ns );
-
-    if ( scene.to_exit )
-    {
-      _scenes.pop();
-      continue;
-    }
-  }
-  while ( false );
+    while ( false );
 
   }
+
+  @Override
+  public void draw()
+  { _scenes.peek().draw(); }
+
 }
