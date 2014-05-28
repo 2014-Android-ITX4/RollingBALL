@@ -8,8 +8,23 @@ import java.util.ArrayList;
  */
 public class RigidBodyGameObject extends GameObject
 {
-  public float mass;
-  public Vec3 velocity;
-  public ArrayList<Vec3> forces;
+  public float mass;                //質量
+  public Vec3 velocity,acceleration;//速度
+  public Vec3 force_sum;
+  public ArrayList<Vec3> forces;    //力
 
+  @Override
+  public void update( final long delta_time_in_ns )
+  {
+    super.update( delta_time_in_ns );
+
+    for( Vec3 v: forces ){
+      force_sum = force_sum.add( v );
+    }
+
+    acceleration = force_sum.multiply( 1 / mass );
+    velocity = velocity.add( acceleration.multiply( delta_time_in_ns ) );
+    super.position = velocity.add( velocity.multiply( delta_time_in_ns ) );
+
+  }
 }
