@@ -13,8 +13,8 @@ public class RigidBodyGameObject extends GameObject
   @Override
   public void update( final long delta_time_in_ns )
   {
-    Vec3 acceleration = new Vec3( 0.0f );
-    Vec3 force_sum    = new Vec3( 0.0f );
+    Vec3 acceleration = new Vec3( 0.0f, 0.0f, 0.0f );
+    Vec3 force_sum    = new Vec3( 0.0f, 0.0f, 0.0f );
 
     for( Vec3 f: forces )
       force_sum = force_sum.add( f );
