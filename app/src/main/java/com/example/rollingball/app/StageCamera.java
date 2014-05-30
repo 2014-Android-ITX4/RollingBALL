@@ -70,4 +70,19 @@ public class StageCamera extends Camera
   public float distance( float value )
   { return _distance = Math.min( Math.max( value, _min_distance ), _max_distance ); }
 
+  public float distance()
+  { return _distance; }
+
+  public float theta( float value )
+  { return _theta = value; }
+
+  public float theta()
+  { return _theta; }
+
+  public float phi( float value )
+  { return _phi = value; }
+
+  public float phi()
+  { return _phi; }
+
 }
