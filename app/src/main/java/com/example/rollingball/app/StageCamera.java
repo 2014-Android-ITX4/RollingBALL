@@ -84,5 +84,5 @@ public class StageCamera extends Camera
 
   public float phi()
   { return _phi; }
-
 }
+
