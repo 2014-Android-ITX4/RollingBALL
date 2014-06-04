@@ -128,20 +128,20 @@ public class MainActivity
       SensorManager.remapCoordinateSystem( in_r, SensorManager.AXIS_X, SensorManager.AXIS_Z, out_r );
       SensorManager.getOrientation( out_r, orientation_values );
 
-      Log.d("MAGNETIC",
-            String.valueOf( magnetic_values[0] ) + ", " + //Z軸方向,azmuth
-              String.valueOf( magnetic_values[1] ) + ", " + //X軸方向,pitch
-              String.valueOf( magnetic_values[2] ) );       //Y軸方向,roll
-
-      Log.d("ACCELERMETER",
-            String.valueOf( accelerometer_values[0] ) + ", " + //Z軸方向,azmuth
-              String.valueOf( accelerometer_values[1] ) + ", " + //X軸方向,pitch
-              String.valueOf( accelerometer_values[2] ) );       //Y軸方向,roll
-
-      Log.d("Orientation",
-            String.valueOf( radianToDegree( orientation_values[0] ) ) + ", " + //Z軸方向,azmuth
-              String.valueOf( radianToDegree( orientation_values[1] ) ) + ", " + //X軸方向,pitch
-              String.valueOf( radianToDegree( orientation_values[2] ) ) );       //Y軸方向,roll
+//      Log.d("MAGNETIC",
+//            String.valueOf( magnetic_values[0] ) + ", " + //Z軸方向,azmuth
+//              String.valueOf( magnetic_values[1] ) + ", " + //X軸方向,pitch
+//              String.valueOf( magnetic_values[2] ) );       //Y軸方向,roll
+//
+//      Log.d("ACCELERMETER",
+//            String.valueOf( accelerometer_values[0] ) + ", " + //Z軸方向,azmuth
+//              String.valueOf( accelerometer_values[1] ) + ", " + //X軸方向,pitch
+//              String.valueOf( accelerometer_values[2] ) );       //Y軸方向,roll
+//
+//      Log.d("Orientation",
+//            String.valueOf( radianToDegree( orientation_values[0] ) ) + ", " + //Z軸方向,azmuth
+//              String.valueOf( radianToDegree( orientation_values[1] ) ) + ", " + //X軸方向,pitch
+//              String.valueOf( radianToDegree( orientation_values[2] ) ) );       //Y軸方向,roll
 
       orientation = new Vec3( orientation_values[ 0 ], orientation_values[ 1 ], orientation_values[ 2 ] );
 
