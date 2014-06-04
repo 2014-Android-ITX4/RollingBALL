@@ -27,7 +27,9 @@ public class MainActivity
   protected void onCreate( Bundle savedInstanceState )
   {
     super.onCreate( savedInstanceState );
-    setContentView( R.layout.activity_main );
+    _view = new MainView( this, this );
+
+    setContentView( _view );
 
     //センサ・マネージャの取得
     sensor_manager = ( SensorManager )getSystemService( SENSOR_SERVICE );
@@ -58,6 +60,7 @@ public class MainActivity
       }
 
     }
+    _view.onResume();
   }
 
   @Override
@@ -72,6 +75,8 @@ public class MainActivity
       _is_magnetic_sensor = false;
       _is_accelerometer_sensor = false;
     }
+
+    _view.onPause();
   }
 
   // センサーの精度が変更された時に呼び出されるメソッド

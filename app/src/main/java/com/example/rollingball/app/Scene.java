@@ -15,6 +15,7 @@ public class Scene implements IUpdatable, IDrawable
   Scene( SceneManager s )
   {
     scene_manager = s;
+    game_objects = new LinkedList< GameObject >();
     camera = new Camera();
     input_manager = new InputManager( this );
 }
