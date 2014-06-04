@@ -14,11 +14,14 @@ public class MainView extends GLSurfaceView
 
   public MainView( Context context, MainActivity arg_activity )
   {
-    super(context);
+    super( context );
+
+    activity = arg_activity;
+    scene_manager = new SceneManager( this );
+
     this.setEGLContextClientVersion( 2 );
     _renderer = new MainRenderer( this );
     this.setRenderer( _renderer );
-    activity = arg_activity;
   }
 
 }

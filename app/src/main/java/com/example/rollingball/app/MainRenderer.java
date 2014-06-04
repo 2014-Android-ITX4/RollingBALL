@@ -16,6 +16,10 @@ class MainRenderer implements GLSurfaceView.Renderer
 
   @Override
   public void onDrawFrame(GL10 gl){
+
+    if( _before_time_in_ns == 0 )
+      _before_time_in_ns = System.nanoTime();
+
     final long delta_time_in_ns = System.nanoTime() - _before_time_in_ns;
 
     _main_view.scene_manager.update( delta_time_in_ns );
@@ -81,7 +85,7 @@ class MainRenderer implements GLSurfaceView.Renderer
           + "#endif\n"
           + "varying vec2 var_texcoord;\n"
           + "varying vec3 var_normal;\n"
-          + "uniform sampler2D sampler;\n"
+          + "uniform sampler2D diffuse_sampler;\n"
           + "uniform vec3 diffuse;\n"
           + "uniform vec3 ambient;\n"
           + "uniform vec3 specular;\n"
@@ -94,7 +98,7 @@ class MainRenderer implements GLSurfaceView.Renderer
           + "{\n"
           + "  gl_FragColor = is_nan( var_texcoord.x ) \n"
           + "    ? vec4( diffuse, 1.0 )\n"
-          + "    : texture2D( texture, var_texcoord );\n"
+          + "    : texture2D( diffuse_sampler, var_texcoord );\n"
           + "  gl_FragColor.a *= transparent;\n"
           + "}\n"
 

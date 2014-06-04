@@ -13,8 +13,12 @@ public class SceneManager implements IUpdatable, IDrawable
   public MainView view;
 
   // MainView 参照コンストラクタ
-  SceneManager( final MainView view_ )
-  { view = view_; }
+  public SceneManager( final MainView view_ )
+  {
+    view = view_;
+
+    push( new TestScene( this ) );
+  }
 
   void push( Scene scene )
   {
