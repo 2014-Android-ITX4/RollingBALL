@@ -28,7 +28,6 @@ public class MainActivity
   {
     super.onCreate( savedInstanceState );
     _view = new MainView( this, this );
-    _view.setEGLContextClientVersion( 2 );
 
     setContentView( _view );
 
@@ -61,7 +60,6 @@ public class MainActivity
       }
 
     }
-
     _view.onResume();
   }
 

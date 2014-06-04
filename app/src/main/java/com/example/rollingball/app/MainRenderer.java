@@ -21,7 +21,7 @@ class MainRenderer implements GLSurfaceView.Renderer
     _main_view.scene_manager.update( delta_time_in_ns );
 
     GLES20.glClearColor( 0.9f, 0.9f, 1.0f, 1.0f );
-    GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+    GLES20.glClear( GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT );
 
     _main_view.scene_manager.draw();
 
@@ -95,7 +95,7 @@ class MainRenderer implements GLSurfaceView.Renderer
           + "  gl_FragColor = is_nan( var_texcoord.x ) \n"
           + "    ? vec4( diffuse, 1.0 )\n"
           + "    : texture2D( texture, var_texcoord );\n"
-          + "  gl_FragColor.a *= transparent"
+          + "  gl_FragColor.a *= transparent;\n"
           + "}\n"
 
           + "bool is_nan( float val )\n"
@@ -125,5 +125,9 @@ class MainRenderer implements GLSurfaceView.Renderer
       throw new RuntimeException( GLES20.glGetProgramInfoLog( program ) );
 
     GLES20.glUseProgram( program );
+
+    // デプスバッファの有効化
+    GLES20.glEnable( GLES20.GL_DEPTH_TEST );
+
   }
 }
