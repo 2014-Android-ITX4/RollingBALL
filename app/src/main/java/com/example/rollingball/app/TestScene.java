@@ -1,4 +1,5 @@
 package com.example.rollingball.app;
+import android.app.Activity;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
 import android.util.Log;
@@ -8,10 +9,15 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class TestScene extends Scene implements Renderer
 {
-  protected final static double rad = 180 / Math.PI;
+
+  //値の計算
+  //protected final static double rad = 180 / Math.PI;
 
   // InputManagerから値を読み取る
-  float[] ver_i = new float[ 3 ];
+  /*float[] ver_i = new float[ 3 ];
+  int i_x = new Integer(0);
+  int i_y = new Integer(0);
+  int i_z = new Integer(0);*/
 
   TestScene( final SceneManager s )
   {
@@ -26,29 +32,19 @@ public class TestScene extends Scene implements Renderer
   {
     super.update( delta_time_in_ns );
     // xyz --> rgb;色を割り当てて、色の変化で傾きをとれていることを確認できるようにする。
-    GLES20.glClearColor( 0.9f, 0.9f, 1.0f, 1.0f ); // 初期化
     GLES20.glClearColor(
       input_manager.rotation.getX(),
       input_manager.rotation.getY(),
       input_manager.rotation.getZ(),
       1.0f
     );
-    // nullの場合のログを出力
-    //Log.d( "RollingBALL", "message" );
-    //Log.d("RollingBALL", isNullOrZeroLength("") + "");
-  }
+    /*
+    GLES20.glClearColor( 0.9f, 0.9f, 1.0f, 1.0f ); // 初期化
+    int i_x = (int)(input_manager.rotation.getX() * rad);
+    int i_y = (int)(input_manager.rotation.getY() * rad);
+    int i_z = (int)(input_manager.rotation.getZ() * rad);
 
-  //null判定
-  public boolean isNullOrZeroLength(String s) {
-    if(s == null) {
-      return true;
-    }
-    else if(s.length() == 0){
-      return true;
-    }
-    else {
-      return false;
-    }
+    GLES20.glClearColor(i_x,i_y,i_z,1.0f);*/
   }
 
   @Override
@@ -66,5 +62,12 @@ public class TestScene extends Scene implements Renderer
   @Override
   public void onDrawFrame( final GL10 gl )
   {
+    /*
+    int i_x = (int)(input_manager.rotation.getX() * rad);
+    int i_y = (int)(input_manager.rotation.getY() * rad);
+    int i_z = (int)(input_manager.rotation.getZ() * rad);
+
+    GLES20.glClearColor(i_x,i_y,i_z,1.0f);
+    */
   }
 }
