@@ -1,6 +1,9 @@
 package com.example.rollingball.app;
 
-
+import java.nio.IntBuffer;
+import android.opengl.GLES20;
+import com.hackoeur.jglm.Matrices;
+import com.hackoeur.jglm.Mat4;
 import com.hackoeur.jglm.Vec3;
 
 /**
@@ -13,6 +16,7 @@ public class Camera implements IUpdatable
   public Vec3 up;
   public float field_of_view;
   public Scene scene;
+  private IntBuffer buffer = IntBuffer.allocate( 1 );
 
   public void Camera( final Scene scene_ )
   {
@@ -22,6 +26,12 @@ public class Camera implements IUpdatable
   @Override
   public void update( final long delta_time_in_ns )
   {
+    Mat4 view = Matrices.lookAt( eye, look_at, up );
+    GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM,  buffer );
 
+    int id = buffer.get();
+    int var_position = GLES20.glGetUniformLocation( id , "world_view_transformation" );
+
+    GLES20.glUniformMatrix4fv( var_position, 1, false, view.getBuffer() );
   }
 }
