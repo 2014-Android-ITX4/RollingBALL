@@ -15,6 +15,7 @@ public class Scene implements IUpdatable, IDrawable
   Scene( SceneManager s )
   {
     scene_manager = s;
+    game_objects = new LinkedList< GameObject >();
     camera = new Camera();
     input_manager = new InputManager( this );
 }
@@ -32,9 +33,14 @@ public class Scene implements IUpdatable, IDrawable
   }
 
   @Override
-  public void update( long delta_time_in_ns ){
+  public void update( long delta_time_in_ns )
+  {
+    input_manager.update( delta_time_in_ns );
+
     for ( GameObject g : game_objects )
       g.update( delta_time_in_ns );
+
+    input_manager.update( delta_time_in_ns );
   }
 
   @Override

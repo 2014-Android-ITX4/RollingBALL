@@ -1,19 +1,27 @@
 package com.example.rollingball.app;
 
+import android.content.Context;
 import android.opengl.GLSurfaceView;
 
 /**
  * Created by sakamoto on 2014/05/14.
  */
-public class MainView
+public class MainView extends GLSurfaceView
 {
   private MainRenderer _renderer;
   public SceneManager scene_manager;
   public MainActivity activity;
 
-  MainView( MainActivity arg_activity )
+  public MainView( Context context, MainActivity arg_activity )
   {
+    super( context );
+
     activity = arg_activity;
+    scene_manager = new SceneManager( this );
+
+    this.setEGLContextClientVersion( 2 );
+    _renderer = new MainRenderer( this );
+    this.setRenderer( _renderer );
   }
 
 }
