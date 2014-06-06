@@ -6,18 +6,24 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-public class UserDataManager extends SQLiteOpenHelper
+public class UserDataManager
 {
+
 
   UserDataManager( Context context )
   {
-    // DBを作成します
-    super( context, "SAVEDATA",  null, 1 );
+
   }
 
   public void save_config( String name, float value)
   {
     // TODO:引数を元にDBのコンフィグの値を更新
+    String sql;
+
+    sql = "update CONFIG set value = " + String.valueOf( value ) +
+          ", where name = '" + name + "'";
+
+
   }
 
   public void save_stage( int world_id, int stage_id, int score, int rank )
@@ -35,49 +41,17 @@ public class UserDataManager extends SQLiteOpenHelper
   // 初期データを挿入します。
   private void insert_newdata()
   {
-
-  }
-
-
-  // データベースが作成された時に呼び出されます
-  @Override
-  public void onCreate( final SQLiteDatabase db )
-  {
-
     try
     {
-      // CONFIGテーブルを作成
-      db.execSQL( "create table CONFIG" +
-                    "(name text not null," +
-                    "value real not null," +
-                    "primary key(name))" );
 
-      // STAGEテーブルを作成
-      db.execSQL( "create table STAGE" +
-                    "(world_id integer not null," +
-                    "stage_id integer not null," +
-                    "score integer, not null" +
-                    "rank integer, not null" +
-                    "primary key(world_id, stage_id)" );
-
-      // ITEMテーブルを作成
-      db.execSQL( "create table ITEM" +
-                    "(id integer not null," +
-                    "number integer not null," +
-                    "primary key(id))" );
+      //TODO:ここで初期データをすべて挿入する
 
     } catch ( SQLException e )
     {
       Log.e( "SQL ERROR", e.toString() );
     }
-
-
-
   }
 
-  @Override
-  public void onUpgrade( final SQLiteDatabase sqLiteDatabase, final int i, final int i2 )
-  {
 
-  }
+
 }
