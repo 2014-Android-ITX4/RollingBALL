@@ -39,8 +39,6 @@ public class Scene implements IUpdatable, IDrawable
 
     for ( GameObject g : game_objects )
       g.update( delta_time_in_ns );
-
-    input_manager.update( delta_time_in_ns );
   }
 
   @Override

@@ -21,7 +21,7 @@ public class MainActivity
 
   private MainView _view;
   public SensorManager sensor_manager;
-  public Vec3 orientation;
+  public Vec3 orientation = new Vec3( 0.0f, 0.0f, 0.0f );
   private boolean _is_magnetic_sensor, _is_accelerometer_sensor;
 
   private final int MATRIX_SIZE = 16;
