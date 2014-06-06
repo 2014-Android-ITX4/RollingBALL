@@ -1,52 +1,38 @@
 package com.example.rollingball.app;
-import android.app.Activity;
 import android.opengl.GLES20;
-import android.opengl.GLSurfaceView.Renderer;
-import android.util.Log;
-import com.hackoeur.jglm.Vec3;
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
 
-public class TestScene extends Scene implements Renderer
+public class TestScene extends Scene
 {
-
-  //値の計算
-  //protected final static double rad = 180 / Math.PI;
-
-  // InputManagerから値を読み取る
-  /*float[] ver_i = new float[ 3 ];
-  int i_x = new Integer(0);
-  int i_y = new Integer(0);
-  int i_z = new Integer(0);*/
 
   TestScene( final SceneManager s )
   {
     super( s );
-
-    // ログを出力
-    //Log.d( "RollingBALL", "message" );
   }
 
   @Override
   public void update( final long delta_time_in_ns )
   {
     super.update( delta_time_in_ns );
-    // xyz --> rgb;色を割り当てて、色の変化で傾きをとれていることを確認できるようにする。
-    GLES20.glClearColor(
-      input_manager.rotation.getX(),
-      input_manager.rotation.getY(),
-      input_manager.rotation.getZ(),
-      1.0f
-    );
-    /*
     GLES20.glClearColor( 0.9f, 0.9f, 1.0f, 1.0f ); // 初期化
-    int i_x = (int)(input_manager.rotation.getX() * rad);
-    int i_y = (int)(input_manager.rotation.getY() * rad);
-    int i_z = (int)(input_manager.rotation.getZ() * rad);
 
-    GLES20.glClearColor(i_x,i_y,i_z,1.0f);*/
+    // InputManagerから値を読み取る
+    float x = input_manager.rotation.getX();
+    float y = input_manager.rotation.getY();
+    float z = input_manager.rotation.getZ();
+
+    //[-π-π]の範囲を[0-1.0]に変換する
+    while ( x < 0.0f ) x += 1.0f;
+    while ( y < 0.0f ) y += 1.0f;
+    while ( z < 0.0f ) z += 1.0f;
+    x = x * 1/2;
+    y = y * 1/2;
+    z = z * 1/2;
+
+    // xyz --> rgb;色を割り当てて、色の変化で傾きをとれていることを確認できるようにする。
+    GLES20.glClearColor(x,y,z,1.0f);
   }
 
+  /*
   @Override
   public void onSurfaceCreated( final GL10 gl10, final EGLConfig eglConfig )
   {
@@ -62,12 +48,7 @@ public class TestScene extends Scene implements Renderer
   @Override
   public void onDrawFrame( final GL10 gl )
   {
-    /*
-    int i_x = (int)(input_manager.rotation.getX() * rad);
-    int i_y = (int)(input_manager.rotation.getY() * rad);
-    int i_z = (int)(input_manager.rotation.getZ() * rad);
 
-    GLES20.glClearColor(i_x,i_y,i_z,1.0f);
-    */
   }
+  */
 }
