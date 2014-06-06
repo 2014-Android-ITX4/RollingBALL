@@ -1,8 +1,10 @@
 package com.example.rollingball.app;
 
 import android.content.Context;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class UserDataManager extends SQLiteOpenHelper
 {
@@ -30,23 +32,47 @@ public class UserDataManager extends SQLiteOpenHelper
 
   public void load(){}
 
+  // 初期データを挿入します。
+  private void insert_newdata()
+  {
+
+  }
+
 
   // データベースが作成された時に呼び出されます
   @Override
   public void onCreate( final SQLiteDatabase db )
   {
-    // CONFIGテーブルを作成
-    db.execSQL( "create table CONFIG " +
-                  "(name text," +
-                  "value real," +
-                  "primary key(name))" );
 
-    db.execSQL( "create table STAGE" +
-                  "(world_id integer," +
-                  "stage_id integer," +
-                  "score integer" +
-                  "rank integer" +
-                  "primary key(world_id, stage_id)" );
+    try
+    {
+      // CONFIGテーブルを作成
+      db.execSQL( "create table CONFIG" +
+                    "(name text not null," +
+                    "value real not null," +
+                    "primary key(name))" );
+
+      // STAGEテーブルを作成
+      db.execSQL( "create table STAGE" +
+                    "(world_id integer not null," +
+                    "stage_id integer not null," +
+                    "score integer, not null" +
+                    "rank integer, not null" +
+                    "primary key(world_id, stage_id)" );
+
+      // ITEMテーブルを作成
+      db.execSQL( "create table ITEM" +
+                    "(id integer not null," +
+                    "number integer not null," +
+                    "primary key(id))" );
+
+    } catch ( SQLException e )
+    {
+      Log.e( "SQL ERROR", e.toString() );
+    }
+
+
+
   }
 
   @Override
