@@ -16,7 +16,6 @@ public class Camera implements IUpdatable
   public Vec3 up;
   public float field_of_view;
   public Scene scene;
-  private IntBuffer buffer = IntBuffer.allocate( 1 );
 
   public void Camera( final Scene scene_ )
   {
@@ -26,12 +25,13 @@ public class Camera implements IUpdatable
   @Override
   public void update( final long delta_time_in_ns )
   {
+    IntBuffer buffer = IntBuffer.allocate( 1 );
     Mat4 view = Matrices.lookAt( eye, look_at, up );
     GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM,  buffer );
 
     int id = buffer.get();
-    int var_position = GLES20.glGetUniformLocation( id , "world_view_transformation" );
+    int location_of_world_view_transformation = GLES20.glGetUniformLocation( id , "world_view_transformation" );
 
-    GLES20.glUniformMatrix4fv( var_position, 1, false, view.getBuffer() );
+    GLES20.glUniformMatrix4fv( location_of_world_view_transformation, 1, false, view.getBuffer() );
   }
 }
