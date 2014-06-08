@@ -1,6 +1,5 @@
 package com.example.rollingball.app;
 
-import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -8,23 +7,30 @@ import android.util.Log;
 
 public class UserDataManager
 {
+  SaveDataSQLiteOpenHelper helper;
+  SQLiteDatabase db;
 
+  SceneManager manager;
 
-  UserDataManager( Context context )
+  public UserDataManager(SceneManager arg_manager)
   {
+    manager = arg_manager;
 
+    helper = new SaveDataSQLiteOpenHelper( manager.view.activity );
+    db = helper.getWritableDatabase();
   }
 
+  // CONFIGの設定情報を更新します
   public void save_config( String name, float value)
   {
-    // TODO:引数を元にDBのコンフィグの値を更新
     String sql;
 
     sql = "update CONFIG set value = " + String.valueOf( value ) +
           ", where name = '" + name + "'";
+    db.execSQL( sql );
 
 
-  }
+ }
 
   public void save_stage( int world_id, int stage_id, int score, int rank )
   {

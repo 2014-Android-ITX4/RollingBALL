@@ -8,9 +8,12 @@ import android.util.Log;
 
 public class SaveDataSQLiteOpenHelper extends SQLiteOpenHelper
 {
+
+  final static int DATABASE_VERSION = 1;
+
   public SaveDataSQLiteOpenHelper(Context context)
   {
-    super(context, "SAVEDATA", null, 1);
+    super(context, "SAVEDATA", null, DATABASE_VERSION);
   }
 
   // データベースが作成された時に呼び出されます
