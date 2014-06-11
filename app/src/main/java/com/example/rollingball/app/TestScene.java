@@ -5,9 +5,13 @@ import android.util.Log;
 public class TestScene extends Scene
 {
 
+  PlayerGameObject object;
+
   TestScene( final SceneManager s )
   {
     super( s );
+    object = new PlayerGameObject();
+    object.model = ModelData.generate_cube( 1 );
   }
 
   @Override
@@ -27,5 +31,7 @@ public class TestScene extends Scene
 
     // xyz --> rgb;色を割り当てて、色の変化で傾きをとれていることを確認できるようにする。
     GLES20.glClearColor( r, 0.5f, b, 1.0f );
+    object.model.draw( null );
+
   }
 }
