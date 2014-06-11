@@ -26,6 +26,6 @@ public class TestScene extends Scene
     float b = ( input_manager.rotation.getZ() + pif ) * inversed_pih;
 
     // xyz --> rgb;色を割り当てて、色の変化で傾きをとれていることを確認できるようにする。
-    GLES20.glClearColor( r, 0.0f, b, 1.0f );
+    GLES20.glClearColor( r, 0.5f, b, 1.0f );
   }
 }
