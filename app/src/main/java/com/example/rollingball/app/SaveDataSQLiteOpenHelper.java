@@ -47,6 +47,8 @@ public class SaveDataSQLiteOpenHelper extends SQLiteOpenHelper
         "primary key(id))";
       db.execSQL( sql );
 
+      Log.d( "DB CREATE","データベースを作成しました。" );
+
     } catch ( SQLException e )
     {
       Log.e( "SQL ERROR", e.toString() );

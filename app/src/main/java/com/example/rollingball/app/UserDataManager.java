@@ -2,7 +2,6 @@ package com.example.rollingball.app;
 
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class UserDataManager
@@ -10,7 +9,7 @@ public class UserDataManager
   SaveDataSQLiteOpenHelper helper;
   SQLiteDatabase db;
 
-  SceneManager manager;
+  private SceneManager manager;
 
   public UserDataManager(SceneManager arg_manager)
   {
