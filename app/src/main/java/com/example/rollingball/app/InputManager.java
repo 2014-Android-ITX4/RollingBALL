@@ -16,7 +16,7 @@ public class InputManager implements IUpdatable
   @Override
   public void update( final long delta_time_in_ns )
   {
-    rotation = _scene.scene_manager.view.activity.orientation;
+    rotation = _scene.scene_manager.view.activity.rotation;
   }
 
 }
