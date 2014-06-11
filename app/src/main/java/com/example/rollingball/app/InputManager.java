@@ -2,13 +2,10 @@ package com.example.rollingball.app;
 
 import com.hackoeur.jglm.Vec3;
 
-/**
- * Created by Tukasa on 2014/05/14.
- */
 public class InputManager implements IUpdatable
 {
 
-  public Vec3 rotation;
+  public Vec3 rotation = new Vec3( 0.0f, 0.0f, 0.0f );
   private Scene _scene;
 
   InputManager(Scene arg_scene)
