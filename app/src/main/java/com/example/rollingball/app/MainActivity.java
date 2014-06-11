@@ -18,23 +18,13 @@ import java.util.List;
 public class MainActivity
   extends ActionBarActivity implements SensorEventListener
 {
-
   private MainView _view;
   public SensorManager sensor_manager;
-  public Vec3 orientation = new Vec3( 0.0f, 0.0f, 0.0f );
   private boolean _is_magnetic_sensor, _is_accelerometer_sensor;
 
   private final int MATRIX_SIZE = 16;
 
-  // 回転行列
-  float[] in_r = new float[ MATRIX_SIZE ];
-  float[] out_r = new float[ MATRIX_SIZE ];
-  float[] i = new float[ MATRIX_SIZE ];
-
-  // センサーの値
-  float[] orientation_values = new float[ 3 ];
-  float[] magnetic_values = new float[ 3 ];
-  float[] accelerometer_values = new float[ 3 ];
+  public Vec3 rotation = new Vec3( 0.0f, 0.0f, 0.0f );
 
   @Override
   protected void onCreate( Bundle savedInstanceState )
@@ -60,18 +50,11 @@ public class MainActivity
     //センサーマネージャーへリスナー登録
     for ( Sensor sensor : sensors )
     {
-      if ( sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD )
-      {
-        sensor_manager.registerListener( this, sensor, SensorManager.SENSOR_DELAY_GAME );
-        _is_magnetic_sensor = true;
-      }
-
       if ( sensor.getType() == Sensor.TYPE_ACCELEROMETER )
       {
         sensor_manager.registerListener( this, sensor, SensorManager.SENSOR_DELAY_GAME );
         _is_accelerometer_sensor = true;
       }
-
     }
     _view.onResume();
   }
@@ -82,10 +65,9 @@ public class MainActivity
     super.onPause();
 
     //センサーマネージャーのリスナー登録破棄
-    if ( _is_magnetic_sensor || _is_accelerometer_sensor )
+    if ( _is_accelerometer_sensor )
     {
       sensor_manager.unregisterListener( this );
-      _is_magnetic_sensor = false;
       _is_accelerometer_sensor = false;
     }
 
@@ -103,52 +85,39 @@ public class MainActivity
   @Override
   public void onSensorChanged( final SensorEvent event )
   {
-
-
-
     if ( event.accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE )
       return;
 
-    switch ( event.sensor.getType() )
-    {
-      case Sensor.TYPE_MAGNETIC_FIELD:
-        magnetic_values = event.values.clone();
-        break;
-
-      case Sensor.TYPE_ACCELEROMETER:
-        accelerometer_values = event.values.clone();
-        break;
-    }
-
-    if ( magnetic_values != null && accelerometer_values != null )
-    {
-      SensorManager.getRotationMatrix( in_r, i, accelerometer_values, magnetic_values );
-
-      // Activity表示が縦の場合。横になるか縦になるか決まったら修正の必要あり。
-      SensorManager.remapCoordinateSystem( in_r, SensorManager.AXIS_X, SensorManager.AXIS_Z, out_r );
-      SensorManager.getOrientation( out_r, orientation_values );
-
-//      Log.d("MAGNETIC",
-//            String.valueOf( magnetic_values[0] ) + ", " + //Z軸方向,azmuth
-//              String.valueOf( magnetic_values[1] ) + ", " + //X軸方向,pitch
-//              String.valueOf( magnetic_values[2] ) );       //Y軸方向,roll
-//
-//      Log.d("ACCELERMETER",
-//            String.valueOf( accelerometer_values[0] ) + ", " + //Z軸方向,azmuth
-//              String.valueOf( accelerometer_values[1] ) + ", " + //X軸方向,pitch
-//              String.valueOf( accelerometer_values[2] ) );       //Y軸方向,roll
-//
-//      Log.d("Orientation",
-//            String.valueOf( radianToDegree( orientation_values[0] ) ) + ", " + //Z軸方向,azmuth
-//              String.valueOf( radianToDegree( orientation_values[1] ) ) + ", " + //X軸方向,pitch
-//              String.valueOf( radianToDegree( orientation_values[2] ) ) );       //Y軸方向,roll
-
-      orientation = new Vec3( orientation_values[ 0 ], orientation_values[ 1 ], orientation_values[ 2 ] );
-
-    }
+    if ( event.sensor.getType() == Sensor.TYPE_ACCELEROMETER )
+      rotation = calc_orientation_from_accelerometer( new Vec3( event.values[0],event.values[1],event.values[2] ) );
   }
 
-  int radianToDegree(float rad){
+  Vec3 calc_orientation_from_accelerometer( Vec3 acceleration )
+  {
+    return new Vec3
+      ( calc_axis_rotation_from_acceleration( acceleration.getY(), acceleration.getZ() )
+      , 0.0f
+      , calc_axis_rotation_from_acceleration( acceleration.getX(), acceleration.getZ() )
+      );
+  }
+
+  float calc_axis_rotation_from_acceleration( float t1, float t2 )
+  {
+    final float pih = (float)( Math.PI * 0.5 );
+
+    // t2+
+    if ( t2 >= 0.0f )
+      return pih * t1 * 1.0e-1f;
+      // t2- and t1-
+    else if ( t1 < 0.0f )
+      return pih * ( -1.0e+1f - t1 ) * 1.0e-1f - pih;
+      // t2- and t1+
+    else
+      return pih * ( 1.0e+1f - t1 ) * 1.0e-1f + pih;
+  }
+
+  int radianToDegree(float rad)
+  {
     return (int) Math.floor( Math.toDegrees(rad) ) ;
   }
 
