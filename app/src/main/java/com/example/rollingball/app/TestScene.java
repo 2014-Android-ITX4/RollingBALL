@@ -11,7 +11,7 @@ public class TestScene extends Scene
   {
     super( s );
     object = new PlayerGameObject();
-    object.model = ModelData.generate_cube( 1 );
+    object.model = ModelData.generate_cube( 1, this );
   }
 
   @Override
