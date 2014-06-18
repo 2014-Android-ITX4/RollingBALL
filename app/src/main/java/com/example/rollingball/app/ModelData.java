@@ -1,8 +1,11 @@
 package com.example.rollingball.app;
 
 import android.opengl.GLES20;
+import android.util.Log;
 
 import com.hackoeur.jglm.Mat4;
+
+import junit.framework.Test;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -18,12 +21,18 @@ public class ModelData
   private int _indices_buffer_id;
   private int _texture_buffer_id;
 
-  public ModelData( float[] arg_vertices, byte[] arg_indices )
+  // TODO:テスト用なので後で消すなり変更するなりする
+  TestScene test_scene;
+  int[] buffer_ids;
+  FloatBuffer float_buffer;
+  ByteBuffer byte_buffer;
+
+  public ModelData( float[] arg_vertices, byte[] arg_indices, TestScene arg_test_scene )
   {
+    test_scene = arg_test_scene;
+
     _vertices_buffer_id = make_float_VBO( arg_vertices );
     _indices_buffer_id = make_byte_VBO( arg_indices );
-
-
   }
 
 
@@ -32,7 +41,7 @@ public class ModelData
     return null;
   }
 
-  public static ModelData generate_cube( double arris_length )
+  public static ModelData generate_cube( double arris_length, TestScene arg_test_scene )
   {
     // TODO arris_lengthの値を反映させる
     float[] vertices =
@@ -55,7 +64,9 @@ public class ModelData
       0, 2, 4, 6,            //面2
     };
 
-     ModelData model_data = new ModelData( vertices, indices );
+
+
+     ModelData model_data = new ModelData( vertices, indices, arg_test_scene );
 
     return model_data;
   }
@@ -67,54 +78,87 @@ public class ModelData
 
   public void draw( Mat4 trasformation )
   {
-    // 頂点バッファの指定
-    GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, _vertices_buffer_id );
-    //GLES20.glVertexAttribPointer( GLES20.glGetAttribLocation(program,"a_Position"), 3,
-    //                              GLES20.GL_FLOAT  );
 
-    // インデックスバッファの指定
-    GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, _indices_buffer_id );
+    test_scene.scene_manager.view.queueEvent( new Runnable() {
+        @Override
+        public void run()
+        {
+          int program = test_scene.scene_manager.view.renderer.program;
 
-    // 面0の描画
-    GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 10, GLES20.GL_UNSIGNED_BYTE, 0 );
+          // 頂点バッファの指定
+          GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, _vertices_buffer_id );
+          GLES20.glVertexAttribPointer( GLES20.glGetAttribLocation(program,"position"), 4,
+                                        GLES20.GL_FLOAT, false, 0, 0  );
 
-    // 面1の描画
-    GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 4, GLES20.GL_UNSIGNED_BYTE, 10 );
+          // インデックスバッファの指定
+          GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, _indices_buffer_id );
 
-    // 面2の描画
-    GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 4, GLES20.GL_UNSIGNED_BYTE, 14 );
+          // 面0の描画
+          GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 10, GLES20.GL_UNSIGNED_BYTE, 0 );
+
+          // 面1の描画
+          GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 4, GLES20.GL_UNSIGNED_BYTE, 10 );
+
+          // 面2の描画
+          GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 4, GLES20.GL_UNSIGNED_BYTE, 14 );
+        }
+      } );
+
+
 
   }
+
+  //
 
   //float配列をVBOに変換
   private int make_float_VBO( float[] array ) {
     //float配列をFloatBufferに変換
-    FloatBuffer fb= ByteBuffer.allocateDirect( array.length * 4 ).order(
+    float_buffer= ByteBuffer.allocateDirect( array.length * 4 ).order(
       ByteOrder.nativeOrder()).asFloatBuffer();
-    fb.put(array).position(0);
+    float_buffer.put( array ).position(0);
 
-    //FloatBufferをVBOに変換
-    int[] bufferIds=new int[1];
-    GLES20.glGenBuffers(1,bufferIds,0);
-    GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,bufferIds[0]);
-    GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER,
-                        fb.capacity()*4,fb,GLES20.GL_STATIC_DRAW);
-    return bufferIds[0];
+    buffer_ids = new int[1];
+
+    this.test_scene.scene_manager.view.queueEvent( new Runnable() {
+      @Override
+      public void run()
+      {
+        //FloatBufferをVBOに変換
+        GLES20.glGenBuffers(1,buffer_ids,0);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,buffer_ids[0]);
+        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER,
+                            float_buffer.capacity()*4,float_buffer,GLES20.GL_STATIC_DRAW);
+      }
+    } );
+
+    return buffer_ids[0];
   }
 
   //byte配列をVBOに変換
   private int make_byte_VBO( byte[] array ) {
     //byte配列をByteBufferに変換
-    ByteBuffer bb=ByteBuffer.allocateDirect(array.length).order(
+    byte_buffer=ByteBuffer.allocateDirect(array.length).order(
       ByteOrder.nativeOrder());
-    bb.put(array).position(0);
+    byte_buffer.put( array ).position(0);
 
-    //ByteBufferをVBOに変換
-    int[] bufferIds=new int[1];
-    GLES20.glGenBuffers(1,bufferIds,0);
-    GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER,bufferIds[0]);
-    GLES20.glBufferData(GLES20.GL_ELEMENT_ARRAY_BUFFER,
-                        bb.capacity(),bb,GLES20.GL_STATIC_DRAW);
-    return bufferIds[0];
+    buffer_ids=new int[1];
+
+    test_scene.scene_manager.view.queueEvent( new Runnable() {
+      @Override
+      public void run()
+      {
+        //ByteBufferをVBOに変換
+
+        GLES20.glGenBuffers(1,buffer_ids,0);
+        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER,buffer_ids[0]);
+        GLES20.glBufferData(
+          GLES20.GL_ELEMENT_ARRAY_BUFFER, byte_buffer.capacity(), byte_buffer, GLES20.GL_STATIC_DRAW
+        );
+      }
+
+    } );
+
+
+    return buffer_ids[0];
   }
 }

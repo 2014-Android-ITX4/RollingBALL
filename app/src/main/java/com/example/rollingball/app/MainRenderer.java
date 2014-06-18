@@ -11,6 +11,8 @@ class MainRenderer implements GLSurfaceView.Renderer
   private MainView _main_view;
   private long _before_time_in_ns;
 
+  int program;
+
   public MainRenderer( final MainView main_view )
   { _main_view = main_view; }
 
@@ -114,7 +116,7 @@ class MainRenderer implements GLSurfaceView.Renderer
       throw new RuntimeException( GLES20.glGetShaderInfoLog( fragment_shader ) );
 
     // shader program
-    int program = GLES20.glCreateProgram();
+    program = GLES20.glCreateProgram();
     if ( program == 0 )
       throw new RuntimeException();
 

@@ -8,7 +8,7 @@ import android.opengl.GLSurfaceView;
  */
 public class MainView extends GLSurfaceView
 {
-  private MainRenderer _renderer;
+  public MainRenderer renderer;
   public SceneManager scene_manager;
   public MainActivity activity;
 
@@ -20,8 +20,8 @@ public class MainView extends GLSurfaceView
     scene_manager = new SceneManager( this );
 
     this.setEGLContextClientVersion( 2 );
-    _renderer = new MainRenderer( this );
-    this.setRenderer( _renderer );
+    renderer = new MainRenderer( this );
+    this.setRenderer( renderer );
   }
 
 }
