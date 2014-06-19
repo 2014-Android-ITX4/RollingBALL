@@ -89,18 +89,32 @@ public class ModelData
           GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, _vertices_buffer_id );
           GLES20.glVertexAttribPointer( GLES20.glGetAttribLocation(program,"position"), 4,
                                         GLES20.GL_FLOAT, false, 0, 0  );
+          Log.d( "GL", "頂点バッファ指定" );
 
           // インデックスバッファの指定
-          GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, _indices_buffer_id );
+          GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, _indices_buffer_id );
+          Log.d( "GL", "インデックスバッファ指定" );
+          if ( GLES20.glGetError() != GLES20.GL_NO_ERROR )
+          {
+            Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
+            throw new RuntimeException(  );
+          }
+
 
           // 面0の描画
           GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 10, GLES20.GL_UNSIGNED_BYTE, 0 );
+          Log.d( "GL", "面0成功" );
+
 
           // 面1の描画
           GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 4, GLES20.GL_UNSIGNED_BYTE, 10 );
+          Log.d( "GL", "面1成功" );
 
           // 面2の描画
           GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 4, GLES20.GL_UNSIGNED_BYTE, 14 );
+          Log.d( "GL", "面2成功" );
+
+
         }
       } );
 
@@ -128,10 +142,15 @@ public class ModelData
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,buffer_ids[0]);
         GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER,
                             float_buffer.capacity()*4,float_buffer,GLES20.GL_STATIC_DRAW);
+
+        Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
+        Log.d( "make_float_VBO buffer_id", String.valueOf( buffer_ids[ 0 ] ) );
       }
     } );
 
-    return buffer_ids[0];
+    Log.d( "make_float_VBO buffer_id2", String.valueOf( buffer_ids[ 0 ] ) );
+    //return buffer_ids[0];
+    return 1;
   }
 
   //byte配列をVBOに変換
@@ -150,15 +169,21 @@ public class ModelData
         //ByteBufferをVBOに変換
 
         GLES20.glGenBuffers(1,buffer_ids,0);
+        Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER,buffer_ids[0]);
+        Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
         GLES20.glBufferData(
           GLES20.GL_ELEMENT_ARRAY_BUFFER, byte_buffer.capacity(), byte_buffer, GLES20.GL_STATIC_DRAW
         );
+        Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
+        Log.d( "make_byte_VBO buffer_id", String.valueOf( buffer_ids[ 0 ] ) );
       }
 
     } );
 
 
-    return buffer_ids[0];
+    Log.d( "make_byte_VBO buffer_id2", String.valueOf( buffer_ids[ 0 ] ) );
+//    return buffer_ids[0];
+    return 2;
   }
 }
