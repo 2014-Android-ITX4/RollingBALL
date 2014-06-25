@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class FieldGameObject extends GameObject
 {
-  private ArrayList< ArrayList< Float > > field_planes = new ArrayList< ArrayList< Float > >();
+  public ArrayList< ArrayList< Float > > field_planes = new ArrayList< ArrayList< Float > >();
 
   public void generate_simple_plane( int arris_x, int arris_z)
   {
