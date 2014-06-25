@@ -30,8 +30,8 @@ public class Camera implements IUpdatable
     GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM,  buffer );
 
     int id = buffer.get();
-    int location_of_world_view_transformation = GLES20.glGetUniformLocation( id , "world_view_transformation" );
+    int location_of_view_transformation = GLES20.glGetUniformLocation( id , "view_transformation" );
 
-    GLES20.glUniformMatrix4fv( location_of_world_view_transformation, 1, false, view.getBuffer() );
+    GLES20.glUniformMatrix4fv( location_of_view_transformation, 1, false, view.getBuffer() );
   }
 }

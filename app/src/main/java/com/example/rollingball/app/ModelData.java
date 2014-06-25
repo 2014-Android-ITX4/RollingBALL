@@ -4,10 +4,13 @@ import android.opengl.GLES20;
 import android.util.Log;
 
 import com.hackoeur.jglm.Mat4;
+import com.hackoeur.jglm.Matrices;
+import com.hackoeur.jglm.Vec3;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
@@ -76,7 +79,7 @@ public class ModelData
     return null;
   }
 
-  public void draw( Mat4 trasformation )
+  public void draw( final Mat4 transformation )
   {
 
     test_scene.scene_manager.view.queueEvent( new Runnable() {
@@ -100,6 +103,18 @@ public class ModelData
             throw new RuntimeException(  );
           }
 
+          // Transformation
+          IntBuffer buffer = IntBuffer.allocate( 1 );
+          GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM,  buffer );
+          int id = buffer.get();
+
+          int location_of_world_transformation = GLES20.glGetUniformLocation( id , "world_transformation" );
+          GLES20.glUniformMatrix4fv(
+            location_of_world_transformation,
+            1,
+            false,
+            transformation.getBuffer()
+          );
 
           // 面0の描画
           GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 10, GLES20.GL_UNSIGNED_BYTE, 0 );

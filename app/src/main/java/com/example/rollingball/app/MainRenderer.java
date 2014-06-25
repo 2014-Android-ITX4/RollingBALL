@@ -55,10 +55,12 @@ class MainRenderer implements GLSurfaceView.Renderer
           + "attribute vec3 normal;\n"
           + "varying vec2 var_texcoord;\n"
           + "varying vec3 var_normal;\n"
-          + "uniform mat4 world_view_transformation;\n"
+          + "uniform mat4 world_transformation;\n"
+          + "uniform mat4 view_transformation;"
+          + "uniform mat4 projection_transformation;"
           + "void main()\n"
           + "{\n"
-          + "  gl_Position = world_view_transformation * position;\n"
+          + "  gl_Position = projection_transformation * view_transformation * world_transformation * position;\n"
           + "  var_texcoord = texcoord;\n"
           + "  var_normal = normal;\n"
           + "}\n"
@@ -133,6 +135,8 @@ class MainRenderer implements GLSurfaceView.Renderer
 
     // デプスバッファの有効化
     GLES20.glEnable( GLES20.GL_DEPTH_TEST );
+    
+
 
   }
 }
