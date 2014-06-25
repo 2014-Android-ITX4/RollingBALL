@@ -1,5 +1,7 @@
 package com.example.rollingball.app;
 
+import android.mtp.MtpObjectInfo;
+import java.nio.FloatBuffer;
 import android.opengl.GLES20;
 import java.util.ArrayList;
 import android.util.Log;
@@ -7,9 +9,6 @@ import android.util.Log;
 public class FieldGameObject extends GameObject
 {
   private ArrayList< ArrayList< Float > > field_planes = new ArrayList< ArrayList< Float > >();
-  private int mPoint;
-  private float[] mMum;
-  private static String TAG = "MyGLRenderer";
 
   public void generate_simple_plane( int arris_x, int arris_z )
   {
@@ -32,39 +31,26 @@ public class FieldGameObject extends GameObject
   { throw new NotImplementedException(); }
 
   // フィールドの描画
-  //頂点を三角形に
   @Override
-  public void draw(ModelData model_data)
+  public void draw(ModelData modelData)
   {
-    // 初期化
-    GLES20.glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
+    //画面のクリア
+    GLES20.glClearColor(0.5f,0.5f,0.5f,0.5f);
 
-    //==繰り返し処理==
     // 頂点バッファを指定する
-    for ( int x = 0; model_data < x; x++ )
+    for ( int i = 0; 24 < i; i+=3)
     {
-      for ( int z = 0; z <; z++ )
-      {
-        GLES20.glVertexAttribPointer(
-          model_data, 3, GLES20.GL_FLOAT, false, 0,
-          );
-        // vertices[x]のxに、indices[i]を入れる。
+      GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, ModelData.generate_cube(i));
 
+      ModelData mData = ModelData.generate_cube(i);
 
-        // 描画
-        GLES20.glDrawArrays( GLES20.GL_TRIANGLES, 0, 3 );
-        checkGlError( TAG, "GLES20.glDrawArrays" );
-      }
-    }
+      GLES20.glVertexAttribPointer(mData, 3, GLES20.GL_FLOAT, false, 0) ;
 
-  // エラーの場合
-  private void checkGlError( String op )
-  {
-    int error;
-    while ( ( error = GLES20.glGetError() ) != GLES20.GL_NO_ERROR )
-    {
-      Log.e( TAG, op + ": glError " + error );
-      throw new RuntimeException( op + ": glError " + error );
-    }
-  }
+      // 描画
+      GLES20.glDrawArrays( GLES20.GL_TRIANGLE_STRIP,0,3);
+     }
+
+    private FloatBuffer mFloatBuffer
+
+   }
 }
