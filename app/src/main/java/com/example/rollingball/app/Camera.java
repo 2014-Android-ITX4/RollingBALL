@@ -11,10 +11,9 @@ import com.hackoeur.jglm.Vec3;
  */
 public class Camera implements IUpdatable
 {
-  public Vec3 eye;
-  public Vec3 look_at;
-  public Vec3 up;
-  public float field_of_view;
+  public Vec3 eye= new Vec3( 0, 0, 10 );
+  public Vec3 look_at = new Vec3( 0, 0, 0 );
+  public Vec3 up = new Vec3( 0, 1, 0 );
   public Scene scene;
 
   public void Camera( final Scene scene_ )

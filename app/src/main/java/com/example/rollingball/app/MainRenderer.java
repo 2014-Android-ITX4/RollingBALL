@@ -3,6 +3,11 @@ package com.example.rollingball.app;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
+import com.hackoeur.jglm.Mat4;
+import com.hackoeur.jglm.Matrices;
+
+import java.nio.IntBuffer;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -135,8 +140,14 @@ class MainRenderer implements GLSurfaceView.Renderer
 
     // デプスバッファの有効化
     GLES20.glEnable( GLES20.GL_DEPTH_TEST );
-    
 
+    IntBuffer buffer = IntBuffer.allocate( 1 );
+    Mat4 view = Matrices.perspective( 60, 16/9, 0.001f, 1000 );
+    GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM,  buffer );
 
+    int id = buffer.get();
+    int location_of_projection_transformation = GLES20.glGetUniformLocation( id , "projection_transformation" );
+
+    GLES20.glUniformMatrix4fv( location_of_projection_transformation, 1, false, view.getBuffer() );
   }
 }
