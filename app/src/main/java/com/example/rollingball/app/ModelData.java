@@ -116,6 +116,24 @@ public class ModelData
             transformation.getBuffer()
           );
 
+          IntBuffer int_buffer = IntBuffer.allocate( 1 );
+          Vec3 color = new Vec3( 1, 1, 1 );
+          GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM,  int_buffer );
+
+          int id2 = int_buffer.get();
+          int location_of_color = GLES20.glGetUniformLocation( id2 , "diffuse" );
+
+          GLES20.glUniform3fv( location_of_color, 1, color.getBuffer() );
+
+          IntBuffer int_buffer2 = IntBuffer.allocate( 1 );
+          float transparent = 1;
+          GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM, int_buffer2 );
+
+          int id3 = int_buffer2.get();
+          int location_of_transparent = GLES20.glGetUniformLocation( id3 , "transparent" );
+
+          GLES20.glUniform1f( location_of_transparent, transparent );
+
           // 面0の描画
           GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 10, GLES20.GL_UNSIGNED_BYTE, 0 );
           Log.d( "GL", "面0成功" );
