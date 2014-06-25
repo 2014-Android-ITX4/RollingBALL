@@ -10,6 +10,8 @@ import junit.framework.Test;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 
 /**
  * Created by Tukasa on 2014/05/14.
@@ -23,7 +25,7 @@ public class ModelData
 
   // TODO:テスト用なので後で消すなり変更するなりする
   TestScene test_scene;
-  int[] buffer_ids;
+//  int[] buffer_ids;
   FloatBuffer float_buffer;
   ByteBuffer byte_buffer;
 
@@ -89,11 +91,11 @@ public class ModelData
           GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, _vertices_buffer_id );
           GLES20.glVertexAttribPointer( GLES20.glGetAttribLocation(program,"position"), 4,
                                         GLES20.GL_FLOAT, false, 0, 0  );
-          Log.d( "GL", "頂点バッファ指定" );
+          Log.d( "GL", "頂点バッファ指定 id:" + _vertices_buffer_id );
 
           // インデックスバッファの指定
           GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, _indices_buffer_id );
-          Log.d( "GL", "インデックスバッファ指定" );
+          Log.d( "GL", "インデックスバッファ指定 id:" + _indices_buffer_id );
           if ( GLES20.glGetError() != GLES20.GL_NO_ERROR )
           {
             Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
@@ -114,7 +116,7 @@ public class ModelData
           GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 4, GLES20.GL_UNSIGNED_BYTE, 14 );
           Log.d( "GL", "面2成功" );
 
-
+          Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
         }
       } );
 
@@ -131,12 +133,12 @@ public class ModelData
       ByteOrder.nativeOrder()).asFloatBuffer();
     float_buffer.put( array ).position(0);
 
-    buffer_ids = new int[1];
-
-    this.test_scene.scene_manager.view.queueEvent( new Runnable() {
+    FutureTask<int[]> future_task = new FutureTask<int[]>( new Callable() {
       @Override
-      public void run()
+      public int[] call()
+        throws Exception
       {
+        int buffer_ids[] = new int[1];
         //FloatBufferをVBOに変換
         GLES20.glGenBuffers(1,buffer_ids,0);
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,buffer_ids[0]);
@@ -145,12 +147,43 @@ public class ModelData
 
         Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
         Log.d( "make_float_VBO buffer_id", String.valueOf( buffer_ids[ 0 ] ) );
+
+        return buffer_ids;
       }
     } );
+    this.test_scene.scene_manager.view.queueEvent( future_task );
 
-    Log.d( "make_float_VBO buffer_id2", String.valueOf( buffer_ids[ 0 ] ) );
-    //return buffer_ids[0];
-    return 1;
+    int[] result;
+
+    try
+    {
+     result = future_task.get();
+    }catch (Exception e )
+    {
+      Log.d( "futureTask","エラー" );
+      result = new int[1];
+      result[0] = -1;
+    }
+
+
+//    this.test_scene.scene_manager.view.queueEvent( new Runnable() {
+//      @Override
+//      public void run()
+//      {
+//        //FloatBufferをVBOに変換
+//        GLES20.glGenBuffers(1,buffer_ids,0);
+//        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,buffer_ids[0]);
+//        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER,
+//                            float_buffer.capacity()*4,float_buffer,GLES20.GL_STATIC_DRAW);
+//
+//        Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
+//        Log.d( "make_float_VBO buffer_id", String.valueOf( buffer_ids[ 0 ] ) );
+//      }
+//    } );
+
+    Log.d( "make_float_VBO buffer_id2", String.valueOf( result[ 0 ] ) );
+    return result[0];
+//    return 1;
   }
 
   //byte配列をVBOに変換
@@ -160,13 +193,14 @@ public class ModelData
       ByteOrder.nativeOrder());
     byte_buffer.put( array ).position(0);
 
-    buffer_ids=new int[1];
 
-    test_scene.scene_manager.view.queueEvent( new Runnable() {
+
+    FutureTask<int[]> future_task = new FutureTask<int[]>( new Callable() {
       @Override
-      public void run()
+      public int[] call()
+        throws Exception
       {
-        //ByteBufferをVBOに変換
+        int[] buffer_ids=new int[1];
 
         GLES20.glGenBuffers(1,buffer_ids,0);
         Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
@@ -177,13 +211,45 @@ public class ModelData
         );
         Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
         Log.d( "make_byte_VBO buffer_id", String.valueOf( buffer_ids[ 0 ] ) );
+
+        return buffer_ids;
       }
-
     } );
+    test_scene.scene_manager.view.queueEvent( future_task );
+
+    int[] result;
+    try
+    {
+      result = future_task.get();
+    }catch (Exception e )
+    {
+      Log.d( "future_task","エラー" );
+      result = new int[1];
+      result[0] = -1;
+    }
+
+//    test_scene.scene_manager.view.queueEvent( new Runnable() {
+//      @Override
+//      public void run()
+//      {
+//        //ByteBufferをVBOに変換
+//
+//        GLES20.glGenBuffers(1,buffer_ids,0);
+//        Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
+//        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER,buffer_ids[0]);
+//        Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
+//        GLES20.glBufferData(
+//          GLES20.GL_ELEMENT_ARRAY_BUFFER, byte_buffer.capacity(), byte_buffer, GLES20.GL_STATIC_DRAW
+//        );
+//        Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
+//        Log.d( "make_byte_VBO buffer_id", String.valueOf( buffer_ids[ 0 ] ) );
+//      }
+//
+//    } );
 
 
-    Log.d( "make_byte_VBO buffer_id2", String.valueOf( buffer_ids[ 0 ] ) );
-//    return buffer_ids[0];
-    return 2;
+    Log.d( "make_byte_VBO buffer_id2", String.valueOf( result[ 0 ] ) );
+    return result[0];
+//    return 2;
   }
 }
