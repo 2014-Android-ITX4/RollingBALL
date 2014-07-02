@@ -4,15 +4,12 @@ import android.opengl.GLES20;
 import android.util.Log;
 
 import com.hackoeur.jglm.Mat4;
-import com.hackoeur.jglm.Matrices;
 import com.hackoeur.jglm.Vec3;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
 
 /**
  * Created by Tukasa on 2014/05/14.
@@ -24,6 +21,9 @@ public class ModelData
   private int _indices_buffer_id;
   private int _texture_buffer_id;
 
+  private int program;
+  private int location_of_position;
+
   // TODO:テスト用なので後で消すなり変更するなりする
   TestScene test_scene;
 //  int[] buffer_ids;
@@ -33,6 +33,9 @@ public class ModelData
   public ModelData( float[] arg_vertices, byte[] arg_indices, TestScene arg_test_scene )
   {
     test_scene = arg_test_scene;
+
+    program = test_scene.scene_manager.view.renderer.program;
+    location_of_position = GLES20.glGetAttribLocation(program,"position");
 
     make_float_VBO( arg_vertices );
     make_byte_VBO( arg_indices );
@@ -86,11 +89,11 @@ public class ModelData
         @Override
         public void run()
         {
-          int program = test_scene.scene_manager.view.renderer.program;
-
           // 頂点バッファの指定
           GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, _vertices_buffer_id );
-          GLES20.glVertexAttribPointer( GLES20.glGetAttribLocation(program,"position"), 4,
+          GLES20.glEnableVertexAttribArray( location_of_position );
+          GLES20.glVertexAttribPointer(
+            location_of_position, 4,
                                         GLES20.GL_FLOAT, false, 0, 0  );
           Log.d( "GL", "頂点バッファ指定 id:" + _vertices_buffer_id );
 
@@ -120,8 +123,8 @@ public class ModelData
           Vec3 color = new Vec3( 1, 1, 1 );
           GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM,  int_buffer );
 
-          int id2 = int_buffer.get();
-          int location_of_color = GLES20.glGetUniformLocation( id2 , "diffuse" );
+          int id_diffuse = int_buffer.get();
+          int location_of_color = GLES20.glGetUniformLocation( id_diffuse , "diffuse" );
 
           GLES20.glUniform3fv( location_of_color, 1, color.getBuffer() );
 
@@ -129,23 +132,22 @@ public class ModelData
           float transparent = 1;
           GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM, int_buffer2 );
 
-          int id3 = int_buffer2.get();
-          int location_of_transparent = GLES20.glGetUniformLocation( id3 , "transparent" );
+          int id_transparent = int_buffer2.get();
+          int location_of_transparent = GLES20.glGetUniformLocation( id_transparent , "transparent" );
 
           GLES20.glUniform1f( location_of_transparent, transparent );
 
           // 面0の描画
           GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 10, GLES20.GL_UNSIGNED_BYTE, 0 );
-          Log.d( "GL", "面0成功" );
-
+          Log.d( "GL", "面0描画" );
 
           // 面1の描画
           GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 4, GLES20.GL_UNSIGNED_BYTE, 10 );
-          Log.d( "GL", "面1成功" );
+          Log.d( "GL", "面1描画" );
 
           // 面2の描画
           GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 4, GLES20.GL_UNSIGNED_BYTE, 14 );
-          Log.d( "GL", "面2成功" );
+          Log.d( "GL", "面2描画" );
 
           Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
         }
@@ -183,7 +185,7 @@ public class ModelData
         GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER,
                             model_data.float_buffer.capacity()*4, model_data.float_buffer,GLES20.GL_STATIC_DRAW);
 
-        Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
+         Log.d((new Throwable()).getStackTrace()[0].getClassName(), (new Throwable()).getStackTrace()[0].getFileName() + ": " + (new Throwable()).getStackTrace()[0].getLineNumber() + ":" + GLES20.glGetError());
         Log.d( "make_float_VBO buffer_id", String.valueOf( buffer_ids[ 0 ] ) );
 
 
@@ -192,7 +194,7 @@ public class ModelData
     }
     this.test_scene.scene_manager.view.queueEvent( new ModelDataVertexRunnable( this ) );
 
-    Log.d( "make_float_VBO buffer_id2", String.valueOf( _vertices_buffer_id ) );
+    Log.d( "make_float_VBO buffer_id_end", String.valueOf( _vertices_buffer_id ) );
   }
 
   //byte配列をVBOに変換
@@ -234,7 +236,7 @@ public class ModelData
 
     test_scene.scene_manager.view.queueEvent( new ModelDataIndicesRunnable( this ) );
 
-    Log.d( "make_byte_VBO buffer_id2", String.valueOf( _indices_buffer_id ) );
+    Log.d( "make_byte_VBO buffer_id_end", String.valueOf( _indices_buffer_id ) );
   }
 
 

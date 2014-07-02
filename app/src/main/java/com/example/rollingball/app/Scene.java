@@ -20,8 +20,9 @@ public class Scene implements IUpdatable, IDrawable
     input_manager = new InputManager( this );
 }
 
-  void push( GameObject game_object ){
-
+  void push( GameObject game_object )
+  {
+    game_objects.push( game_object );
   }
 
   void message( Message message ){
@@ -36,6 +37,7 @@ public class Scene implements IUpdatable, IDrawable
   public void update( long delta_time_in_ns )
   {
     input_manager.update( delta_time_in_ns );
+    camera.update( delta_time_in_ns );
 
     for ( GameObject g : game_objects )
       g.update( delta_time_in_ns );
@@ -44,7 +46,8 @@ public class Scene implements IUpdatable, IDrawable
   @Override
   public void draw()
   {
-
+    for ( GameObject g : game_objects )
+      g.draw();
   }
 
 }

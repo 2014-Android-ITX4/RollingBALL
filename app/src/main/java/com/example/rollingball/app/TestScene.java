@@ -41,10 +41,13 @@ public class TestScene extends Scene
     Mat4 translation = Mat4.MAT4_IDENTITY.translate( position );
     Mat4 rotation_x= Matrices.rotate( (float)Math.sin( delta_time_in_ns ), new Vec3( 1.0f, 0.0f, 0.0f ) );
 
-    Mat4 scaling = new Mat4( 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f );
+    Mat4 scaling = new Mat4( 1.0f, 0.0f, 0.0f, 0.0f,
+                             0.0f, 1.0f, 0.0f, 0.0f,
+                             0.0f, 0.0f, 1.0f, 0.0f,
+                             0.0f, 0.0f, 0.0f, 1.0f );
 
     Mat4 world_transformation = translation.multiply( rotation_x.multiply( scaling ) );
-    object.model.draw( new Mat4( world_transformation ) );
+    object.model.draw(  world_transformation  );
 
   }
 }
