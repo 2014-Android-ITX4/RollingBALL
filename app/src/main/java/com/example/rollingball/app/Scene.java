@@ -18,6 +18,7 @@ public class Scene implements IUpdatable, IDrawable
     game_objects = new LinkedList< GameObject >();
     camera = new Camera();
     input_manager = new InputManager( this );
+    to_exit = false;
 }
 
   void push( GameObject game_object )

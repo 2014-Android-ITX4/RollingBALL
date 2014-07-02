@@ -17,6 +17,8 @@ public class TestScene extends Scene
     super( s );
     object = new PlayerGameObject();
     object.model = ModelData.generate_cube( 1, this );
+    object.position = new Vec3( 0,0,0 );
+    push( object );
   }
 
   @Override
@@ -47,7 +49,7 @@ public class TestScene extends Scene
                              0.0f, 0.0f, 0.0f, 1.0f );
 
     Mat4 world_transformation = translation.multiply( rotation_x.multiply( scaling ) );
-    object.model.draw(  world_transformation  );
+//    object.model.draw(  world_transformation  );
 
   }
 }

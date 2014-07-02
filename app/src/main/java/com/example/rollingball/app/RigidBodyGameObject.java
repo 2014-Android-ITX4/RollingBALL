@@ -6,8 +6,8 @@ import java.util.ArrayList;
 public class RigidBodyGameObject extends GameObject
 {
   public float mass;             //質量
-  public Vec3 velocity;          //速度
-  public ArrayList<Vec3> forces; //力
+  public Vec3 velocity = new Vec3( 0, 0, 0 );          //速度
+  public ArrayList<Vec3> forces = new ArrayList< Vec3 >(); //力
   public ArrayList<Float> collision_radiuses;
 
   @Override

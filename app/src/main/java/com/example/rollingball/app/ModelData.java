@@ -85,75 +85,88 @@ public class ModelData
   public void draw( final Mat4 transformation )
   {
 
-    test_scene.scene_manager.view.queueEvent( new Runnable() {
-        @Override
-        public void run()
-        {
-          // 頂点バッファの指定
-          GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, _vertices_buffer_id );
-          GLES20.glEnableVertexAttribArray( location_of_position );
-          GLES20.glVertexAttribPointer(
-            location_of_position, 4,
-                                        GLES20.GL_FLOAT, false, 0, 0  );
-          Log.d( "GL", "頂点バッファ指定 id:" + _vertices_buffer_id );
+//    test_scene.scene_manager.view.queueEvent( new Runnable() {
+//        @Override
+//        public void run()
+//        {
+//          // 頂点バッファの指定
+//          GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, _vertices_buffer_id );
+//          GLES20.glEnableVertexAttribArray( location_of_position );
+//          GLES20.glVertexAttribPointer(
+//            location_of_position, 4,
+//                                        GLES20.GL_FLOAT, false, 0, 0  );
+//          Log.d( "GL", "頂点バッファ指定 id:" + _vertices_buffer_id );
+//
+//          // インデックスバッファの指定
+//          GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, _indices_buffer_id );
+//          Log.d( "GL", "インデックスバッファ指定 id:" + _indices_buffer_id );
+//          if ( GLES20.glGetError() != GLES20.GL_NO_ERROR )
+//          {
+//            Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
+//            throw new RuntimeException(  );
+//          }
+//
+//          // Transformation
+//          IntBuffer buffer = IntBuffer.allocate( 1 );
+//          GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM,  buffer );
+//          int id = buffer.get();
+//
+//          int location_of_world_transformation = GLES20.glGetUniformLocation( id , "world_transformation" );
+//          GLES20.glUniformMatrix4fv(
+//            location_of_world_transformation,
+//            1,
+//            false,
+//            transformation.getBuffer()
+//          );
+//
+//          IntBuffer int_buffer = IntBuffer.allocate( 1 );
+//          Vec3 color = new Vec3( 1, 1, 1 );
+//          GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM,  int_buffer );
+//
+//          int id_diffuse = int_buffer.get();
+//          int location_of_color = GLES20.glGetUniformLocation( id_diffuse , "diffuse" );
+//
+//          GLES20.glUniform3fv( location_of_color, 1, color.getBuffer() );
+//
+//          IntBuffer int_buffer2 = IntBuffer.allocate( 1 );
+//          float transparent = 1;
+//          GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM, int_buffer2 );
+//
+//          int id_transparent = int_buffer2.get();
+//          int location_of_transparent = GLES20.glGetUniformLocation( id_transparent , "transparent" );
+//
+//          GLES20.glUniform1f( location_of_transparent, transparent );
+//
+//          // 面0の描画
+//          GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 10, GLES20.GL_UNSIGNED_BYTE, 0 );
+//          Log.d( "GL", "面0描画" );
+//
+//          // 面1の描画
+//          GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 4, GLES20.GL_UNSIGNED_BYTE, 10 );
+//          Log.d( "GL", "面1描画" );
+//
+//          // 面2の描画
+//          GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 4, GLES20.GL_UNSIGNED_BYTE, 14 );
+//          Log.d( "GL", "面2描画" );
+//
+//          Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
+//        }
+//      } );
 
-          // インデックスバッファの指定
-          GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, _indices_buffer_id );
-          Log.d( "GL", "インデックスバッファ指定 id:" + _indices_buffer_id );
-          if ( GLES20.glGetError() != GLES20.GL_NO_ERROR )
-          {
-            Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
-            throw new RuntimeException(  );
-          }
-
-          // Transformation
-          IntBuffer buffer = IntBuffer.allocate( 1 );
-          GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM,  buffer );
-          int id = buffer.get();
-
-          int location_of_world_transformation = GLES20.glGetUniformLocation( id , "world_transformation" );
-          GLES20.glUniformMatrix4fv(
-            location_of_world_transformation,
-            1,
-            false,
-            transformation.getBuffer()
-          );
-
-          IntBuffer int_buffer = IntBuffer.allocate( 1 );
-          Vec3 color = new Vec3( 1, 1, 1 );
-          GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM,  int_buffer );
-
-          int id_diffuse = int_buffer.get();
-          int location_of_color = GLES20.glGetUniformLocation( id_diffuse , "diffuse" );
-
-          GLES20.glUniform3fv( location_of_color, 1, color.getBuffer() );
-
-          IntBuffer int_buffer2 = IntBuffer.allocate( 1 );
-          float transparent = 1;
-          GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM, int_buffer2 );
-
-          int id_transparent = int_buffer2.get();
-          int location_of_transparent = GLES20.glGetUniformLocation( id_transparent , "transparent" );
-
-          GLES20.glUniform1f( location_of_transparent, transparent );
-
-          // 面0の描画
-          GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 10, GLES20.GL_UNSIGNED_BYTE, 0 );
-          Log.d( "GL", "面0描画" );
-
-          // 面1の描画
-          GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 4, GLES20.GL_UNSIGNED_BYTE, 10 );
-          Log.d( "GL", "面1描画" );
-
-          // 面2の描画
-          GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 4, GLES20.GL_UNSIGNED_BYTE, 14 );
-          Log.d( "GL", "面2描画" );
-
-          Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
-        }
-      } );
-
-
+    IntBuffer program_id_buffer = IntBuffer.allocate( 1 );
+    GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM, program_id_buffer );
+    int program_id = program_id_buffer.get();
+    float[] vertices =
+      {
+        -0.5f, 0.5f,0,
+        -0.5f,-0.5f,0,
+        0.5f, 0.5f,0
+      };
+    FloatBuffer b = ByteBuffer.allocateDirect( vertices.length * 4 ).order( ByteOrder.nativeOrder()).asFloatBuffer();
+    b.put(vertices).position(0);
+    int location_of_position = GLES20.glGetAttribLocation( program_id, "position");
+    GLES20.glVertexAttribPointer( location_of_position, 3, GLES20.GL_FLOAT, false, 0, b  );
+    GLES20.glDrawArrays( GLES20.GL_TRIANGLES, 0, 3 );
 
   }
 

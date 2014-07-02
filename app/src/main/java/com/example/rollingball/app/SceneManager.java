@@ -51,16 +51,16 @@ public class SceneManager implements IUpdatable, IDrawable
         }
       }
 
-        // _scenesが空のとき
-        if ( _scenes.isEmpty() == true )
-        {
-          // TODO: version-0.2.0 レベルで作成される BlandLogoScene の自動push
-          // push( new BlandLogoScene(  ) );
-          push( new TestScene( this ) );
+      // _scenesが空のとき
+      if ( _scenes.isEmpty() == true )
+      {
+        // TODO: version-0.2.0 レベルで作成される BlandLogoScene の自動push
+        // push( new BlandLogoScene(  ) );
+        push( new TestScene( this ) );
 
-          continue;
+        continue;
 
-        }
+      }
 
 
 
