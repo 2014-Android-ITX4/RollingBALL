@@ -3,9 +3,6 @@ package com.example.rollingball.app;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 
-/**
- * Created by sakamoto on 2014/05/14.
- */
 public class MainView extends GLSurfaceView
 {
   public MainRenderer renderer;
