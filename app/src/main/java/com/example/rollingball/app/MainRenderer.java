@@ -6,6 +6,9 @@ import android.opengl.GLSurfaceView;
 import com.hackoeur.jglm.Mat4;
 import com.hackoeur.jglm.Matrices;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -29,11 +32,27 @@ class MainRenderer implements GLSurfaceView.Renderer
 
     final long delta_time_in_ns = System.nanoTime() - _before_time_in_ns;
 
-    _main_view.scene_manager.update( delta_time_in_ns );
+    //_main_view.scene_manager.update( delta_time_in_ns );
 
     GLES20.glClear( GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT );
 
-    _main_view.scene_manager.draw();
+    //_main_view.scene_manager.draw();
+    //*
+    IntBuffer program_id_buffer = IntBuffer.allocate( 1 );
+    GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM, program_id_buffer );
+    int program_id = program_id_buffer.get();
+    float[] vertices =
+      {
+        -0.5f, 0.5f,0,
+        -0.5f,-0.5f,0,
+        0.5f, 0.5f,0
+      };
+    FloatBuffer b = ByteBuffer.allocateDirect( vertices.length * 4 ).order( ByteOrder.nativeOrder()).asFloatBuffer();
+    b.put(vertices).position(0);
+    int location_of_position = GLES20.glGetAttribLocation( program_id, "position");
+    GLES20.glVertexAttribPointer( location_of_position, 3, GLES20.GL_FLOAT, false, 0, b  );
+    GLES20.glDrawArrays( GLES20.GL_TRIANGLES, 0, 3 );
+    //*/
 
     _before_time_in_ns = System.nanoTime();
   }
@@ -65,7 +84,7 @@ class MainRenderer implements GLSurfaceView.Renderer
           + "uniform mat4 projection_transformation;"
           + "void main()\n"
           + "{\n"
-          + "  gl_Position = projection_transformation * view_transformation * world_transformation * position;\n"
+          + "  gl_Position = /*projection_transformation * view_transformation * world_transformation * */position;\n"
           + "  var_texcoord = texcoord;\n"
           + "  var_normal = normal;\n"
           + "}\n"
@@ -108,6 +127,7 @@ class MainRenderer implements GLSurfaceView.Renderer
           + "    ? vec4( diffuse, 1.0 )\n"
           + "    : texture2D( diffuse_sampler, var_texcoord );\n"
           + "  gl_FragColor.a *= transparent;\n"
+          + "  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n"
           + "}\n"
 
           + "bool is_nan( float val )\n"
@@ -137,6 +157,8 @@ class MainRenderer implements GLSurfaceView.Renderer
       throw new RuntimeException( GLES20.glGetProgramInfoLog( program ) );
 
     GLES20.glUseProgram( program );
+
+    GLES20.glEnableVertexAttribArray( GLES20.glGetAttribLocation( program, "position" ) );
 
     // デプスバッファの有効化
     GLES20.glEnable( GLES20.GL_DEPTH_TEST );
