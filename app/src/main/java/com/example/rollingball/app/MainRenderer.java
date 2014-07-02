@@ -102,16 +102,19 @@ class MainRenderer implements GLSurfaceView.Renderer
           + "uniform vec3 specular;\n"
           + "uniform vec3 emisive;\n"
           + "uniform float transparent;\n"
+          + "uniform float diffuse_texture_blending_factor;"
 
           + "bool is_nan( float );\n"
 
           + "void main()\n"
           + "{\n"
-          + "  gl_FragColor = is_nan( var_texcoord.x ) \n"
-          + "    ? vec4( diffuse, 1.0 )\n"
-          + "    : texture2D( diffuse_sampler, var_texcoord );\n"
+          + "  gl_FragColor = vec4( diffuse, 1.0 ); \n"
+          + "  if ( diffuse_texture_blending_factor > 0.0 )\n"
+          + "  {\n"
+          + "    gl_FragColor.rgb *= 1.0 - diffuse_texture_blending_factor;\n"
+          + "    gl_FragColor     += texture2D( diffuse_sampler, var_texcoord ) * diffuse_texture_blending_factor;\n"
+          + "  }\n"
           + "  gl_FragColor.a *= transparent;\n"
-          + "  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n"
           + "}\n"
 
           + "bool is_nan( float val )\n"
@@ -143,17 +146,14 @@ class MainRenderer implements GLSurfaceView.Renderer
     GLES20.glUseProgram( program );
 
     GLES20.glEnableVertexAttribArray( GLES20.glGetAttribLocation( program, "position" ) );
+    // TODO: テクスチャーを使うようになったらどうぞ。
+    //GLES20.glEnableVertexAttribArray( GLES20.glGetAttribLocation( program, "texcoord" ) );
 
     // デプスバッファの有効化
     GLES20.glEnable( GLES20.GL_DEPTH_TEST );
 
-    IntBuffer buffer = IntBuffer.allocate( 1 );
-    Mat4 view = Matrices.perspective( 60, 16/9, 0.001f, 1000 );
-    GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM,  buffer );
-
-    int id = buffer.get();
-    int location_of_projection_transformation = GLES20.glGetUniformLocation( id , "projection_transformation" );
-
-    GLES20.glUniformMatrix4fv( location_of_projection_transformation, 1, false, view.getBuffer() );
+    Mat4 projection = Matrices.perspective( 60, 16/9, 0.001f, 1000 );
+    int location_of_projection_transformation = GLES20.glGetUniformLocation( program , "projection_transformation" );
+    GLES20.glUniformMatrix4fv( location_of_projection_transformation, 1, false, projection.getBuffer() );
   }
 }

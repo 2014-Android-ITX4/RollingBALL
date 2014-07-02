@@ -21,9 +21,6 @@ public class ModelData
   private int _indices_buffer_id;
   private int _texture_buffer_id;
 
-  private int program_id;
-  private int location_of_position;
-
   // TODO:テスト用なので後で消すなり変更するなりする
 //  int[] buffer_ids;
   FloatBuffer float_buffer;
@@ -31,12 +28,6 @@ public class ModelData
 
   public ModelData( float[] arg_vertices, byte[] arg_indices )
   {
-    IntBuffer program_id_buffer = IntBuffer.allocate( 1 );
-    GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM, program_id_buffer );
-    int program_id = program_id_buffer.get();
-
-    location_of_position = GLES20.glGetAttribLocation(program_id, "position");
-
     make_float_VBO( arg_vertices );
     make_byte_VBO( arg_indices );
   }
@@ -84,11 +75,10 @@ public class ModelData
 
   public void draw( final Mat4 transformation )
   {
+    IntBuffer program_id_buffer = IntBuffer.allocate( 1 );
+    GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM, program_id_buffer );
+    int program_id = program_id_buffer.get();
 
-//    test_scene.scene_manager.view.queueEvent( new Runnable() {
-//        @Override
-//        public void run()
-//        {
 //          // 頂点バッファの指定
 //          GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, _vertices_buffer_id );
 //          GLES20.glEnableVertexAttribArray( location_of_position );
@@ -96,7 +86,7 @@ public class ModelData
 //            location_of_position, 4,
 //                                        GLES20.GL_FLOAT, false, 0, 0  );
 //          Log.d( "GL", "頂点バッファ指定 id:" + _vertices_buffer_id );
-//
+
 //          // インデックスバッファの指定
 //          GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, _indices_buffer_id );
 //          Log.d( "GL", "インデックスバッファ指定 id:" + _indices_buffer_id );
@@ -105,7 +95,7 @@ public class ModelData
 //            Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
 //            throw new RuntimeException(  );
 //          }
-//
+
 //          // Transformation
 //          IntBuffer buffer = IntBuffer.allocate( 1 );
 //          GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM,  buffer );
@@ -118,25 +108,41 @@ public class ModelData
 //            false,
 //            transformation.getBuffer()
 //          );
-//
-//          IntBuffer int_buffer = IntBuffer.allocate( 1 );
-//          Vec3 color = new Vec3( 1, 1, 1 );
-//          GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM,  int_buffer );
-//
-//          int id_diffuse = int_buffer.get();
-//          int location_of_color = GLES20.glGetUniformLocation( id_diffuse , "diffuse" );
-//
-//          GLES20.glUniform3fv( location_of_color, 1, color.getBuffer() );
-//
-//          IntBuffer int_buffer2 = IntBuffer.allocate( 1 );
-//          float transparent = 1;
-//          GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM, int_buffer2 );
-//
-//          int id_transparent = int_buffer2.get();
-//          int location_of_transparent = GLES20.glGetUniformLocation( id_transparent , "transparent" );
-//
-//          GLES20.glUniform1f( location_of_transparent, transparent );
-//
+
+    // 拡散反射光の色
+    int location_of_diffuse = GLES20.glGetUniformLocation( program_id, "diffuse" );
+    GLES20.glUniform3fv( location_of_diffuse, 1, new Vec3(0.0f, 1.0f, 0.0f).getBuffer() );
+
+    // 不透明度
+    int location_of_transparent = GLES20.glGetUniformLocation( program_id, "transparent" );
+    GLES20.glUniform1f( location_of_transparent, 1.0f );
+
+    // TODO: テクスチャー対応用。テクスチャーに対応する際にどうぞ
+    // テクスチャーのブレンド比
+    //int location_of_diffuse_texture_blending_factor = GLES20.glGetUniformLocation( program_id, "location_of_diffuse_texture_blending_factor" );
+    //GLES20.glUniform1f( location_of_diffuse_texture_blending_factor, 0.0f );
+
+    float[] vs_position =
+    { -0.5f,+0.5f,0.0f
+    , -0.5f,-0.5f,0.0f
+    , +0.5f,+0.5f,0.0f
+    };
+    FloatBuffer vs_position_buffer = ByteBuffer.allocateDirect( vs_position.length * 4 ).order( ByteOrder.nativeOrder()).asFloatBuffer();
+    vs_position_buffer.put(vs_position).position(0);
+    GLES20.glVertexAttribPointer( GLES20.glGetAttribLocation( program_id, "position"), 3, GLES20.GL_FLOAT, false, 0, vs_position_buffer );
+
+    // TODO: テクスチャー対応用。テクスチャーに対応する際にどうぞ
+    //float[] vs_texcoord =
+    //{ Float.NaN, Float.NaN
+    //, Float.NaN, Float.NaN
+    //, Float.NaN, Float.NaN
+    //};
+    //FloatBuffer vs_texcoord_buffer = ByteBuffer.allocateDirect( vs_texcoord.length * 4 ).order( ByteOrder.nativeOrder()).asFloatBuffer();
+    //vs_texcoord_buffer.put(vs_texcoord).position(0);
+    //GLES20.glVertexAttribPointer( GLES20.glGetAttribLocation( program_id, "texcoord"), 2, GLES20.GL_FLOAT, false, 0, vs_texcoord_buffer );
+
+    GLES20.glDrawArrays( GLES20.GL_TRIANGLES, 0, 3 );
+
 //          // 面0の描画
 //          GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 10, GLES20.GL_UNSIGNED_BYTE, 0 );
 //          Log.d( "GL", "面0描画" );
@@ -149,27 +155,7 @@ public class ModelData
 //          GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 4, GLES20.GL_UNSIGNED_BYTE, 14 );
 //          Log.d( "GL", "面2描画" );
 //
-//          Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
-//        }
-//      } );
-
-    //*
-    IntBuffer program_id_buffer = IntBuffer.allocate( 1 );
-    GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM, program_id_buffer );
-    int program_id = program_id_buffer.get();
-    float[] vertices =
-      {
-        -0.5f, 0.5f,0,
-        -0.5f,-0.5f,0,
-        0.5f, 0.5f,0
-      };
-    FloatBuffer b = ByteBuffer.allocateDirect( vertices.length * 4 ).order( ByteOrder.nativeOrder()).asFloatBuffer();
-    b.put(vertices).position(0);
-    int location_of_position = GLES20.glGetAttribLocation( program_id, "position");
-    GLES20.glVertexAttribPointer( location_of_position, 3, GLES20.GL_FLOAT, false, 0, b  );
-    GLES20.glDrawArrays( GLES20.GL_TRIANGLES, 0, 3 );
-    //*/
-
+    Log.d( "GL_NO_ERROR", String.valueOf( GLES20.glGetError() == GLES20.GL_NO_ERROR ) );
   }
 
    //float配列をVBOに変換
