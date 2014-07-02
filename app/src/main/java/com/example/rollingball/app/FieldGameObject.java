@@ -1,20 +1,30 @@
 package com.example.rollingball.app;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ByteBuffer;
 import android.opengl.GLES20;
 import java.util.ArrayList;
+import java.nio.IntBuffer;
 import android.util.Log;
+import com.hackoeur.jglm.Mat4;
 
 public class FieldGameObject extends GameObject
 {
+  private int _vertices_buffer_id;
+  private int _indices_buffer_id;
+  private int _normalBuffer_id;    //法線バッファID
   private ArrayList< ArrayList< Float > > field_planes = new ArrayList< ArrayList< Float > >();
-  private FloatBuffer mVertexBuffer;  // 頂点バッファ
-  private ByteBuffer mIndexBuffer;    // インデックスバッファ
-  public static int positionHandle;   //位置ハンドル
-  public static int colorHandle;     //色ハンドル
-  private static int program;//プログラムオブジェクト
+
+  public FieldGameObject( float[] arg_vertices, byte[] arg_indices, float[] arg_normals )
+    {
+      _vertices_buffer_id = make_float_VBO( arg_vertices );
+      _indices_buffer_id = make_byte_VBO( arg_indices );
+      _normalBuffer_id= make_float_VBO( arg_normals );
+    }
 
   public void generate_simple_plane( int arris_x, int arris_z )
   {
@@ -33,115 +43,126 @@ public class FieldGameObject extends GameObject
     }
   }
 
-  private void FieldGameObject( double field_length )
+  public static FieldGameObject generate_triangle( double arris_length )
   {
-    // TODO field__lengthの値を反映させる
     float[] vertices = {
       1.0f, 1.0f, 1.0f,//頂点0
       1.0f, 1.0f, -1.0f,//頂点1
       -1.0f, 1.0f, 1.0f,//頂点2
       -1.0f, 1.0f, -1.0f,//頂点3
-      1.0f, -1.0f, 1.0f,//頂点4
-      1.0f, -1.0f, -1.0f,//頂点5
-      -1.0f, -1.0f, 1.0f,//頂点6
-      -1.0f, -1.0f, -1.0f,//頂点7
     };
-    mVertexBuffer = makeFloatBuffer( vertices );
+
+    //法線バッファの生成
+    float[] normals={
+      1.0f, 1.0f, 1.0f,//頂点0
+      1.0f, 1.0f,-1.0f,//頂点1
+      -1.0f, 1.0f, 1.0f,//頂点2
+      -1.0f, 1.0f,-1.0f,//頂点3
+    };
+
+    float div=(float)Math.sqrt(
+      (1.0f*1.0f)+(1.0f*1.0f)+(1.0f*1.0f));
+    for (int i=0;i<normals.length;i++) normals[i]/=div;
 
     //インデックスバッファの生成
     byte[] indices = {
-      0, 1, 2, 3, 6, 7, 4, 5, 0, 1,//面0
-      1, 5, 3, 7,         //面1
-      0, 2, 4, 6,        //面2
+      0, 1, 3, //面1
+      0, 2, 3, //面2
     };
-    mIndexBuffer = makeByteBuffer( indices );
+
+    FieldGameObject field_data = new FieldGameObject( vertices, indices, normals );
+
+    return field_data;
   }
 
-  // シェーダー
-  public class initShader
-  {
-    //頂点シェーダのコード
-    private final static String VERTEX_CODE = "attribute vec4 a_Position;" +
-      "void main(){" +
-      "gl_Position=a_Position;" +
-      "}";
-
-    //フラグメントシェーダのコード
-    private final static String FRAGMENT_CODE = "precision mediump float;" +
-      "uniform vec4 u_Color;" +
-      "void main(){" +
-      "gl_FragColor=u_Color;" +
-      "}";
-
-  }
-
-    //プログラムの生成
-  public static void makeProgram() {
-      //シェーダーオブジェクトの生成
-      int vertexShader=loadShader(GLES20.GL_VERTEX_SHADER,VERTEX_CODE);
-      int fragmentShader=loadShader(GLES20.GL_FRAGMENT_SHADER,FRAGMENT_CODE);
-
-      //プログラムオブジェクトの生成
-      program=GLES20.glCreateProgram();
-      GLES20.glAttachShader(program,vertexShader);
-      GLES20.glAttachShader(program,fragmentShader);
-      GLES20.glLinkProgram(program);
-
-      //ハンドルの取得
-      positionHandle=GLES20.glGetAttribLocation(program,"a_Position");
-      colorHandle=GLES20.glGetUniformLocation(program,"u_Color");
-
-      //プログラムオブジェクトの利用開始
-      GLES20.glUseProgram(program);
-    }
-
-    //シェーダーオブジェクトの生成
-    private static int loadShader(int type,String shaderCode) {
-      int shader=GLES20.glCreateShader(type);
-      GLES20.glShaderSource(shader,shaderCode);
-      GLES20.glCompileShader(shader);
-      return shader;
-    }
-
-  public void load_from_file()
-  { throw new NotImplementedException(); }
-
-  // フィールド描画処理
-  @Override
   public void draw( GLES20 gles20 )
   {
-    //画面のクリア
-    GLES20.glClearColor( 0.5f, 0.5f, 0.5f, 0.5f );
+   /*for ( int i = 0; i > field_planes.size(); ++i )
+    {
+      // 頂点バッファの指定
+      GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, _vertices_buffer_id );
 
-     GLES20.glUseProgram(program);
+      //法線バッファの指定
+      GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, _normalBuffer_id);
 
-    // 頂点バッファを指定する
-    GLES20.glVertexAttribPointer(,3,GLES20.GL_FLOAT,false,0,mVertexBuffer);
+      // インデックスバッファの指定
+      GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, _indices_buffer_id );
 
-    //色の指定
-    GLES20.glUniform4f(this.colorHandle,1.0f,0.0f,0.0f,1.0f);
+      */
 
-    // 描画
-    GLES20.glDrawElements( GLES20.GL_TRIANGLES, GLES20.GL_UNSIGNED_BYTE, 6, mIndexBuffer );
+      // 面１の描画
+      // GLES20.glDrawElements( GLES20.GL_TRIANGLES, 3 , GLES20.GL_UNSIGNED_BYTE, i );
+      // 面２の描画
+      //GLES20.glDrawElements( GLES20.GL_TRIANGLES, 3 , GLES20.GL_UNSIGNED_BYTE, i);
+
+      //*
+      IntBuffer program_id_buffer = IntBuffer.allocate( 1 );
+      GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM, program_id_buffer );
+      int program_id = program_id_buffer.get();
+      float[] vertices =
+        {
+          -0.5f, 0.5f,0,
+          -0.5f,-0.5f,0,
+          0.5f, 0.5f,0
+        };
+      FloatBuffer b = ByteBuffer.allocateDirect( vertices.length * 4 ).order( ByteOrder.nativeOrder()).asFloatBuffer();
+      b.put(vertices).position(0);
+      int location_of_position = GLES20.glGetAttribLocation( program_id, "position");
+      GLES20.glVertexAttribPointer( location_of_position, 3, GLES20.GL_FLOAT, false, 0, b  );
+      GLES20.glDrawArrays( GLES20.GL_TRIANGLES, 0, 3 );
+      //*/
+
+      Log.d(
+        ( new Throwable() ).getStackTrace()[ 0 ].getClassName(),
+        ( new Throwable() ).getStackTrace()[ 0 ].getFileName() + ": " + ( new Throwable() ).getStackTrace()[ 0 ]
+          .getLineNumber()
+      );
+    }
+  //}
+
+  // ファイル読み込み
+  public void load_from_file()
+  {
+    /*try {
+    FileInputStream fileInputStream;
+    fileInputStream = openFileInput("myfile.txt");
+    byte[] readBytes = new byte[fileInputStream.available()];
+    fileInputStream.read(readBytes);
+    String readString = new String(readBytes);
+    Log.v("readString", readString);
+  } catch (FileNotFoundException e) {
+  } catch (IOException e) {
+  }*/}
+
+  //float配列をVBOに変換
+  private int make_float_VBO( float[] array ) {
+    //float配列をFloatBufferに変換
+    FloatBuffer fb= ByteBuffer.allocateDirect( array.length * 3 ).order(
+      ByteOrder.nativeOrder()).asFloatBuffer();
+    fb.put(array).position(0);
+
+    //FloatBufferをVBOに変換
+    int[] bufferIds=new int[1];
+    GLES20.glGenBuffers(1,bufferIds,0);
+    GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,bufferIds[0]);
+    GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER,
+                        fb.capacity()*4,fb,GLES20.GL_STATIC_DRAW);
+    return bufferIds[0];
   }
 
-  //byte配列をByteBufferに変換
-  private ByteBuffer makeByteBuffer( byte[] array )
-  {
-    ByteBuffer bb = ByteBuffer.allocateDirect( array.length ).order(
-      ByteOrder.nativeOrder()
-    );
-    bb.put( array ).position( 0 );
-    return bb;
-  }
+  //byte配列をVBOに変換
+  private int make_byte_VBO( byte[] array ) {
+    //byte配列をByteBufferに変換
+    ByteBuffer bb=ByteBuffer.allocateDirect(array.length).order(
+      ByteOrder.nativeOrder());
+    bb.put(array).position(0);
 
-  //float配列をFloatBufferに変換
-  private FloatBuffer makeFloatBuffer( float[] array )
-  {
-    FloatBuffer fb = ByteBuffer.allocateDirect( array.length * 3 ).order(
-      ByteOrder.nativeOrder()
-    ).asFloatBuffer();
-    fb.put( array ).position( 0 );
-    return fb;
+    //ByteBufferをVBOに変換
+    int[] bufferIds=new int[1];
+    GLES20.glGenBuffers(1,bufferIds,0);
+    GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER,bufferIds[0]);
+    GLES20.glBufferData(GLES20.GL_ELEMENT_ARRAY_BUFFER,
+                        bb.capacity(),bb,GLES20.GL_STATIC_DRAW);
+    return bufferIds[0];
   }
 }
