@@ -21,33 +21,33 @@ public class ModelData
   private int _indices_buffer_id;
   private int _texture_buffer_id;
 
-  private int program;
+  private int program_id;
   private int location_of_position;
 
   // TODO:テスト用なので後で消すなり変更するなりする
-  TestScene test_scene;
 //  int[] buffer_ids;
   FloatBuffer float_buffer;
   ByteBuffer byte_buffer;
 
-  public ModelData( float[] arg_vertices, byte[] arg_indices, TestScene arg_test_scene )
+  public ModelData( float[] arg_vertices, byte[] arg_indices )
   {
-    test_scene = arg_test_scene;
+    IntBuffer program_id_buffer = IntBuffer.allocate( 1 );
+    GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM, program_id_buffer );
+    int program_id = program_id_buffer.get();
 
-    program = test_scene.scene_manager.view.renderer.program;
-    location_of_position = GLES20.glGetAttribLocation(program,"position");
+    location_of_position = GLES20.glGetAttribLocation(program_id, "position");
 
     make_float_VBO( arg_vertices );
     make_byte_VBO( arg_indices );
   }
 
 
-  public static ModelData generate_sphere( double radius )
+  public static ModelData generate_sphere( float radius )
   {
     return null;
   }
 
-  public static ModelData generate_cube( double arris_length, TestScene arg_test_scene )
+  public static ModelData generate_cube( float arris_length )
   {
     // TODO arris_lengthの値を反映させる
     float[] vertices =
@@ -72,7 +72,7 @@ public class ModelData
 
 
 
-     ModelData model_data = new ModelData( vertices, indices, arg_test_scene );
+     ModelData model_data = new ModelData( vertices, indices );
 
     return model_data;
   }
@@ -179,33 +179,33 @@ public class ModelData
       ByteOrder.nativeOrder()).asFloatBuffer();
     float_buffer.put( array ).position(0);
 
-    class ModelDataVertexRunnable implements Runnable
-    {
-      ModelData model_data;
+    //class ModelDataVertexRunnable implements Runnable
+    //{
+      //ModelData model_data;
 
-      ModelDataVertexRunnable( ModelData model )
-      {
-        model_data = model;
-      }
+      //ModelDataVertexRunnable( ModelData model )
+      //{
+        //model_data = model;
+      //}
 
-      @Override
-      public synchronized void run()
-      {
+      //@Override
+      //public synchronized void run()
+      //{
         int buffer_ids[] = new int[1];
         //FloatBufferをVBOに変換
         GLES20.glGenBuffers(1,buffer_ids,0);
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,buffer_ids[0]);
         GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER,
-                            model_data.float_buffer.capacity()*4, model_data.float_buffer,GLES20.GL_STATIC_DRAW);
+                            float_buffer.capacity()*4, float_buffer,GLES20.GL_STATIC_DRAW);
 
          Log.d((new Throwable()).getStackTrace()[0].getClassName(), (new Throwable()).getStackTrace()[0].getFileName() + ": " + (new Throwable()).getStackTrace()[0].getLineNumber() + ":" + GLES20.glGetError());
         Log.d( "make_float_VBO buffer_id", String.valueOf( buffer_ids[ 0 ] ) );
 
 
-        model_data._vertices_buffer_id = buffer_ids[0];
-      }
-    }
-    this.test_scene.scene_manager.view.queueEvent( new ModelDataVertexRunnable( this ) );
+        _vertices_buffer_id = buffer_ids[0];
+      //}
+    //}
+    //this.test_scene.scene_manager.view.queueEvent( new ModelDataVertexRunnable( this ) );
 
     Log.d( "make_float_VBO buffer_id_end", String.valueOf( _vertices_buffer_id ) );
   }
@@ -217,19 +217,19 @@ public class ModelData
       ByteOrder.nativeOrder());
     byte_buffer.put( array ).position(0);
 
-    class ModelDataIndicesRunnable
-      implements Runnable
-    {
-      ModelData model_data;
+    //class ModelDataIndicesRunnable
+      //implements Runnable
+    //{
+      //ModelData model_data;
 
-      ModelDataIndicesRunnable( ModelData model )
-      {
-        model_data = model;
-      }
+      //ModelDataIndicesRunnable( ModelData model )
+      //{
+        //model_data = model;
+      //}
 
-      @Override
-      public synchronized void run()
-      {
+      //@Override
+      //public synchronized void run()
+      //{
         int[] buffer_ids=new int[1];
 
         GLES20.glGenBuffers(1,buffer_ids,0);
@@ -237,21 +237,19 @@ public class ModelData
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER,buffer_ids[0]);
         Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
         GLES20.glBufferData(
-          GLES20.GL_ELEMENT_ARRAY_BUFFER, model_data.byte_buffer.capacity(), model_data.byte_buffer, GLES20.GL_STATIC_DRAW
+          GLES20.GL_ELEMENT_ARRAY_BUFFER, byte_buffer.capacity(), byte_buffer, GLES20.GL_STATIC_DRAW
         );
         Log.d( "OPEN GL", String.valueOf( GLES20.glGetError() ) );
         Log.d( "make_byte_VBO buffer_id", String.valueOf( buffer_ids[ 0 ] ) );
 
-        model_data._indices_buffer_id = buffer_ids[0];
+        _indices_buffer_id = buffer_ids[0];
 
-      }
-    }
+      //}
+    //}
 
-    test_scene.scene_manager.view.queueEvent( new ModelDataIndicesRunnable( this ) );
+    //test_scene.scene_manager.view.queueEvent( new ModelDataIndicesRunnable( this ) );
 
     Log.d( "make_byte_VBO buffer_id_end", String.valueOf( _indices_buffer_id ) );
   }
-
-
 
 }

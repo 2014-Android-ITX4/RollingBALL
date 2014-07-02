@@ -80,24 +80,7 @@ public class SceneManager implements IUpdatable, IDrawable
   @Override
   public void draw()
   {
-    //_scenes.peek().draw();
-
-    //*
-    IntBuffer program_id_buffer = IntBuffer.allocate( 1 );
-    GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM, program_id_buffer );
-    int program_id = program_id_buffer.get();
-    float[] vertices =
-      {
-        -0.5f, 0.5f,0,
-        -0.5f,-0.5f,0,
-        0.5f, 0.5f,0
-      };
-    FloatBuffer b = ByteBuffer.allocateDirect( vertices.length * 4 ).order( ByteOrder.nativeOrder()).asFloatBuffer();
-    b.put(vertices).position(0);
-    int location_of_position = GLES20.glGetAttribLocation( program_id, "position");
-    GLES20.glVertexAttribPointer( location_of_position, 3, GLES20.GL_FLOAT, false, 0, b  );
-    GLES20.glDrawArrays( GLES20.GL_TRIANGLES, 0, 3 );
-    //*/
+    _scenes.peek().draw();
   }
 
 }

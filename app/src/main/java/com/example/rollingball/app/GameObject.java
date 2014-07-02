@@ -5,8 +5,8 @@ import com.hackoeur.jglm.Vec3;
 
 public class GameObject implements IUpdatable, IDrawable
 {
-  public Vec3 position;
-  public ModelData model;
+  public Vec3 position = new Vec3( 0.0f, 0.0f, 0.0f );
+  public ModelData model = ModelData.generate_cube( 1.0f );
   protected Scene _scene;
 
   @Override

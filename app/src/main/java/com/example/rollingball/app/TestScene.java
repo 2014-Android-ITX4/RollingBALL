@@ -10,15 +10,12 @@ import com.hackoeur.jglm.Vec3;
 public class TestScene extends Scene
 {
 
-  PlayerGameObject object;
+  PlayerGameObject player;
 
   TestScene( final SceneManager s )
   {
     super( s );
-    object = new PlayerGameObject();
-    object.model = ModelData.generate_cube( 1, this );
-    object.position = new Vec3( 0,0,0 );
-    push( object );
+    push( player = new PlayerGameObject() );
   }
 
   @Override

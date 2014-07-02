@@ -5,10 +5,10 @@ import java.util.ArrayList;
 
 public class RigidBodyGameObject extends GameObject
 {
-  public float mass;             //質量
+  public float mass = 1.0f;             //質量
   public Vec3 velocity = new Vec3( 0, 0, 0 );          //速度
   public ArrayList<Vec3> forces = new ArrayList< Vec3 >(); //力
-  public ArrayList<Float> collision_radiuses;
+  public ArrayList<Float> collision_radiuses = new ArrayList< Float >( );
 
   @Override
   public void update( final long delta_time_in_ns )
