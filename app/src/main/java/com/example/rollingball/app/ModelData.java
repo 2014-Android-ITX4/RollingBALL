@@ -153,6 +153,7 @@ public class ModelData
 //        }
 //      } );
 
+    //*
     IntBuffer program_id_buffer = IntBuffer.allocate( 1 );
     GLES20.glGetIntegerv( GLES20.GL_CURRENT_PROGRAM, program_id_buffer );
     int program_id = program_id_buffer.get();
@@ -167,12 +168,11 @@ public class ModelData
     int location_of_position = GLES20.glGetAttribLocation( program_id, "position");
     GLES20.glVertexAttribPointer( location_of_position, 3, GLES20.GL_FLOAT, false, 0, b  );
     GLES20.glDrawArrays( GLES20.GL_TRIANGLES, 0, 3 );
+    //*/
 
   }
 
-  //
-
-  //float配列をVBOに変換
+   //float配列をVBOに変換
   private void make_float_VBO( float[] array ) {
     //float配列をFloatBufferに変換
     float_buffer= ByteBuffer.allocateDirect( array.length * 4 ).order(

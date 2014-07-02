@@ -17,11 +17,12 @@ public class MainView extends GLSurfaceView
     super( context );
 
     activity = arg_activity;
-    scene_manager = new SceneManager( this );
 
     this.setEGLContextClientVersion( 2 );
     renderer = new MainRenderer( this );
     this.setRenderer( renderer );
+
+    scene_manager = new SceneManager( this );
   }
 
 }

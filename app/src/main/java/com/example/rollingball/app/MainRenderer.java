@@ -6,9 +6,6 @@ import android.opengl.GLSurfaceView;
 import com.hackoeur.jglm.Mat4;
 import com.hackoeur.jglm.Matrices;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -37,8 +34,6 @@ class MainRenderer implements GLSurfaceView.Renderer
     GLES20.glClear( GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT );
 
     _main_view.scene_manager.draw();
-
-
 
     _before_time_in_ns = System.nanoTime();
   }
