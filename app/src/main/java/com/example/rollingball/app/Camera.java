@@ -8,9 +8,6 @@ import com.hackoeur.jglm.Matrices;
 import com.hackoeur.jglm.Mat4;
 import com.hackoeur.jglm.Vec3;
 
-/**
- * Created by Tukasa on 2014/05/14.
- */
 public class Camera implements IUpdatable
 {
   public Vec3 eye= new Vec3( 0, 0, 10 );
@@ -26,7 +23,7 @@ public class Camera implements IUpdatable
   @Override
   public void update( final long delta_time_in_ns )
   {
-    Log.d( "Camera update", "updateが呼び出されました" );
+    //Log.d( "Camera update", "updateが呼び出されました" );
 
     IntBuffer buffer = IntBuffer.allocate( 1 );
     Mat4 view = Matrices.lookAt( eye, look_at, up );

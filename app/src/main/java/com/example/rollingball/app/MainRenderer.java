@@ -68,7 +68,7 @@ class MainRenderer implements GLSurfaceView.Renderer
           + "uniform mat4 projection_transformation;"
           + "void main()\n"
           + "{\n"
-          + "  gl_Position = /*projection_transformation * view_transformation * world_transformation * */position;\n"
+          + "  gl_Position = projection_transformation * view_transformation * world_transformation * position;\n"
           + "  var_texcoord = texcoord;\n"
           + "  var_normal = normal;\n"
           + "}\n"

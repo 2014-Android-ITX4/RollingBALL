@@ -27,7 +27,7 @@ public class TestScene extends Scene
     final float inversed_pih = (float)( 0.5 / Math.PI );
 
     // for debug LOG
-    Log.d( "RollingBALL", input_manager.rotation.toString() );
+    //Log.d( "RollingBALL", input_manager.rotation.toString() );
 
     // InputManagerから値[-π..+π]を読み取って[0.0..+1.0]にする。
     float r = ( input_manager.rotation.getX() + pif ) * inversed_pih;
@@ -46,7 +46,5 @@ public class TestScene extends Scene
                              0.0f, 0.0f, 0.0f, 1.0f );
 
     Mat4 world_transformation = translation.multiply( rotation_x.multiply( scaling ) );
-//    object.model.draw(  world_transformation  );
-
   }
 }

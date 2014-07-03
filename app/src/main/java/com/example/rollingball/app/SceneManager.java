@@ -22,7 +22,7 @@ public class SceneManager implements IUpdatable, IDrawable
   {
     view = view_;
 
-    push( new TestScene( this ) );
+    //push( new TestScene( this ) );
   }
 
   void push( Scene scene )
@@ -40,22 +40,15 @@ public class SceneManager implements IUpdatable, IDrawable
   @Override
   public void update( final long delta_time_in_ns )
   {
-    /*
+    //*
     do
     {
       Scene scene = _scenes.peek();
 
-
-
       // bool to_exit が true ならばそのシーンをpop
       if ( scene != null )
-      {
         if ( scene.to_exit )
-        {
           _scenes.pop();
-
-        }
-      }
 
       // _scenesが空のとき
       if ( _scenes.isEmpty() == true )
@@ -65,16 +58,11 @@ public class SceneManager implements IUpdatable, IDrawable
         push( new TestScene( this ) );
 
         continue;
-
       }
-
-
-
       scene.update( delta_time_in_ns );
-
     }
     while ( false );
-    */
+    //*/
   }
 
   @Override
