@@ -8,6 +8,8 @@ public class MainView extends GLSurfaceView
   public MainRenderer renderer;
   public SceneManager scene_manager;
   public MainActivity activity;
+  public int screen_width;
+  public int screen_height;
 
   public MainView( Context context, MainActivity arg_activity )
   {
