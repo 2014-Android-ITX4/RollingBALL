@@ -3,11 +3,8 @@ package com.example.rollingball.app;
 import com.hackoeur.jglm.Vec3;
 import java.util.LinkedList;
 
-<<<<<<< HEAD
-public class PlayerGameObject extends LifeGameObject
-=======
 public class PlayerGameObject extends RigidBodyGameObject implements IUpdatable
->>>>>>> origin/#104SceneCamera作成
+
 {
   public LinkedList< Item > items;
   public InputManager input_manager;
