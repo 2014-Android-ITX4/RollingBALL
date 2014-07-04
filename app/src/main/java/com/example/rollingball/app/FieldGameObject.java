@@ -28,15 +28,13 @@ public class FieldGameObject extends GameObject
       field_planes.add( field_lines );
       field_lines = new ArrayList< Float >();
     }
-
   }
 
   // ファイル読み込み
   public void load_from_file()
   {
     try {
-      //Resources res = getResources();
-      AssetManager as = getResources().getAssets();
+      AssetManager as = this._scene.scene_manager.view.getResources().getAssets();
       InputStream in = as.open( "sample_field.png" );
     } catch (FileNotFoundException e) {
       e.printStackTrace();
