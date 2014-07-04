@@ -19,9 +19,13 @@ public class RigidBodyGameObject extends GameObject
     for( Vec3 f: forces )
       force_sum = force_sum.add( f );
 
+    forces.clear();
+
+    float delta_time_in_seconds = delta_time_in_ns * 1.0e-9f;
+
     acceleration = force_sum.multiply( 1.0f / mass );
-    velocity = velocity.add( acceleration.multiply( delta_time_in_ns ) );
-    position = velocity.add( velocity.multiply( delta_time_in_ns ) );
+    velocity = velocity.add( acceleration.multiply( delta_time_in_seconds ) );
+    position = velocity.add( velocity.multiply( delta_time_in_seconds ) );
 
     super.update( delta_time_in_ns );
   }
