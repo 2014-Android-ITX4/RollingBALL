@@ -2,6 +2,7 @@ package com.example.rollingball.app;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -10,6 +11,8 @@ class MainRenderer implements GLSurfaceView.Renderer
 {
   private MainView _main_view;
   private long _before_time_in_ns;
+  private int screen_width;
+  private int screen_height;
 
   public MainRenderer( final MainView main_view )
   { _main_view = main_view; }
@@ -34,6 +37,12 @@ class MainRenderer implements GLSurfaceView.Renderer
   @Override
   public void onSurfaceChanged( final GL10 gl10, final int width, final int height )
   {
+    screen_width = width;
+    screen_height = height;
+    setScreenW( screen_width );
+    setScreenH( screen_height );
+    Log.d( "size", "width："+screen_width );
+    Log.d( "size", "height："+screen_height );
     GLES20.glViewport( 0, 0, width, height );
   }
 
@@ -132,5 +141,13 @@ class MainRenderer implements GLSurfaceView.Renderer
     // デプスバッファの有効化
     GLES20.glEnable( GLES20.GL_DEPTH_TEST );
 
+  }
+  public void setScreenW(int screen_width)
+  {
+    _main_view.screen_width = screen_width;
+  }
+  public void setScreenH(int screen_height)
+  {
+    _main_view.screen_height = screen_height;
   }
 }
