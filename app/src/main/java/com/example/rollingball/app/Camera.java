@@ -5,6 +5,7 @@ import android.opengl.GLES20;
 import com.hackoeur.jglm.Matrices;
 import com.hackoeur.jglm.Mat4;
 import com.hackoeur.jglm.Vec3;
+import com.hackoeur.jglm.Vec4;
 
 /**
  * Created by Tukasa on 2014/05/14.

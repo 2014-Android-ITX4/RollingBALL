@@ -1,8 +1,10 @@
 package com.example.rollingball.app;
 
 import android.opengl.GLU;
+import android.util.Log;
 
 import com.hackoeur.jglm.Vec3;
+import com.hackoeur.jglm.Vec4;
 
 public class StageCamera extends Camera
 {
@@ -17,6 +19,20 @@ public class StageCamera extends Camera
 
   // プレイヤーゲームオブジェクトを保持しておく
   private PlayerGameObject _player_game_object = null;
+
+  //端末の横幅、縦幅
+  private float screen_width;
+  private float screen_height;
+  private float diffX;
+  private float diffY;
+  private float velocityX;
+  private float velocityY;
+  private int swipe_distance = 100;
+  private int swipe_velocity = 100;
+  private float pi = (float)Math.PI;
+  private float omega = 0.0f;
+  private float time_conversion = 1.0e-9f;
+  private Vec4 event = new Vec4( 0.0f, 0.0f, 0.0f, 0.0f );
 
   // プレイヤーゲームオブジェクトをシーンから探す
   private void find_player_game_object()
@@ -40,6 +56,62 @@ public class StageCamera extends Camera
   @Override
   public void update( long delta_time_in_ns )
   {
+    screen_width = scene.scene_manager.view.screen_width;
+    screen_height = scene.scene_manager.view.screen_height;
+    Log.d( "simpleOn" , "StageCameraのwidth" + screen_width );
+    Log.d( "simpleOn" , "StageCameraのheight" + screen_height );
+    event = scene.scene_manager.view.activity.touch_event;
+    diffX = event.getX();
+    diffY = event.getY();
+    velocityX = event.getZ();
+    velocityY = event.getW();
+    float asd = 0.0f;
+
+    if ( Math.abs( diffX ) > swipe_distance && Math.abs( velocityX ) > swipe_velocity )
+    {
+      omega = time_conversion * pi * diffX / screen_width;
+      if ( diffX > 0 )
+      {
+        //右にスワイプ
+        //θ減少
+        theta( theta() - omega * delta_time_in_ns );
+        Log.d( "simpleOn", "right" );
+        asd = theta();
+        Log.d( "simpleOn", Float.toString( asd ) );
+      }
+      else
+      {
+        //左にスワイプ
+        //θ増加
+        theta( theta() + omega * delta_time_in_ns );
+        Log.d( "simpleOn", "left" );
+        asd = theta();
+        Log.d( "simpleOn", Float.toString( asd ));
+      }
+    }
+    if ( Math.abs( diffY ) > swipe_distance && Math.abs( velocityY ) > swipe_velocity )
+    {
+      omega = time_conversion * pi * diffY / screen_height;
+      if ( diffY > 0 )
+      {
+        //上にスワイプ
+        //φ減少
+        phi( phi() - omega * delta_time_in_ns );
+        Log.d( "simpleOn", "bottom" );
+        asd = phi();
+        Log.d( "simpleOn", Float.toString(asd) );
+      }
+      else
+      {
+        //下にスワイプ
+        //φ増加
+        phi( phi() + omega * delta_time_in_ns );
+        Log.d( "simpleOn", "top" );
+        asd = phi();
+        Log.d( "simpleOn", Float.toString( asd ) );
+      }
+    }
+
     // 複数回使うので事前に1回だけ計算して保持
     final float dst  = _distance * (float) Math.sin( _theta );
 

@@ -7,10 +7,13 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 
 import com.hackoeur.jglm.Vec3;
+import com.hackoeur.jglm.Vec4;
 
 import java.util.List;
 
@@ -24,7 +27,10 @@ public class MainActivity
 
   private final int MATRIX_SIZE = 16;
 
+  private GestureDetector gestureDetector;
+
   public Vec3 rotation = new Vec3( 0.0f, 0.0f, 0.0f );
+  public Vec4 touch_event = new Vec4( 0.0f, 0.0f, 0.0f, 0.0f );
 
   @Override
   protected void onCreate( Bundle savedInstanceState )
@@ -36,6 +42,8 @@ public class MainActivity
 
     //センサ・マネージャの取得
     sensor_manager = ( SensorManager )getSystemService( SENSOR_SERVICE );
+
+    gestureDetector = new GestureDetector( this, onGestureListener );
 
   }
 
@@ -142,4 +150,26 @@ public class MainActivity
     }
     return super.onOptionsItemSelected( item );
   }
+
+  @Override
+  public boolean onTouchEvent(MotionEvent event) {
+    gestureDetector.onTouchEvent(event);
+    return false;
+  }
+
+  private GestureDetector.SimpleOnGestureListener onGestureListener = new GestureDetector.SimpleOnGestureListener()
+  {
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY)
+    {
+      float diffX = e2.getX() - e1.getX();
+      float diffY = e2.getY() - e1.getY();
+      Log.d( "simpleOn", "diffX:"+  diffX);
+      touch_event = new Vec4(diffX, diffY, velocityX, velocityY);
+      Log.d( "simpleOn", "MainActivityのtouch_event"+touch_event );
+
+      return false;
+    }
+  };
+
 }
