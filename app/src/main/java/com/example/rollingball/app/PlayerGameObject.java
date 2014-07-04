@@ -10,7 +10,7 @@ public class PlayerGameObject extends RigidBodyGameObject implements IUpdatable
   public InputManager input_manager;
 
   PlayerGameObject( final InputManager s )
-  {}
+  { input_manager = s; }
 
   @Override
   public void update( final long delta_time_in_ns )

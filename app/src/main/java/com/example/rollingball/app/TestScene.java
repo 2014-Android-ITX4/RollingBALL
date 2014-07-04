@@ -15,7 +15,7 @@ public class TestScene extends Scene
   TestScene( final SceneManager s )
   {
     super( s );
-    push( player = new PlayerGameObject() );
+    push( player = new PlayerGameObject(input_manager) );
   }
 
   @Override
