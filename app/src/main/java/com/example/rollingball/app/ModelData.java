@@ -54,8 +54,21 @@ public class ModelData
     {
       0, 1, 2, 3, 6, 7, 4, 5, 0, 1,//面0
       1, 5, 3, 7,            //面1
-      0, 2, 4, 6,            //面2
+      0, 2, 4, 6            //面2
     };
+
+//    float[] vertices =
+//      {
+//       1, 1, 0,
+//        1,-1, 0,
+//        -1, -1, 0
+//      };
+//
+//    //インデックスバッファの元データ配列を定義
+//    byte[] indices =
+//      {
+//        0, 1, 2
+//      };
 
     return new ModelData( vertices, indices );
   }
@@ -80,7 +93,7 @@ public class ModelData
     GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, _indices_buffer_id );
 
     // 頂点レイアウトの指定
-    GLES20.glVertexAttribPointer( GLES20.glGetAttribLocation( program_id, "position" ), 4, GLES20.GL_FLOAT, false, 0, 0  );
+    GLES20.glVertexAttribPointer( GLES20.glGetAttribLocation( program_id, "position" ), 3, GLES20.GL_FLOAT, false, 0, 0  );
 
     // ワールド変換
     GLES20.glUniformMatrix4fv( GLES20.glGetUniformLocation( program_id , "world_transformation" ), 1, false, transformation.getBuffer( ) );

@@ -64,11 +64,11 @@ class MainRenderer implements GLSurfaceView.Renderer
           + "varying vec2 var_texcoord;\n"
           + "varying vec3 var_normal;\n"
           + "uniform mat4 world_transformation;\n"
-          + "uniform mat4 view_transformation;"
-          + "uniform mat4 projection_transformation;"
+          + "uniform mat4 view_transformation;\n"
+          + "uniform mat4 projection_transformation;\n"
           + "void main()\n"
           + "{\n"
-          + "  gl_Position = projection_transformation * view_transformation * world_transformation * position;\n"
+          + "  gl_Position =  projection_transformation * view_transformation * world_transformation * position;\n"
           + "  var_texcoord = texcoord;\n"
           + "  var_normal = normal;\n"
           + "}\n"
@@ -152,7 +152,7 @@ class MainRenderer implements GLSurfaceView.Renderer
     // デプスバッファの有効化
     GLES20.glEnable( GLES20.GL_DEPTH_TEST );
 
-    Mat4 projection = Matrices.perspective( 60, 16/9, 0.001f, 1000 );
+    Mat4 projection = Matrices.perspective( 60, 16.0f/9.0f, 0.001f, 1000 );
     int location_of_projection_transformation = GLES20.glGetUniformLocation( program , "projection_transformation" );
     GLES20.glUniformMatrix4fv( location_of_projection_transformation, 1, false, projection.getBuffer() );
   }
