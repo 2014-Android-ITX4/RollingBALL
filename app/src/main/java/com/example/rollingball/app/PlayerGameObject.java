@@ -3,7 +3,7 @@ package com.example.rollingball.app;
 import com.hackoeur.jglm.Vec3;
 import java.util.LinkedList;
 
-public class PlayerGameObject extends RigidBodyGameObject implements IUpdatable
+public class PlayerGameObject extends LifeGameObject implements IUpdatable
 
 {
   public LinkedList< Item > items;
@@ -22,7 +22,7 @@ public class PlayerGameObject extends RigidBodyGameObject implements IUpdatable
     // 標準体重のハムスターを1[秒間]に1[m/(ss)]加速する程度の力f: 1.0e-1 [N]
     final float max_force = 1.0e-1f;
 
-    // 傾きに応じて速度に力(f)を追加する
+    // 傾きに応じてオブジェクトの力群forcesに力fを追加する
     forces.add( input_manager.rotation.multiply( max_force ) );
 
     super.update( delta_time_in_ns );
