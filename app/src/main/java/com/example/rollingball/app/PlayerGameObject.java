@@ -10,7 +10,10 @@ public class PlayerGameObject extends LifeGameObject implements IUpdatable
   public InputManager input_manager;
 
   PlayerGameObject( final InputManager s )
-  { input_manager = s; }
+  {
+    this.mass = 0.1f;
+    input_manager = s;
+  }
 
   @Override
   public void update( final long delta_time_in_ns )
