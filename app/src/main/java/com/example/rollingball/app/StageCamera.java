@@ -56,10 +56,12 @@ public class StageCamera extends Camera
   @Override
   public void update( long delta_time_in_ns )
   {
-    screen_width = scene.scene_manager.view.screen_width;
-    screen_height = scene.scene_manager.view.screen_height;
+    screen_width = scene.scene_manager.view.screen_width();
+    screen_height = scene.scene_manager.view.screen_height();
+
     Log.d( "simpleOn" , "StageCameraのwidth" + screen_width );
     Log.d( "simpleOn" , "StageCameraのheight" + screen_height );
+
     event = scene.scene_manager.view.activity.touch_event;
     diffX = event.getX();
     diffY = event.getY();
