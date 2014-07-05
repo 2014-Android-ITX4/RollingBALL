@@ -1,9 +1,13 @@
 package com.example.rollingball.app;
 
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,6 +29,26 @@ public class MainView extends GLSurfaceView
     this.setRenderer( renderer );
 
     scene_manager = new SceneManager( this );
+  }
+
+  public Bitmap load_bitmap_from_asset( String path )
+  {
+    Bitmap bitmap = null;
+
+    try
+    {
+      bitmap = BitmapFactory.decodeStream( getResources().getAssets().open( path ) );
+    }
+    catch (FileNotFoundException e)
+    {
+      e.printStackTrace();
+    }
+    catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+
+    return bitmap;
   }
 
   public String load_text_from_raw_resource( int resource_id )
