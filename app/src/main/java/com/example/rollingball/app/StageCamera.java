@@ -3,6 +3,7 @@ package com.example.rollingball.app;
 import android.opengl.GLU;
 import android.util.Log;
 
+import com.hackoeur.jglm.Vec;
 import com.hackoeur.jglm.Vec3;
 import com.hackoeur.jglm.Vec4;
 
@@ -20,19 +21,14 @@ public class StageCamera extends Camera
   // プレイヤーゲームオブジェクトを保持しておく
   private PlayerGameObject _player_game_object = null;
 
-  //端末の横幅、縦幅
-  private float screen_width;
-  private float screen_height;
-  private float diffX;
-  private float diffY;
-  private float velocityX;
-  private float velocityY;
-  private int swipe_distance = 100;
-  private int swipe_velocity = 100;
-  private float pi = (float)Math.PI;
-  private float omega = 0.0f;
-  private float time_conversion = 1.0e-9f;
-  private Vec4 event = new Vec4( 0.0f, 0.0f, 0.0f, 0.0f );
+  public void StageCamera( Scene scene )
+  {
+    // 親クラスのコンストラクターの呼び出し
+    super.Camera(scene);
+
+    // この時点でプレイヤーゲームオブジェクトがあればセットする
+    find_player_game_object();
+  }
 
   // プレイヤーゲームオブジェクトをシーンから探す
   private void find_player_game_object()
@@ -44,76 +40,21 @@ public class StageCamera extends Camera
         _player_game_object = (PlayerGameObject)o;
   }
 
-  public void StageCamera( Scene scene )
-  {
-    // 親クラスのコンストラクターの呼び出し
-    super.Camera(scene);
-
-    // この時点でプレイヤーゲームオブジェクトがあればセットする
-    find_player_game_object();
-  }
-
   @Override
   public void update( long delta_time_in_ns )
   {
-    screen_width = scene.scene_manager.view.screen_width();
-    screen_height = scene.scene_manager.view.screen_height();
+    final float delta_time_in_seconds = (float)delta_time_in_ns * 1.0e-9f;
 
-    Log.d( "simpleOn" , "StageCameraのwidth" + screen_width );
-    Log.d( "simpleOn" , "StageCameraのheight" + screen_height );
+    update_swipe( delta_time_in_seconds );
 
-    event = scene.scene_manager.view.activity.touch_event;
-    diffX = event.getX();
-    diffY = event.getY();
-    velocityX = event.getZ();
-    velocityY = event.getW();
-    float asd = 0.0f;
+    update_position();
 
-    if ( Math.abs( diffX ) > swipe_distance && Math.abs( velocityX ) > swipe_velocity )
-    {
-      omega = time_conversion * pi * diffX / screen_width;
-      if ( diffX > 0 )
-      {
-        //右にスワイプ
-        //θ減少
-        theta( theta() - omega * delta_time_in_ns );
-        Log.d( "simpleOn", "right" );
-        asd = theta();
-        Log.d( "simpleOn", Float.toString( asd ) );
-      }
-      else
-      {
-        //左にスワイプ
-        //θ増加
-        theta( theta() + omega * delta_time_in_ns );
-        Log.d( "simpleOn", "left" );
-        asd = theta();
-        Log.d( "simpleOn", Float.toString( asd ));
-      }
-    }
-    if ( Math.abs( diffY ) > swipe_distance && Math.abs( velocityY ) > swipe_velocity )
-    {
-      omega = time_conversion * pi * diffY / screen_height;
-      if ( diffY > 0 )
-      {
-        //上にスワイプ
-        //φ減少
-        phi( phi() - omega * delta_time_in_ns );
-        Log.d( "simpleOn", "bottom" );
-        asd = phi();
-        Log.d( "simpleOn", Float.toString(asd) );
-      }
-      else
-      {
-        //下にスワイプ
-        //φ増加
-        phi( phi() + omega * delta_time_in_ns );
-        Log.d( "simpleOn", "top" );
-        asd = phi();
-        Log.d( "simpleOn", Float.toString( asd ) );
-      }
-    }
+    // override 元の親クラスの update も呼んでおく
+    super.update( delta_time_in_ns );
+  }
 
+  private  void update_position()
+  {
     // 複数回使うので事前に1回だけ計算して保持
     final float dst  = _distance * (float) Math.sin( _theta );
 
@@ -135,9 +76,25 @@ public class StageCamera extends Camera
 
     // カメラの視点位置をプレイヤーゲームオブジェクトを基準に軌道上の差分位置を加算して設定
     eye = _player_game_object.position.add( delta_position );
+  }
 
-    // override 元の親クラスの update も呼んでおく
-    super.update( delta_time_in_ns );
+  private void update_swipe( float delta_time_in_seconds )
+  {
+    Vec3 screen_size = new Vec3
+      ( scene.scene_manager.view.screen_width()
+      , scene.scene_manager.view.screen_height()
+      , 0.0f
+      );
+
+    Log.d( "screen size" , screen_size.toString() );
+
+    Vec3 dp = scene.scene_manager.view.activity.swipe_delta_position();
+    Vec3 rotation_ratio = new Vec3( dp.getX() / screen_size.getX(), dp.getY() / screen_size.getY(), 0.0f );
+
+    final float rotation_magnifier = (float)Math.PI;
+
+    _theta += rotation_magnifier * rotation_ratio.getX();
+    _phi   += rotation_magnifier * rotation_ratio.getY();
   }
 
   // distance を一定値範囲内だけで設定可能とするためのプロパティーセッターアクセサー
