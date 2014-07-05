@@ -22,7 +22,7 @@ public class Camera implements IUpdatable
   }
 
   @Override
-  public void update( final long delta_time_in_ns )
+  public void update( final float delta_time_in_seconds )
   {
     //Log.d( "Camera update", "updateが呼び出されました" );
 

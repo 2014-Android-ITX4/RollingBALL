@@ -11,7 +11,7 @@ public class RigidBodyGameObject extends GameObject
   public ArrayList<Float> collision_radiuses = new ArrayList< Float >( );
 
   @Override
-  public void update( final long delta_time_in_ns )
+  public void update( final float delta_time_in_seconds )
   {
     Vec3 acceleration = new Vec3( 0.0f, 0.0f, 0.0f );
     Vec3 force_sum    = new Vec3( 0.0f, 0.0f, 0.0f );
@@ -21,12 +21,10 @@ public class RigidBodyGameObject extends GameObject
 
     forces.clear();
 
-    float delta_time_in_seconds = delta_time_in_ns * 1.0e-9f;
-
     acceleration = force_sum.multiply( 1.0f / mass );
     velocity = velocity.add( acceleration.multiply( delta_time_in_seconds ) );
     position = velocity.add( velocity.multiply( delta_time_in_seconds ) );
 
-    super.update( delta_time_in_ns );
+    super.update( delta_time_in_seconds );
   }
 }

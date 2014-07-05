@@ -16,10 +16,10 @@ public class StageScene extends Scene
   }
 
   @Override
-  public void update( final long delta_time_in_ns )
+  public void update( final float delta_time_in_seconds )
   {
     if ( ! _pause ) _stage_time++;
-    super.update( delta_time_in_ns );
+    super.update( delta_time_in_seconds );
   }
 
   //TODO:update()で_pauseの判定とフラグセット

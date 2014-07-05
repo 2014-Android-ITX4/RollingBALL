@@ -16,7 +16,7 @@ public class PlayerGameObject extends LifeGameObject implements IUpdatable
   }
 
   @Override
-  public void update( final long delta_time_in_ns )
+  public void update( final float delta_time_in_seconds )
   {
     // 傾きからかかる力を計算
     // 傾きベクターの値の範囲 [ -π .. +π ] [rad]
@@ -28,6 +28,6 @@ public class PlayerGameObject extends LifeGameObject implements IUpdatable
     // 傾きに応じてオブジェクトの力群forcesに力fを追加する
     forces.add( input_manager.rotation.multiply( max_force ) );
 
-    super.update( delta_time_in_ns );
+    super.update( delta_time_in_seconds );
   }
 }
