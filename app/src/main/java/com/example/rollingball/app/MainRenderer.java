@@ -2,6 +2,15 @@ package com.example.rollingball.app;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
+
+import com.hackoeur.jglm.Mat4;
+import com.hackoeur.jglm.Matrices;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -10,6 +19,10 @@ class MainRenderer implements GLSurfaceView.Renderer
 {
   private MainView _main_view;
   private long _before_time_in_ns;
+  private int screen_width;
+  private int screen_height;
+
+  int program;
 
   public MainRenderer( final MainView main_view )
   { _main_view = main_view; }
@@ -34,6 +47,12 @@ class MainRenderer implements GLSurfaceView.Renderer
   @Override
   public void onSurfaceChanged( final GL10 gl10, final int width, final int height )
   {
+    screen_width = width;
+    screen_height = height;
+    setScreenW( screen_width );
+    setScreenH( screen_height );
+    Log.d( "size", "width："+screen_width );
+    Log.d( "size", "height："+screen_height );
     GLES20.glViewport( 0, 0, width, height );
   }
 
@@ -53,10 +72,12 @@ class MainRenderer implements GLSurfaceView.Renderer
           + "attribute vec3 normal;\n"
           + "varying vec2 var_texcoord;\n"
           + "varying vec3 var_normal;\n"
-          + "uniform mat4 world_view_transformation;\n"
+          + "uniform mat4 world_transformation;\n"
+          + "uniform mat4 view_transformation;\n"
+          + "uniform mat4 projection_transformation;\n"
           + "void main()\n"
           + "{\n"
-          + "  gl_Position = world_view_transformation * position;\n"
+          + "  gl_Position =  projection_transformation * view_transformation * world_transformation * position;\n"
           + "  var_texcoord = texcoord;\n"
           + "  var_normal = normal;\n"
           + "}\n"
@@ -90,14 +111,18 @@ class MainRenderer implements GLSurfaceView.Renderer
           + "uniform vec3 specular;\n"
           + "uniform vec3 emisive;\n"
           + "uniform float transparent;\n"
+          + "uniform float diffuse_texture_blending_factor;"
 
           + "bool is_nan( float );\n"
 
           + "void main()\n"
           + "{\n"
-          + "  gl_FragColor = is_nan( var_texcoord.x ) \n"
-          + "    ? vec4( diffuse, 1.0 )\n"
-          + "    : texture2D( diffuse_sampler, var_texcoord );\n"
+          + "  gl_FragColor = vec4( diffuse, 1.0 ); \n"
+          + "  if ( diffuse_texture_blending_factor > 0.0 )\n"
+          + "  {\n"
+          + "    gl_FragColor.rgb *= 1.0 - diffuse_texture_blending_factor;\n"
+          + "    gl_FragColor     += texture2D( diffuse_sampler, var_texcoord ) * diffuse_texture_blending_factor;\n"
+          + "  }\n"
           + "  gl_FragColor.a *= transparent;\n"
           + "}\n"
 
@@ -114,7 +139,7 @@ class MainRenderer implements GLSurfaceView.Renderer
       throw new RuntimeException( GLES20.glGetShaderInfoLog( fragment_shader ) );
 
     // shader program
-    int program = GLES20.glCreateProgram();
+    program = GLES20.glCreateProgram();
     if ( program == 0 )
       throw new RuntimeException();
 
@@ -129,8 +154,23 @@ class MainRenderer implements GLSurfaceView.Renderer
 
     GLES20.glUseProgram( program );
 
+    GLES20.glEnableVertexAttribArray( GLES20.glGetAttribLocation( program, "position" ) );
+    // TODO: テクスチャーを使うようになったらどうぞ。
+    //GLES20.glEnableVertexAttribArray( GLES20.glGetAttribLocation( program, "texcoord" ) );
+
     // デプスバッファの有効化
     GLES20.glEnable( GLES20.GL_DEPTH_TEST );
 
+    Mat4 projection = Matrices.perspective( 60, 16.0f/9.0f, 0.001f, 1000 );
+    int location_of_projection_transformation = GLES20.glGetUniformLocation( program , "projection_transformation" );
+    GLES20.glUniformMatrix4fv( location_of_projection_transformation, 1, false, projection.getBuffer() );
+  }
+  public void setScreenW(int screen_width)
+  {
+    _main_view.screen_width = screen_width;
+  }
+  public void setScreenH(int screen_height)
+  {
+    _main_view.screen_height = screen_height;
   }
 }
