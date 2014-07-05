@@ -7,6 +7,7 @@ import android.util.Log;
 import com.hackoeur.jglm.Matrices;
 import com.hackoeur.jglm.Mat4;
 import com.hackoeur.jglm.Vec3;
+import com.hackoeur.jglm.Vec4;
 
 public class Camera implements IUpdatable
 {
