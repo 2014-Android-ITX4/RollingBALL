@@ -26,8 +26,6 @@ public class MainActivity
   public Vec3 rotation = new Vec3( 0.0f, 0.0f, 0.0f );
   public Vec4 touch_event = new Vec4( 0.0f, 0.0f, 0.0f, 0.0f );
 
-  private final int MATRIX_SIZE = 16;
-
   private MainView _view;
   private boolean _is_magnetic_sensor, _is_accelerometer_sensor;
 
