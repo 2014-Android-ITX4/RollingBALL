@@ -1,7 +1,12 @@
 package com.example.rollingball.app;
 import android.annotation.TargetApi;
+import android.opengl.GLES20;
 import android.os.Build;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.*;
 import java.lang.*;
 import java.io.*;
@@ -17,7 +22,7 @@ public class SceneManager implements IUpdatable, IDrawable
   {
     view = view_;
 
-    push( new TestScene( this ) );
+    //push( new TestScene( this ) );
   }
 
   void push( Scene scene )
@@ -33,37 +38,37 @@ public class SceneManager implements IUpdatable, IDrawable
   }
 
   @Override
-  public void update( final long delta_time_in_ns )
+  public void update( final float delta_time_in_seconds )
   {
+    //*
     do
     {
       Scene scene = _scenes.peek();
 
-      scene.update( delta_time_in_ns );
-
       // bool to_exit が true ならばそのシーンをpop
-      if ( scene.to_exit )
+      if ( scene != null )
+        if ( scene.to_exit )
+          _scenes.pop();
+
+      // _scenesが空のとき
+      if ( _scenes.isEmpty() == true )
       {
-        _scenes.pop();
-
-        // _scenesが空のとき
-        if ( _scenes.isEmpty() == true )
-        {
-          // TODO: version-0.2.0 レベルで作成される BlandLogoScene の自動push
-          // push( new BlandLogoScene(  ) );
-          push( new TestScene( this ) );
-
-        }
+        // TODO: version-0.2.0 レベルで作成される BlandLogoScene の自動push
+        // push( new BlandLogoScene(  ) );
+        push( new TestScene( this ) );
 
         continue;
       }
+      scene.update( delta_time_in_seconds );
     }
     while ( false );
-
+    //*/
   }
 
   @Override
   public void draw()
-  { _scenes.peek().draw(); }
+  {
+    _scenes.peek().draw();
+  }
 
 }

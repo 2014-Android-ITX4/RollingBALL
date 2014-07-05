@@ -5,13 +5,13 @@ import java.util.ArrayList;
 
 public class RigidBodyGameObject extends GameObject
 {
-  public float mass;             //質量
-  public Vec3 velocity;          //速度
-  public ArrayList<Vec3> forces; //力
-  public ArrayList<Float> collision_radiuses;
+  public float mass = 1.0f;             //質量
+  public Vec3 velocity = new Vec3( 0, 0, 0 );          //速度
+  public ArrayList<Vec3> forces = new ArrayList< Vec3 >(); //力
+  public ArrayList<Float> collision_radiuses = new ArrayList< Float >( );
 
   @Override
-  public void update( final long delta_time_in_ns )
+  public void update( final float delta_time_in_seconds )
   {
     Vec3 acceleration = new Vec3( 0.0f, 0.0f, 0.0f );
     Vec3 force_sum    = new Vec3( 0.0f, 0.0f, 0.0f );
@@ -19,10 +19,12 @@ public class RigidBodyGameObject extends GameObject
     for( Vec3 f: forces )
       force_sum = force_sum.add( f );
 
-    acceleration = force_sum.multiply( 1.0f / mass );
-    velocity = velocity.add( acceleration.multiply( delta_time_in_ns ) );
-    position = velocity.add( velocity.multiply( delta_time_in_ns ) );
+    forces.clear();
 
-    super.update( delta_time_in_ns );
+    acceleration = force_sum.multiply( 1.0f / mass );
+    velocity = velocity.add( acceleration.multiply( delta_time_in_seconds ) );
+    position = velocity.add( velocity.multiply( delta_time_in_seconds ) );
+
+    super.update( delta_time_in_seconds );
   }
 }

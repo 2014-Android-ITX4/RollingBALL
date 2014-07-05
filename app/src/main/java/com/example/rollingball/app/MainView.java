@@ -3,12 +3,14 @@ package com.example.rollingball.app;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 
-/**
- * Created by sakamoto on 2014/05/14.
- */
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 public class MainView extends GLSurfaceView
 {
-  private MainRenderer _renderer;
+  public MainRenderer renderer;
   public SceneManager scene_manager;
   public MainActivity activity;
 
@@ -17,11 +19,36 @@ public class MainView extends GLSurfaceView
     super( context );
 
     activity = arg_activity;
-    scene_manager = new SceneManager( this );
 
     this.setEGLContextClientVersion( 2 );
-    _renderer = new MainRenderer( this );
-    this.setRenderer( _renderer );
+    renderer = new MainRenderer( this );
+    this.setRenderer( renderer );
+
+    scene_manager = new SceneManager( this );
   }
+
+  public String load_text_from_raw_resource( int resource_id )
+  {
+    InputStream s = getResources().openRawResource( resource_id );
+    InputStreamReader sr = new InputStreamReader( s );
+
+    final int buffer_size = 64 * 1024;
+
+    char[] char_buffer = new char[ buffer_size ];
+    int read_size = 0;
+
+    try
+    { read_size = sr.read( char_buffer, 0, buffer_size ); }
+    catch ( IOException e )
+    { e.printStackTrace(); }
+
+    return String.valueOf( char_buffer, 0, read_size );
+  }
+
+  public int screen_width()
+  { return renderer.screen_width(); }
+
+  public int screen_height()
+  { return renderer.screen_height(); }
 
 }

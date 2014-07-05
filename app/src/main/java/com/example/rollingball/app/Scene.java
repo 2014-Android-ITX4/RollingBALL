@@ -18,10 +18,12 @@ public class Scene implements IUpdatable, IDrawable
     game_objects = new LinkedList< GameObject >();
     camera = new Camera();
     input_manager = new InputManager( this );
+    to_exit = false;
 }
 
-  void push( GameObject game_object ){
-
+  void push( GameObject game_object )
+  {
+    game_objects.push( game_object );
   }
 
   void message( Message message ){
@@ -33,18 +35,20 @@ public class Scene implements IUpdatable, IDrawable
   }
 
   @Override
-  public void update( long delta_time_in_ns )
+  public void update( final float delta_time_in_seconds )
   {
-    input_manager.update( delta_time_in_ns );
+    input_manager.update( delta_time_in_seconds );
+    camera.update( delta_time_in_seconds );
 
     for ( GameObject g : game_objects )
-      g.update( delta_time_in_ns );
+      g.update( delta_time_in_seconds );
   }
 
   @Override
   public void draw()
   {
-
+    for ( GameObject g : game_objects )
+      g.draw();
   }
 
 }
