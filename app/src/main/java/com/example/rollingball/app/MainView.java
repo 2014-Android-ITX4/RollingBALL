@@ -37,14 +37,14 @@ public class MainView extends GLSurfaceView
     final int buffer_size = 64 * 1024;
 
     char[] char_buffer = new char[ buffer_size ];
-    int readed_size = 0;
+    int read_size = 0;
 
     try
-    { readed_size = sr.read( char_buffer, 0, buffer_size ); }
+    { read_size = sr.read( char_buffer, 0, buffer_size ); }
     catch ( IOException e )
     { e.printStackTrace(); }
 
-    return String.valueOf( char_buffer, 0, readed_size );
+    return String.valueOf( char_buffer, 0, read_size );
   }
 
 }
