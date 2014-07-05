@@ -4,15 +4,32 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
+import com.hackoeur.jglm.Mat4;
+import com.hackoeur.jglm.Matrices;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 class MainRenderer implements GLSurfaceView.Renderer
 {
-  private MainView _main_view;
-  private long _before_time_in_ns;
-  private int screen_width;
-  private int screen_height;
+  private MainView _main_view = null;
+
+  private long _before_time_in_ns = 0;
+
+  private int _screen_width  = 0;
+  private int _screen_height = 0;
+
+  private float _field_of_view = (float)( Math.PI / 3.0 );
+  private float _aspect_ratio  = 1.0f;
+  private float _near_clip     = 1.0e-3f;
+  private float _far_clip      = 1.0e+3f;
+
+  private int _program = 0;
 
   public MainRenderer( final MainView main_view )
   { _main_view = main_view; }
@@ -37,98 +54,89 @@ class MainRenderer implements GLSurfaceView.Renderer
   @Override
   public void onSurfaceChanged( final GL10 gl10, final int width, final int height )
   {
-    screen_width = width;
-    screen_height = height;
-    setScreenW( screen_width );
-    setScreenH( screen_height );
-    Log.d( "size", "width："+screen_width );
-    Log.d( "size", "height："+screen_height );
+    Log.d( "change screen width" , String.valueOf( width ) );
+    Log.d( "change screen height", String.valueOf( height ) );
+
+    _screen_width  = width;
+    _screen_height = height;
+    _aspect_ratio  = (float)width / (float) height;
+
     GLES20.glViewport( 0, 0, width, height );
+
+    uniform_projection_transformation( _field_of_view, _aspect_ratio, _near_clip, _far_clip );
   }
 
   @Override
   public void onSurfaceCreated( final GL10 gl10, final EGLConfig eglConfig )
   {
-    int vertex_shader = GLES20.glCreateShader( GLES20.GL_VERTEX_SHADER );
+    _program = create_program_from_sources
+      ( _main_view.load_text_from_raw_resource( R.raw.shader_default_vertex )
+      , _main_view.load_text_from_raw_resource( R.raw.shader_default_fragment )
+      );
 
-    if( vertex_shader == 0 )
+    GLES20.glUseProgram( _program );
+
+    GLES20.glEnableVertexAttribArray( GLES20.glGetAttribLocation( _program, "position" ) );
+    // TODO: テクスチャーを使うようになったらどうぞ。
+    //GLES20.glEnableVertexAttribArray( GLES20.glGetAttribLocation( program, "texcoord" ) );
+
+    // デプスバッファの有効化
+    GLES20.glEnable( GLES20.GL_DEPTH_TEST );
+
+    uniform_projection_transformation( _field_of_view, _aspect_ratio, _near_clip, _far_clip );
+  }
+
+  public int screen_width( )
+  {
+    return _screen_width;
+  }
+
+  public int screen_height( )
+  {
+   return _screen_height;
+  }
+
+  private void uniform_projection_transformation( float field_of_view_in_rad, float aspect_ratio, float near_clip, float far_clip )
+  {
+    Mat4 projection = Matrices.perspective( (float)Math.toDegrees( field_of_view_in_rad ), aspect_ratio, near_clip, far_clip );
+    int location_of_projection_transformation = GLES20.glGetUniformLocation( _program , "projection_transformation" );
+    GLES20.glUniformMatrix4fv( location_of_projection_transformation, 1, false, projection.getBuffer() );
+  }
+
+  // String ( shader source code ) --> int ( shader id )
+  private static int create_shader( String shader_source_code, int shader_type )
+  {
+    int shader_id = GLES20.glCreateShader( shader_type );
+
+    if( shader_id == 0 )
       throw new RuntimeException();
 
-    GLES20.glShaderSource
-      ( vertex_shader
-        , "#version 100\n"
-          + "attribute vec4 position;\n"
-          + "attribute vec2 texcoord;\n"
-          + "attribute vec3 normal;\n"
-          + "varying vec2 var_texcoord;\n"
-          + "varying vec3 var_normal;\n"
-          + "uniform mat4 world_view_transformation;\n"
-          + "void main()\n"
-          + "{\n"
-          + "  gl_Position = world_view_transformation * position;\n"
-          + "  var_texcoord = texcoord;\n"
-          + "  var_normal = normal;\n"
-          + "}\n"
-      );
-    GLES20.glCompileShader( vertex_shader );
+    GLES20.glShaderSource( shader_id, shader_source_code );
+    GLES20.glCompileShader( shader_id );
 
     final int[] vertex_shader_result = new int[ 1 ];
-    GLES20.glGetShaderiv( vertex_shader, GLES20.GL_COMPILE_STATUS, vertex_shader_result, 0 );
+    GLES20.glGetShaderiv( shader_id, GLES20.GL_COMPILE_STATUS, vertex_shader_result, 0 );
     if ( vertex_shader_result[ 0 ] == 0 )
-      throw new RuntimeException( GLES20.glGetShaderInfoLog( vertex_shader ) );
+      throw new RuntimeException( GLES20.glGetShaderInfoLog( shader_id ) );
 
-    // fragment shader
-    int fragment_shader = GLES20.glCreateShader( GLES20.GL_FRAGMENT_SHADER );
+    return shader_id;
+  }
 
-    if ( fragment_shader == 0)
-      throw new RuntimeException();
+  private static int create_vertex_shader( String shader_source_code )
+  { return create_shader( shader_source_code, GLES20.GL_VERTEX_SHADER ); }
 
-    GLES20.glShaderSource
-      ( fragment_shader
-        , "#version 100\n"
-          + "#ifdef GL_FRAGMENT_PRECISION_HIGH\n"
-          + "  precision highp float;\n"
-          + "#else\n"
-          + "  precision mediump float;\n"
-          + "#endif\n"
-          + "varying vec2 var_texcoord;\n"
-          + "varying vec3 var_normal;\n"
-          + "uniform sampler2D diffuse_sampler;\n"
-          + "uniform vec3 diffuse;\n"
-          + "uniform vec3 ambient;\n"
-          + "uniform vec3 specular;\n"
-          + "uniform vec3 emisive;\n"
-          + "uniform float transparent;\n"
+  private static int create_fragment_shader( String shader_source_code )
+  { return create_shader( shader_source_code, GLES20.GL_FRAGMENT_SHADER ); }
 
-          + "bool is_nan( float );\n"
-
-          + "void main()\n"
-          + "{\n"
-          + "  gl_FragColor = is_nan( var_texcoord.x ) \n"
-          + "    ? vec4( diffuse, 1.0 )\n"
-          + "    : texture2D( diffuse_sampler, var_texcoord );\n"
-          + "  gl_FragColor.a *= transparent;\n"
-          + "}\n"
-
-          + "bool is_nan( float val )\n"
-          + "{\n"
-          + "  return (val <= 0.0 || 0.0 <= val) ? false : true;\n"
-          + "}\n"
-      );
-    GLES20.glCompileShader( fragment_shader );
-
-    final int[] fragment_shader_result = new int[ 1 ];
-    GLES20.glGetShaderiv( fragment_shader, GLES20.GL_COMPILE_STATUS, fragment_shader_result, 0 );
-    if ( fragment_shader_result[ 0 ] == 0 )
-      throw new RuntimeException( GLES20.glGetShaderInfoLog( fragment_shader ) );
-
+  private static int create_program( int vertex_shader_id, int fragment_shader_id )
+  {
     // shader program
     int program = GLES20.glCreateProgram();
     if ( program == 0 )
       throw new RuntimeException();
 
-    GLES20.glAttachShader( program, vertex_shader );
-    GLES20.glAttachShader( program, fragment_shader );
+    GLES20.glAttachShader( program, vertex_shader_id   );
+    GLES20.glAttachShader( program, fragment_shader_id );
 
     GLES20.glLinkProgram( program );
     final int[] linkStatus = new int[1];
@@ -136,18 +144,24 @@ class MainRenderer implements GLSurfaceView.Renderer
     if (linkStatus[0] != GLES20.GL_TRUE)
       throw new RuntimeException( GLES20.glGetProgramInfoLog( program ) );
 
-    GLES20.glUseProgram( program );
-
-    // デプスバッファの有効化
-    GLES20.glEnable( GLES20.GL_DEPTH_TEST );
-
+    return program;
   }
-  public void setScreenW(int screen_width)
+
+  private static int create_program_with_delete_shader( int vertex_shader_id, int fragment_shader_id )
   {
-    _main_view.screen_width = screen_width;
+    int program = create_program( vertex_shader_id, fragment_shader_id );
+
+    GLES20.glDeleteShader( vertex_shader_id   );
+    GLES20.glDeleteShader( fragment_shader_id );
+
+    return program;
   }
-  public void setScreenH(int screen_height)
+
+  private static int create_program_from_sources( String vertex_shader_source, String fragment_shader_source )
   {
-    _main_view.screen_height = screen_height;
+    int vertex_shader_id   = create_vertex_shader( vertex_shader_source );
+    int fragment_shader_id = create_fragment_shader( fragment_shader_source );
+
+    return create_program_with_delete_shader( vertex_shader_id, fragment_shader_id );
   }
 }
