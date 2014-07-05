@@ -13,8 +13,6 @@ public class MainView extends GLSurfaceView
   public MainRenderer renderer;
   public SceneManager scene_manager;
   public MainActivity activity;
-  public int screen_width;
-  public int screen_height;
 
   public MainView( Context context, MainActivity arg_activity )
   {
@@ -46,5 +44,11 @@ public class MainView extends GLSurfaceView
 
     return String.valueOf( char_buffer, 0, read_size );
   }
+
+  public int screen_width()
+  { return renderer.screen_width(); }
+
+  public int screen_height()
+  { return renderer.screen_height(); }
 
 }
