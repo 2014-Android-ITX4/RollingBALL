@@ -64,24 +64,7 @@ class MainRenderer implements GLSurfaceView.Renderer
     if( vertex_shader == 0 )
       throw new RuntimeException();
 
-    GLES20.glShaderSource
-      ( vertex_shader
-        , "#version 100\n"
-          + "attribute vec4 position;\n"
-          + "attribute vec2 texcoord;\n"
-          + "attribute vec3 normal;\n"
-          + "varying vec2 var_texcoord;\n"
-          + "varying vec3 var_normal;\n"
-          + "uniform mat4 world_transformation;\n"
-          + "uniform mat4 view_transformation;\n"
-          + "uniform mat4 projection_transformation;\n"
-          + "void main()\n"
-          + "{\n"
-          + "  gl_Position =  projection_transformation * view_transformation * world_transformation * position;\n"
-          + "  var_texcoord = texcoord;\n"
-          + "  var_normal = normal;\n"
-          + "}\n"
-      );
+    GLES20.glShaderSource( vertex_shader, _main_view.load_text_from_raw_resource( R.raw.shader_default_vertex ) );
     GLES20.glCompileShader( vertex_shader );
 
     final int[] vertex_shader_result = new int[ 1 ];
@@ -95,42 +78,7 @@ class MainRenderer implements GLSurfaceView.Renderer
     if ( fragment_shader == 0)
       throw new RuntimeException();
 
-    GLES20.glShaderSource
-      ( fragment_shader
-        , "#version 100\n"
-          + "#ifdef GL_FRAGMENT_PRECISION_HIGH\n"
-          + "  precision highp float;\n"
-          + "#else\n"
-          + "  precision mediump float;\n"
-          + "#endif\n"
-          + "varying vec2 var_texcoord;\n"
-          + "varying vec3 var_normal;\n"
-          + "uniform sampler2D diffuse_sampler;\n"
-          + "uniform vec3 diffuse;\n"
-          + "uniform vec3 ambient;\n"
-          + "uniform vec3 specular;\n"
-          + "uniform vec3 emisive;\n"
-          + "uniform float transparent;\n"
-          + "uniform float diffuse_texture_blending_factor;"
-
-          + "bool is_nan( float );\n"
-
-          + "void main()\n"
-          + "{\n"
-          + "  gl_FragColor = vec4( diffuse, 1.0 ); \n"
-          + "  if ( diffuse_texture_blending_factor > 0.0 )\n"
-          + "  {\n"
-          + "    gl_FragColor.rgb *= 1.0 - diffuse_texture_blending_factor;\n"
-          + "    gl_FragColor     += texture2D( diffuse_sampler, var_texcoord ) * diffuse_texture_blending_factor;\n"
-          + "  }\n"
-          + "  gl_FragColor.a *= transparent;\n"
-          + "}\n"
-
-          + "bool is_nan( float val )\n"
-          + "{\n"
-          + "  return (val <= 0.0 || 0.0 <= val) ? false : true;\n"
-          + "}\n"
-      );
+    GLES20.glShaderSource( fragment_shader, _main_view.load_text_from_raw_resource( R.raw.shader_default_fragment ));
     GLES20.glCompileShader( fragment_shader );
 
     final int[] fragment_shader_result = new int[ 1 ];
@@ -165,12 +113,15 @@ class MainRenderer implements GLSurfaceView.Renderer
     int location_of_projection_transformation = GLES20.glGetUniformLocation( program , "projection_transformation" );
     GLES20.glUniformMatrix4fv( location_of_projection_transformation, 1, false, projection.getBuffer() );
   }
+
   public void setScreenW(int screen_width)
   {
     _main_view.screen_width = screen_width;
   }
+
   public void setScreenH(int screen_height)
   {
     _main_view.screen_height = screen_height;
   }
+
 }
