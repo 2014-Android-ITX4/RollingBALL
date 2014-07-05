@@ -35,13 +35,13 @@ public class Scene implements IUpdatable, IDrawable
   }
 
   @Override
-  public void update( long delta_time_in_ns )
+  public void update( final float delta_time_in_seconds )
   {
-    input_manager.update( delta_time_in_ns );
-    camera.update( delta_time_in_ns );
+    input_manager.update( delta_time_in_seconds );
+    camera.update( delta_time_in_seconds );
 
     for ( GameObject g : game_objects )
-      g.update( delta_time_in_ns );
+      g.update( delta_time_in_seconds );
   }
 
   @Override

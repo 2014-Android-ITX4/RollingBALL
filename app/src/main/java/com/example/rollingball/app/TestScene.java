@@ -19,9 +19,9 @@ public class TestScene extends Scene
   }
 
   @Override
-  public void update( final long delta_time_in_ns )
+  public void update( final float delta_time_in_seconds )
   {
-    super.update( delta_time_in_ns );
+    super.update( delta_time_in_seconds );
 
     final float pif = (float)Math.PI;
     final float inversed_pih = (float)( 0.5 / Math.PI );
@@ -38,7 +38,7 @@ public class TestScene extends Scene
 
     Vec3 position = new Vec3( 0, 0, 0 );
     Mat4 translation = Mat4.MAT4_IDENTITY.translate( position );
-    Mat4 rotation_x= Matrices.rotate( (float)Math.sin( delta_time_in_ns ), new Vec3( 1.0f, 0.0f, 0.0f ) );
+    Mat4 rotation_x= Matrices.rotate( (float)Math.sin( delta_time_in_seconds ), new Vec3( 1.0f, 0.0f, 0.0f ) );
 
     Mat4 scaling = new Mat4( 1.0f, 0.0f, 0.0f, 0.0f,
                              0.0f, 1.0f, 0.0f, 0.0f,

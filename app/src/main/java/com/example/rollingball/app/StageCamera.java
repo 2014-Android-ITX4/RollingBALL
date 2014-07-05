@@ -41,16 +41,14 @@ public class StageCamera extends Camera
   }
 
   @Override
-  public void update( long delta_time_in_ns )
+  public void update( float delta_time_in_seconds )
   {
-    final float delta_time_in_seconds = (float)delta_time_in_ns * 1.0e-9f;
-
     update_swipe( delta_time_in_seconds );
 
     update_position();
 
     // override 元の親クラスの update も呼んでおく
-    super.update( delta_time_in_ns );
+    super.update( delta_time_in_seconds );
   }
 
   private  void update_position()

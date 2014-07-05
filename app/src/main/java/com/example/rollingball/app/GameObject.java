@@ -12,7 +12,7 @@ public class GameObject implements IUpdatable, IDrawable
   protected Scene _scene;
 
   @Override
-  public void update( final long delta_time_in_ns )
+  public void update( final float delta_time_in_seconds )
   {
 
   }

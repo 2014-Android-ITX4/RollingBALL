@@ -42,7 +42,7 @@ class MainRenderer implements GLSurfaceView.Renderer
 
     final long delta_time_in_ns = System.nanoTime() - _before_time_in_ns;
 
-    _main_view.scene_manager.update( delta_time_in_ns );
+    _main_view.scene_manager.update( 1.0e-9f * (float)delta_time_in_ns );
 
     GLES20.glClear( GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT );
 

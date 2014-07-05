@@ -38,7 +38,7 @@ public class SceneManager implements IUpdatable, IDrawable
   }
 
   @Override
-  public void update( final long delta_time_in_ns )
+  public void update( final float delta_time_in_seconds )
   {
     //*
     do
@@ -59,7 +59,7 @@ public class SceneManager implements IUpdatable, IDrawable
 
         continue;
       }
-      scene.update( delta_time_in_ns );
+      scene.update( delta_time_in_seconds );
     }
     while ( false );
     //*/
