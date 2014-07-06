@@ -40,6 +40,7 @@ public class SceneManager implements IUpdatable, IDrawable
   @Override
   public void update( final float delta_time_in_seconds )
   {
+    //*
     do
     {
       Scene scene = _scenes.peek();
@@ -54,13 +55,14 @@ public class SceneManager implements IUpdatable, IDrawable
       {
         // TODO: version-0.2.0 レベルで作成される BlandLogoScene の自動push
         // push( new BlandLogoScene(  ) );
-        push( new TestStageScene( this ) );
+        push( new TestScene( this ) );
 
         continue;
       }
       scene.update( delta_time_in_seconds );
     }
     while ( false );
+    //*/
   }
 
   @Override
