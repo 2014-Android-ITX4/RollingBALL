@@ -63,8 +63,12 @@ public class ModelData
 
     final int field_area = field_size_x * field_size_z;
 
-    final int number_of_vertices = field_area * 4;
-    final int number_of_indices  = field_area * 6;
+    final int elements_per_vertices = 3;
+    final int vertices_per_cell     = 4;
+    final int vertices_per_triangle = 3;
+    final int triangles_per_cell    = 2;
+    final int number_of_vertices = field_area * elements_per_vertices * vertices_per_cell;
+    final int number_of_indices  = field_area * vertices_per_triangle * triangles_per_cell;
 
     float[] vertices = new float[ number_of_vertices ];
     short[] indices  = new short[ number_of_indices  ];
@@ -80,7 +84,7 @@ public class ModelData
       };
 
     for ( int x = 0; x < field_size_x; ++x )
-      for ( int z = 0; z < field_size_x; ++z )
+      for ( int z = 0; z < field_size_z; ++z )
       {
         Vec3 p = new Vec3( (float)x, (float)z, field.get( x ).get( z ) );
         for ( Vec3 d : ds )
