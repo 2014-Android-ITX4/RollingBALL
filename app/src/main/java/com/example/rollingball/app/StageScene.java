@@ -1,8 +1,5 @@
 package com.example.rollingball.app;
 
-/**
- * Created by sakamoto on 2014/05/21.
- */
 public class StageScene extends Scene
 {
   protected float _stage_time;
