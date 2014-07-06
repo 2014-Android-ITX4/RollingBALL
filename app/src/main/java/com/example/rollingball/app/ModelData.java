@@ -111,7 +111,6 @@ public class ModelData
   }
 
   public static ModelData generate_sphere( float radius, int rings, int sectors )
-    throws Exception
   {
     int   number_of_vertices = rings * sectors * 3;
     short number_of_indices  = (short)( rings * sectors * 4 );
@@ -171,7 +170,7 @@ public class ModelData
   }
 
   public static ModelData generate_sphere( float radius, int split )
-  { return generate_sphere( split, split ); }
+  { return generate_sphere( radius, split, split ); }
 
   public static ModelData generate_sphere( float radius )
   { return generate_sphere( radius, 16 ); }
