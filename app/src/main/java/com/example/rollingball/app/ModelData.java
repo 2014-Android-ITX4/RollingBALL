@@ -106,11 +106,74 @@ public class ModelData
     return new ModelData( vertices, indices, GLES20.GL_TRIANGLES );
   }
 
-  public static ModelData generate_sphere( float radius )
+  public static ModelData generate_sphere( float radius, int rings, int sectors )
+    throws Exception
   {
-    // TODO: #151
-    throw new NotImplementedException();
+    int   number_of_vertices = rings * sectors * 3;
+    short number_of_indices  = (short)( rings * sectors * 4 );
+
+    float[] vertices = new float[ number_of_vertices ];
+    short[] indices  = new short[ number_of_indices  ];
+
+    int   vertex_index = 0;
+    short index_index  = 0;
+
+    final float ring_step   = 1.0f / (float)( rings   - 1 );
+    final float sector_step = 1.0f / (float)( sectors - 1 );
+    
+    final float pi = (float)Math.PI;
+
+    for( int r = 0; r < rings; ++r )
+    {
+      final float rf = (float)r;
+      for ( int s = 0; s < sectors; ++s )
+      {
+        final float sf = (float)s;
+
+        final Vec3 v = new Vec3
+          ( ( float ) ( Math.cos( 2.0f * pi * sf * sector_step ) * Math.sin( pi * rf * ring_step ) )
+          , ( float ) ( Math.sin( pi * ( 0.5f + rf * ring_step - 1.0f ) ) )
+          , ( float ) ( Math.sin( 2.0f * pi * sf * sector_step ) * Math.sin( pi * rf * ring_step ) )
+          );
+
+        vertices[ vertex_index++ ] = v.getX() * radius;
+        vertices[ vertex_index++ ] = v.getY() * radius;
+        vertices[ vertex_index++ ] = v.getZ() * radius;
+
+        // TODO: テクスチャーUV座標を頂点構造に入れる事になったらどうぞ
+        //vertices[vertex_index++] = s * sector_step;
+        //vertices[vertex_index++] = r * ring_step;
+
+        // TODO: 法線ベクターを頂点構造に入れる事になったらどうぞ
+        //vertices[vertex_index++] = v.getX();
+        //vertices[vertex_index++] = v.getY();
+        //vertices[vertex_index++] = v.getZ();
+      }
+    }
+
+    for ( short r = 0; r < rings - 1; ++r )
+      for ( short s = 0; s < sectors - 1; ++s )
+      {
+        short r1 = (short)(r + 1);
+        short s1 = (short)(s + 1);
+
+        indices[index_index++] = (short)( r  * sectors + s  );
+        indices[index_index++] = (short)( r  * sectors + s1 );
+        indices[index_index++] = (short)( r1 * sectors + s1 );
+        indices[index_index++] = (short)( r1 * sectors + s  );
+      }
+
+    return new ModelData( vertices, indices, GLES20.GL_TRIANGLES );
   }
+
+  public static ModelData generate_sphere( float radius, int split )
+  { return generate_sphere( split, split ); }
+
+  public static ModelData generate_sphere( float radius )
+  { return generate_sphere( radius, 16 ); }
+
+  public static ModelData generate_sphere( )
+  { return generate_sphere( 1.0f ); }
 
   public static ModelData generate_cube( float arris_length )
   {
@@ -138,6 +201,9 @@ public class ModelData
 
     return new ModelData( vertices, indices );
   }
+
+  public static ModelData generate_cube( )
+  { return generate_cube( 1.0f ); }
 
   public static ModelData load_from_file( String file_path )
   {
