@@ -13,6 +13,15 @@ public class FieldGameObject extends GameObject
 {
   private ArrayList< ArrayList< Float > > field_planes = new ArrayList< ArrayList< Float > >();
 
+  public FieldGameObject( int arris_x, int arris_z )
+  { generate_simple_plane( arris_x, arris_z ); }
+
+  public FieldGameObject( String path )
+  { load_from_file( path ); }
+
+  public FieldGameObject( )
+  { load_from_file(); }
+
   public void generate_simple_plane( int arris_x, int arris_z)
   {
     ArrayList< Float > field_line = new ArrayList< Float >();
@@ -31,12 +40,14 @@ public class FieldGameObject extends GameObject
       field_planes.add( field_line );
       field_line = new ArrayList< Float >();
     }
+
+    model = ModelData.generate_from_field( field_planes );
   }
 
   // ファイル読み込み
-  public void load_from_file()
+  public void load_from_file( String path )
   {
-    Bitmap bitmap = _scene.scene_manager.view.load_bitmap_from_asset( "sample_field.png" );
+    Bitmap bitmap = _scene.scene_manager.view.load_bitmap_from_asset( path );
 
     ArrayList< Float > field_line = new ArrayList< Float >(  );
 
@@ -54,5 +65,16 @@ public class FieldGameObject extends GameObject
       field_planes.add( field_line );
       field_line = new ArrayList< Float >(  );
     }
+
+    model = ModelData.generate_from_field( field_planes );
   }
+
+  // for debug, to load default test data.
+  public void load_from_file()
+  { load_from_file( "sample_field.png" ); }
+
+  // GameObject基底の draw で model を描画するようにしたのでここでの Override は不要になりました。
+  // see more: #123 https://github.com/2014-Android-ITX4/RollingBALL/issues/123
+  //@Override
+  //public void draw() { }
 }

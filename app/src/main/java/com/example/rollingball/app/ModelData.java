@@ -10,21 +10,100 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
+import java.util.ArrayList;
 
 public class ModelData
 {
-  private int _vertex_array_object_id;
+  // TODO: VAO 使う必要が生じたらどうぞ
+  //private int _vertex_array_object_id;
+
   private int _vertices_buffer_id;
   private int _indices_buffer_id;
-  private int _texture_buffer_id;
+
+  private int _number_of_indices;
+  private int _indices_buffer_type;
+  private int _polygon_mode;
+
+  // TODO: Texture 使う必要が生じたらどうぞ
+  //private int _texture_buffer_id;
+
+  public ModelData( float[] arg_vertices, byte[] arg_indices, int polygon_mode )
+  {
+    _vertices_buffer_id  = generate_vertex_buffer( arg_vertices );
+    _indices_buffer_id   = generate_index_buffer( arg_indices );
+    _number_of_indices   = arg_indices.length;
+    _indices_buffer_type = GLES20.GL_UNSIGNED_BYTE;
+    _polygon_mode        = polygon_mode;
+  }
 
   public ModelData( float[] arg_vertices, byte[] arg_indices )
   {
-    _vertices_buffer_id = generate_vertex_buffer_from_float_buffer( create_float_buffer( arg_vertices ) );
-    //Log.d( "_vertices_buffer_id generated", String.valueOf( _vertices_buffer_id ) );
+    this( arg_vertices, arg_indices, GLES20.GL_TRIANGLE_STRIP );
+  }
 
-    _indices_buffer_id = generate_index_buffer_from_byte_buffer( create_byte_buffer( arg_indices ) );
-    //Log.d( "_indices_buffer_id generated", String.valueOf( _indices_buffer_id ) );
+  public ModelData( float[] arg_vertices, short[] arg_indices, int polygon_mode )
+  {
+    _vertices_buffer_id  = generate_vertex_buffer( arg_vertices );
+    _indices_buffer_id   = generate_index_buffer( arg_indices );
+    _number_of_indices   = arg_indices.length;
+    _indices_buffer_type = GLES20.GL_UNSIGNED_SHORT;
+    _polygon_mode        = polygon_mode;
+  }
+
+  public ModelData( float[] arg_vertices, short[] arg_indices )
+  {
+    this(arg_vertices, arg_indices, GLES20.GL_TRIANGLE_STRIP);
+  }
+
+  public static ModelData generate_from_field( ArrayList< ArrayList< Float > > field )
+  {
+    final int field_size_x = field.size();
+    final int field_size_z = field.get( 0 ).size();
+
+    final int field_area = field_size_x * field_size_z;
+
+    final int number_of_vertices = field_area * 4;
+    final int number_of_indices  = field_area * 6;
+
+    float[] vertices = new float[ number_of_vertices ];
+    short[] indices  = new short[ number_of_indices  ];
+
+    int   vertex_index = 0;
+    short index_index  = 0;
+
+    Vec3[] ds =
+      { new Vec3( -0.5f, -0.5f, 0.0f )
+      , new Vec3( +0.5f, -0.5f, 0.0f )
+      , new Vec3( -0.5f, +0.5f, 0.0f )
+      , new Vec3( +0.5f, +0.5f, 0.0f )
+      };
+
+    for ( int x = 0; x < field_size_x; ++x )
+      for ( int z = 0; z < field_size_x; ++z )
+      {
+        Vec3 p = new Vec3( (float)x, (float)z, field.get( x ).get( z ) );
+        for ( Vec3 d : ds )
+        {
+          Vec3 v = p.add( d );
+
+          vertices[ vertex_index++ ] = v.getX();
+          vertices[ vertex_index++ ] = v.getY();
+          vertices[ vertex_index++ ] = v.getZ();
+        }
+
+        short base_index = index_index;
+
+        indices[ index_index++ ] = (short)( base_index + 0 );
+        indices[ index_index++ ] = (short)( base_index + 1 );
+        indices[ index_index++ ] = (short)( base_index + 2 );
+
+        indices[ index_index++ ] = (short)( base_index + 2 );
+        indices[ index_index++ ] = (short)( base_index + 1 );
+        indices[ index_index++ ] = (short)( base_index + 3 );
+      }
+
+    return new ModelData( vertices, indices, GLES20.GL_TRIANGLES );
   }
 
   public static ModelData generate_sphere( float radius )
@@ -56,19 +135,6 @@ public class ModelData
       1, 5, 3, 7,            //面1
       0, 2, 4, 6            //面2
     };
-
-//    float[] vertices =
-//      {
-//       1, 1, 0,
-//        1,-1, 0,
-//        -1, -1, 0
-//      };
-//
-//    //インデックスバッファの元データ配列を定義
-//    byte[] indices =
-//      {
-//        0, 1, 2
-//      };
 
     return new ModelData( vertices, indices );
   }
@@ -109,9 +175,7 @@ public class ModelData
     //GLES20.glUniform1f( GLES20.glGetUniformLocation( program_id, "location_of_diffuse_texture_blending_factor" ), 0.0f );
 
     // 面群の描画
-    GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 10, GLES20.GL_UNSIGNED_BYTE, 0 );
-    GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 4, GLES20.GL_UNSIGNED_BYTE, 10 );
-    GLES20.glDrawElements( GLES20.GL_TRIANGLE_STRIP, 4, GLES20.GL_UNSIGNED_BYTE, 14 );
+    GLES20.glDrawElements( _polygon_mode, _number_of_indices, _indices_buffer_type, 0 );
 
     // 束縛解除
     GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, 0 );
@@ -121,7 +185,7 @@ public class ModelData
   }
 
   // float[] --> FloatBuffer
-  private static FloatBuffer create_float_buffer( float[] float_array )
+  private static FloatBuffer create_buffer( float[] float_array )
   {
     FloatBuffer b = ByteBuffer.allocateDirect( float_array.length * 4 ).order( ByteOrder.nativeOrder() ).asFloatBuffer( );
     b.put( float_array ).position( 0 );
@@ -129,7 +193,7 @@ public class ModelData
   }
 
   // FloatBuffer --> int ( generated id of vertex buffer object )
-  private static int generate_vertex_buffer_from_float_buffer( FloatBuffer b )
+  private static int generate_vertex_buffer( FloatBuffer b )
   {
     // VBO をGPUに生成し、CPUの FloatBuffer を GPU の VBO へ転送
     int buffer_ids[] = new int[ 1 ];
@@ -141,8 +205,11 @@ public class ModelData
     return buffer_ids[ 0 ];
   }
 
+  private static int generate_vertex_buffer( float[] float_array )
+  { return generate_vertex_buffer( create_buffer( float_array ) ); }
+
   // byte[] --> ByteBuffer
-  private static ByteBuffer create_byte_buffer( byte[] byte_array )
+  private static ByteBuffer create_buffer( byte[] byte_array )
   {
     ByteBuffer b = ByteBuffer.allocate( byte_array.length ).order( ByteOrder.nativeOrder( ) );
     b.put( byte_array ).position( 0 );
@@ -150,15 +217,41 @@ public class ModelData
   }
 
   // ByteBuffer --> int ( generated id of vertex buffer object )
-  private static int generate_index_buffer_from_byte_buffer( ByteBuffer b )
+  private static int generate_index_buffer( ByteBuffer b )
   {
-    int[] buffer_ids=new int[ 1 ];
+    int[] buffer_ids = new int[ 1 ];
 
     GLES20.glGenBuffers( 1, buffer_ids, 0 );
-    GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER,buffer_ids[ 0 ] );
+    GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, buffer_ids[ 0 ] );
     GLES20.glBufferData( GLES20.GL_ELEMENT_ARRAY_BUFFER, b.capacity( ), b, GLES20.GL_STATIC_DRAW );
 
     return buffer_ids[ 0 ];
   }
+
+  private static int generate_index_buffer( byte[] byte_array )
+  { return generate_index_buffer( create_buffer( byte_array ) );}
+
+  // short[] --> ShortBuffer
+  private static ShortBuffer create_buffer( short[] short_array )
+  {
+    ShortBuffer b = ByteBuffer.allocate( short_array.length * 2 ).order( ByteOrder.nativeOrder( ) ).asShortBuffer();
+    b.put( short_array ).position( 0 );
+    return b;
+  }
+
+  // ByteBuffer --> int ( generated id of vertex buffer object )
+  private static int generate_index_buffer( ShortBuffer b )
+  {
+    int[] buffer_ids = new int[ 1 ];
+
+    GLES20.glGenBuffers( 1, buffer_ids, 0 );
+    GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, buffer_ids[ 0 ] );
+    GLES20.glBufferData( GLES20.GL_ELEMENT_ARRAY_BUFFER, b.capacity( ), b, GLES20.GL_STATIC_DRAW );
+
+    return buffer_ids[ 0 ];
+  }
+
+  private static int generate_index_buffer( short[] short_array )
+  { return generate_index_buffer( create_buffer( short_array ) ); }
 
 }
