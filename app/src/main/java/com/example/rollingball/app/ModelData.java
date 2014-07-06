@@ -271,6 +271,7 @@ public class ModelData
     GLES20.glGenBuffers( 1, buffer_ids, 0 );
     GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, buffer_ids[ 0 ] );
     GLES20.glBufferData( GLES20.GL_ARRAY_BUFFER, b.capacity() * 4, b, GLES20.GL_STATIC_DRAW );
+    GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, 0 );
 
     return buffer_ids[ 0 ];
   }
@@ -294,6 +295,7 @@ public class ModelData
     GLES20.glGenBuffers( 1, buffer_ids, 0 );
     GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, buffer_ids[ 0 ] );
     GLES20.glBufferData( GLES20.GL_ELEMENT_ARRAY_BUFFER, b.capacity( ), b, GLES20.GL_STATIC_DRAW );
+    GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, 0 );
 
     return buffer_ids[ 0 ];
   }
@@ -304,7 +306,7 @@ public class ModelData
   // short[] --> ShortBuffer
   private static ShortBuffer create_buffer( short[] short_array )
   {
-    ShortBuffer b = ByteBuffer.allocate( short_array.length * 2 ).order( ByteOrder.nativeOrder( ) ).asShortBuffer();
+    ShortBuffer b = ByteBuffer.allocateDirect( short_array.length * 2 ).order( ByteOrder.nativeOrder( ) ).asShortBuffer();
     b.put( short_array ).position( 0 );
     return b;
   }
@@ -316,7 +318,8 @@ public class ModelData
 
     GLES20.glGenBuffers( 1, buffer_ids, 0 );
     GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, buffer_ids[ 0 ] );
-    GLES20.glBufferData( GLES20.GL_ELEMENT_ARRAY_BUFFER, b.capacity( ), b, GLES20.GL_STATIC_DRAW );
+    GLES20.glBufferData( GLES20.GL_ELEMENT_ARRAY_BUFFER, b.capacity( ) * 2, b, GLES20.GL_STATIC_DRAW );
+    GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, 0 );
 
     return buffer_ids[ 0 ];
   }
