@@ -5,6 +5,7 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
+import android.view.View;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -21,6 +22,12 @@ public class MainView extends GLSurfaceView
   public MainView( Context context, MainActivity arg_activity )
   {
     super( context );
+
+    setSystemUiVisibility
+      ( View.SYSTEM_UI_FLAG_IMMERSIVE
+      | View.SYSTEM_UI_FLAG_FULLSCREEN
+      | View.SYSTEM_UI_FLAG_IMMERSIVE
+      );
 
     activity = arg_activity;
 
