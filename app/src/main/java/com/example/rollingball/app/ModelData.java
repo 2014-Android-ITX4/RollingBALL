@@ -113,7 +113,7 @@ public class ModelData
   public static ModelData generate_sphere( float radius, int rings, int sectors )
   {
     int   number_of_vertices = rings * sectors * 3;
-    short number_of_indices  = (short)( rings * sectors * 4 );
+    short number_of_indices  = (short)( rings * sectors * 6 );
 
     float[] vertices = new float[ number_of_vertices ];
     short[] indices  = new short[ number_of_indices  ];
@@ -160,10 +160,25 @@ public class ModelData
         short r1 = (short)(r + 1);
         short s1 = (short)(s + 1);
 
+        /*
         indices[index_index++] = (short)( r  * sectors + s  );
         indices[index_index++] = (short)( r  * sectors + s1 );
         indices[index_index++] = (short)( r1 * sectors + s1 );
         indices[index_index++] = (short)( r1 * sectors + s  );
+        */
+
+        short i0 = (short)( r  * sectors + s  );
+        short i1 = (short)( r  * sectors + s1 );
+        short i2 = (short)( r1 * sectors + s1 );
+        short i3 = (short)( r1 * sectors + s  );
+
+        indices[index_index++] = i0;
+        indices[index_index++] = i1;
+        indices[index_index++] = i2;
+
+        indices[index_index++] = i0;
+        indices[index_index++] = i2;
+        indices[index_index++] = i3;
       }
 
     return new ModelData( vertices, indices, GLES20.GL_TRIANGLES );
