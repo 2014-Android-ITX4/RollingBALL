@@ -161,6 +161,27 @@ public class MainActivity
   public Vec3 swipe_velocity()
   { return _swipe_velocity; }
 
+  public void attenuate_swipe_state()
+  {
+    final float attenuation = 0.90f;
+
+    if ( _swipe_delta_position.getLengthSquared() > 0.05f )
+      _swipe_delta_position = _swipe_delta_position.multiply( attenuation );
+    else
+      _swipe_delta_position = Vec3.VEC3_ZERO;
+
+    if ( _swipe_velocity.getLengthSquared() > 0.05f )
+      _swipe_velocity = _swipe_velocity.multiply( attenuation );
+    else
+      _swipe_velocity = Vec3.VEC3_ZERO;
+  }
+
+  public void reset_swipe_state()
+  {
+    _swipe_delta_position = Vec3.VEC3_ZERO;
+    _swipe_velocity       = Vec3.VEC3_ZERO;
+  }
+
   private GestureDetector.SimpleOnGestureListener onGestureListener = new GestureDetector.SimpleOnGestureListener()
   {
     @Override

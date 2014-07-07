@@ -16,7 +16,7 @@ public class Camera implements IUpdatable
   public Vec3 up = new Vec3( 0, 1, 0 );
   public Scene scene;
 
-  public void Camera( final Scene scene_ )
+  public Camera( final Scene scene_ )
   {
     scene = scene_;
   }

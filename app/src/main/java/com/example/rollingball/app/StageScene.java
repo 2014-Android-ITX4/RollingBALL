@@ -12,8 +12,8 @@ public class StageScene extends Scene
   StageScene( final SceneManager s )
   {
     super( s );
-
     push( _player = new PlayerGameObject( input_manager ) );
+    this.camera = new StageCamera( this );
   }
 
   @Override

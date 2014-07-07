@@ -5,28 +5,26 @@ import java.util.LinkedList;
 
 public class Scene implements IUpdatable, IDrawable
 {
-  public LinkedList<GameObject> game_objects;
-  public Camera camera;
-  public InputManager input_manager;
-  public SceneManager scene_manager;
-  protected Message[] _massages;
-  public boolean to_exit;
+  public LinkedList<GameObject> game_objects  = new LinkedList< GameObject >( );
+  public boolean                to_exit       = false;
+  public Camera                 camera        = new Camera( this );
+  public InputManager           input_manager = new InputManager( this );
+  public SceneManager           scene_manager = null;
 
-  Scene( SceneManager s )
+  protected Message[] _massages;
+
+  Scene( SceneManager scene_manager )
   {
-    scene_manager = s;
-    game_objects = new LinkedList< GameObject >();
-    camera = new Camera();
-    input_manager = new InputManager( this );
-    to_exit = false;
-}
+    scene_manager = scene_manager;
+  }
 
   void push( GameObject game_object )
   {
     game_objects.push( game_object );
   }
 
-  void message( Message message ){
+  void message( Message message )
+  {
 
   }
 
