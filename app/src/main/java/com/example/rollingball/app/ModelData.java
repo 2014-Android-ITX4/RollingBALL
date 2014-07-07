@@ -191,7 +191,7 @@ public class ModelData
   { return generate_sphere( radius, 16 ); }
 
   public static ModelData generate_sphere( )
-  { return generate_sphere( 1.0f ); }
+  { return generate_sphere( 0.5f ); }
 
   public static ModelData generate_cube( float arris_length )
   {
