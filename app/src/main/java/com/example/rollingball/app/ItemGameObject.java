@@ -4,6 +4,9 @@ public class ItemGameObject extends GameObject
 {
   private final Item _item;
 
-  public ItemGameObject( final Item item )
-  { _item = item; }
+  public ItemGameObject( Scene scene, final Item item )
+  {
+    super( scene );
+    _item = item;
+  }
 }

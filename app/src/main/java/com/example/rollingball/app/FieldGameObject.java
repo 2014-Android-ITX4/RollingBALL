@@ -13,14 +13,23 @@ public class FieldGameObject extends GameObject
 {
   private ArrayList< ArrayList< Float > > field_planes = new ArrayList< ArrayList< Float > >();
 
-  public FieldGameObject( int arris_x, int arris_z )
-  { generate_simple_plane( arris_x, arris_z ); }
+  public FieldGameObject( Scene scene, int arris_x, int arris_z )
+  {
+    super( scene );
+    generate_simple_plane( arris_x, arris_z );
+  }
 
-  public FieldGameObject( String path )
-  { load_from_file( path ); }
+  public FieldGameObject( Scene scene, String path )
+  {
+    super( scene );
+    load_from_file( path );
+  }
 
-  public FieldGameObject( )
-  { load_from_file(); }
+  public FieldGameObject( Scene scene )
+  {
+    super( scene );
+    load_from_file( );
+  }
 
   public void generate_simple_plane( int arris_x, int arris_z)
   {
