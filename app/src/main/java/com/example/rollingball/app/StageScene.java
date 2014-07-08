@@ -9,9 +9,10 @@ public class StageScene extends Scene
   protected PlayerGameObject _player                   = null;
   protected FieldGameObject  _field                    = null;
 
-  StageScene( final SceneManager s )
+  public StageScene( final SceneManager s )
   {
     super( s );
+
     push( _player = new PlayerGameObject( this, input_manager ) );
     this.camera = new StageCamera( this );
   }

@@ -13,9 +13,9 @@ public class Scene implements IUpdatable, IDrawable
 
   protected Message[] _massages;
 
-  Scene( SceneManager scene_manager )
+  public Scene( final SceneManager scene_manager_ )
   {
-    scene_manager = scene_manager;
+    scene_manager = scene_manager_;
   }
 
   void push( GameObject game_object )
@@ -26,10 +26,6 @@ public class Scene implements IUpdatable, IDrawable
   void message( Message message )
   {
 
-  }
-
-  public SceneManager getScene_manager(){
-    return scene_manager;
   }
 
   @Override
