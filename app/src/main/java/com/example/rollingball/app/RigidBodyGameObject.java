@@ -10,6 +10,9 @@ public class RigidBodyGameObject extends GameObject
   public ArrayList<Vec3> forces = new ArrayList< Vec3 >(); //力
   public ArrayList<Float> collision_radiuses = new ArrayList< Float >( );
 
+  public RigidBodyGameObject( Scene scene )
+  { super( scene );}
+
   @Override
   public void update( final float delta_time_in_seconds )
   {

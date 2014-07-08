@@ -9,8 +9,10 @@ public class PlayerGameObject extends LifeGameObject implements IUpdatable
   public LinkedList< Item > items;
   public InputManager input_manager;
 
-  PlayerGameObject( final InputManager s )
+  PlayerGameObject( Scene scene, final InputManager s )
   {
+    super( scene );
+
     this.mass = 0.1f;
     input_manager = s;
   }

@@ -8,8 +8,9 @@ public class TestStageScene extends StageScene
     super( s );
 
     _player.model = ModelData.generate_sphere();
+    //game_objects.clear();
 
-    //push( _field = new FieldGameObject( 10, 10 ) );
+    push( _field = new FieldGameObject( this ) );
   }
 
   @Override
