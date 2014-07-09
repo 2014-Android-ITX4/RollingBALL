@@ -28,6 +28,13 @@ public class RigidBodyGameObject extends GameObject
     velocity = velocity.add( acceleration.multiply( delta_time_in_seconds ) );
     position = velocity.add( velocity.multiply( delta_time_in_seconds ) );
 
+    if ( StageScene.class.isInstance( _scene ) )
+    {
+      StageScene s = (StageScene)_scene;
+      if ( position.getY() < s.death_height() )
+        position = new Vec3( position.getX(), s.death_height(), position.getZ() );
+    }
+
     super.update( delta_time_in_seconds );
   }
 

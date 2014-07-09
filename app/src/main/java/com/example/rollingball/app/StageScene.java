@@ -26,6 +26,9 @@ public class StageScene extends Scene
     super.update( delta_time_in_seconds );
   }
 
+  public float death_height()
+  { return  _death_height; }
+
   //TODO:update()で_pauseの判定とフラグセット
 
 }
