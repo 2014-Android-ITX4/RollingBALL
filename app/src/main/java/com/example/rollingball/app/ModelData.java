@@ -2,10 +2,8 @@ package com.example.rollingball.app;
 
 import android.opengl.GLES20;
 import android.util.Log;
-
 import com.hackoeur.jglm.Mat4;
 import com.hackoeur.jglm.Vec3;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -341,4 +339,23 @@ public class ModelData
   private static int generate_index_buffer( short[] short_array )
   { return generate_index_buffer( create_buffer( short_array ) ); }
 
+  // 3Dデータ実装
+  protected void moveLight()
+  {
+    //generate_vertex_buffer();
+
+    //フラグメントシェーダに値を渡すための変数
+    varying vec3 vPositon; // 頂点→光源のベクトル
+    varying vec3 vNormal; // 法線
+
+    //材質
+    //拡散反射色
+    //diffuse_color
+
+    // 鏡面反射の計算
+    vec3 specular = vec3(0.0);
+    if(Light > 0.0){}
+
+
+  }
 }
