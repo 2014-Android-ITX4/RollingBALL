@@ -27,9 +27,6 @@ public class ModelData
 
   public Material material = new Material();
 
-  // TODO: Texture 使う必要が生じたらどうぞ
-  //private int _texture_buffer_id;
-
   public ModelData( float[] arg_vertices, byte[] arg_indices, int polygon_mode )
   {
     _vertices_buffer_id  = generate_vertex_buffer( arg_vertices );

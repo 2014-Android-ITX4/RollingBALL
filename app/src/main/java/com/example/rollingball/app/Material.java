@@ -1,15 +1,23 @@
 package com.example.rollingball.app;
 
+import android.graphics.Bitmap;
 import android.opengl.GLES20;
+import android.opengl.GLUtils;
+import android.util.Log;
 
 import com.hackoeur.jglm.Vec3;
 
 import java.nio.IntBuffer;
 
+import javax.microedition.khronos.opengles.GL10;
+
 public class Material implements IDrawable
 {
   Vec3  _diffuse_color = new Vec3( 1.0f, 0.9f, 0.9f );
   float _transparent   = 0.0f;
+
+  float _diffuse_texture_blending_factor = 0.0f;
+  int   _diffuse_texture_id = 0;
 
   public Material diffuse_color( final Vec3 diffuse_color )
   {
@@ -23,6 +31,44 @@ public class Material implements IDrawable
     return this;
   }
 
+  public Material diffuse_texture_blending_factor( final float f )
+  {
+    if ( _diffuse_texture_id == 0 )
+      Log.w( "Material.diffuse_texture_blending_factor()", "_diffuse_texture_id is 0." );
+
+    _diffuse_texture_blending_factor = f;
+    return this;
+  }
+
+  // set
+  public Material diffuse_texture( final Bitmap image )
+  {
+    if ( _diffuse_texture_id > 0 )
+      diffuse_texture();
+
+    int[] ts = new int[]{ 0 };
+    GLES20.glGenTextures( 1, ts, 0 );
+
+    GLES20.glBindTexture( GLES20.GL_TEXTURE_2D, _diffuse_texture_id );
+
+    GLUtils.texImage2D( GL10.GL_TEXTURE_2D, 0, image, 0 );
+
+    image.recycle();
+
+    _diffuse_texture_blending_factor = 1.0f;
+
+    return this;
+  }
+
+  // remove
+  public Material diffuse_texture()
+  {
+    GLES20.glDeleteTextures( 1, new int[]{ _diffuse_texture_id }, 0 );
+    _diffuse_texture_id = 0;
+    _diffuse_texture_blending_factor = 0.0f;
+    return this;
+  }
+
   public void draw( int program_id )
   {
 
@@ -32,9 +78,17 @@ public class Material implements IDrawable
     // 不透明度
     GLES20.glUniform1f( GLES20.glGetUniformLocation( program_id, "transparent" ), _transparent );
 
-    // TODO: テクスチャー対応用。テクスチャーに対応する際にどうぞ
-    // テクスチャーのブレンド比
-    //GLES20.glUniform1f( GLES20.glGetUniformLocation( program_id, "location_of_diffuse_texture_blending_factor" ), 0.0f );
+    if ( _diffuse_texture_id > 0 )
+    {
+      // テクスチャーのブレンド比
+      GLES20.glUniform1f( GLES20.glGetUniformLocation( program_id, "diffuse_texture_blending_factor" ), _diffuse_texture_blending_factor );
+
+      // テクスチャーユニットの有効化
+      GLES20.glActiveTexture( 0 );
+
+      // テクスチャーの有効化
+      GLES20.glBindTexture( GLES20.GL_TEXTURE_2D, _diffuse_texture_id );
+    }
 
   }
 
