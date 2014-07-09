@@ -32,4 +32,5 @@ public class PlayerGameObject extends LifeGameObject implements IUpdatable
 
     super.update( delta_time_in_seconds );
   }
+
 }

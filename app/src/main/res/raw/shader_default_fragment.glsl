@@ -27,7 +27,7 @@ void main()
     gl_FragColor.rgb *= 1.0 - diffuse_texture_blending_factor;
     gl_FragColor     += texture2D( diffuse_sampler, var_texcoord ) * diffuse_texture_blending_factor;
   }
-  gl_FragColor.a *= transparent;
+  gl_FragColor.a *= 1.0 - transparent;
 }
 
 bool is_nan( float val )
