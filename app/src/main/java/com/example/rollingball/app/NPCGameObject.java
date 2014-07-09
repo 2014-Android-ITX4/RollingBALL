@@ -15,4 +15,11 @@ public class NPCGameObject extends LifeGameObject
     _ai = ai;
   }
 
+  @Override
+  public void update( final float delta_time_in_seconds )
+  {
+    _ai.update( delta_time_in_seconds );
+
+    super.update( delta_time_in_seconds );
+  }
 }
