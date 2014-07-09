@@ -10,6 +10,7 @@ varying vec2 var_texcoord;
 varying vec3 var_normal;
 
 uniform sampler2D diffuse_sampler;
+
 uniform vec3 diffuse;
 uniform vec3 ambient;
 uniform vec3 specular;
@@ -27,7 +28,7 @@ void main()
     gl_FragColor.rgb *= 1.0 - diffuse_texture_blending_factor;
     gl_FragColor     += texture2D( diffuse_sampler, var_texcoord ) * diffuse_texture_blending_factor;
   }
-  gl_FragColor.a *= transparent;
+  gl_FragColor.a *= 1.0 - transparent;
 }
 
 bool is_nan( float val )

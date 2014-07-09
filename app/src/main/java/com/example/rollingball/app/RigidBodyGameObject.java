@@ -37,4 +37,10 @@ public class RigidBodyGameObject extends GameObject
 
     super.update( delta_time_in_seconds );
   }
+
+  @Override
+  public void effect_gravity( final Vec3 g_in_m_per_s_s )
+  {
+    this.forces.add( g_in_m_per_s_s );
+  }
 }

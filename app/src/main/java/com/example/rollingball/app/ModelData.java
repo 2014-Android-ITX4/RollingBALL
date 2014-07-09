@@ -25,8 +25,7 @@ public class ModelData
   private int _indices_buffer_type;
   private int _polygon_mode;
 
-  // TODO: Texture 使う必要が生じたらどうぞ
-  //private int _texture_buffer_id;
+  public Material material = new Material();
 
   public ModelData( float[] arg_vertices, byte[] arg_indices, int polygon_mode )
   {
@@ -252,15 +251,8 @@ public class ModelData
     // ワールド変換
     GLES20.glUniformMatrix4fv( GLES20.glGetUniformLocation( program_id , "world_transformation" ), 1, false, transformation.getBuffer( ) );
 
-    // 拡散反射光の色
-    GLES20.glUniform3fv( GLES20.glGetUniformLocation( program_id, "diffuse" ), 1, new Vec3( 0.0f, 1.0f, 0.0f ).getBuffer( ) );
-
-    // 不透明度
-    GLES20.glUniform1f( GLES20.glGetUniformLocation( program_id, "transparent" ), 1.0f );
-
-    // TODO: テクスチャー対応用。テクスチャーに対応する際にどうぞ
-    // テクスチャーのブレンド比
-    //GLES20.glUniform1f( GLES20.glGetUniformLocation( program_id, "location_of_diffuse_texture_blending_factor" ), 0.0f );
+    // 材質の適用
+    material.draw( program_id );
 
     // 面群の描画
     GLES20.glDrawElements( _polygon_mode, _number_of_indices, _indices_buffer_type, 0 );
