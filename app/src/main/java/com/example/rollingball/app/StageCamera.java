@@ -71,8 +71,11 @@ public class StageCamera extends Camera
         throw new NullPointerException( " this scene has not player game object." );
     }
 
+    // プレイヤー方向を向く
+    look_at = _player_game_object.position;
+
     // カメラの視点位置をプレイヤーゲームオブジェクトを基準に軌道上の差分位置を加算して設定
-    eye = _player_game_object.position.add( delta_position );
+    eye = look_at.add( delta_position );
   }
 
   private void update_swipe( float delta_time_in_seconds )
