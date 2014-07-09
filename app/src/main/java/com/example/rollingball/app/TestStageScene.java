@@ -10,7 +10,7 @@ public class TestStageScene extends StageScene
     _player.model = ModelData.generate_sphere();
     //game_objects.clear();
 
-    push( _field = new FieldGameObject( this ) );
+    push( _field = new FieldGameObject( this, "test_1_64x64.png" ) );
   }
 
   @Override
