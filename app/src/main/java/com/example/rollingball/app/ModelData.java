@@ -39,7 +39,7 @@ public class ModelData
 
   public ModelData( float[] arg_vertices, byte[] arg_indices )
   {
-    this( arg_vertices, arg_indices, GLES20.GL_TRIANGLE_STRIP );
+    this( arg_vertices, arg_indices, GLES20.GL_TRIANGLES );
   }
 
   public ModelData( float[] arg_vertices, short[] arg_indices, int polygon_mode )
@@ -53,7 +53,7 @@ public class ModelData
 
   public ModelData( float[] arg_vertices, short[] arg_indices )
   {
-    this(arg_vertices, arg_indices, GLES20.GL_TRIANGLE_STRIP);
+    this(arg_vertices, arg_indices, GLES20.GL_TRIANGLES);
   }
 
   public static ModelData generate_from_field( ArrayList< ArrayList< Float > > field )
@@ -83,6 +83,8 @@ public class ModelData
       , new Vec3( +0.5f, +0.5f, 0.0f )
       };
 
+    short base_index = 0;
+
     for ( int x = 0; x < field_size_x; ++x )
       for ( int z = 0; z < field_size_z; ++z )
       {
@@ -96,15 +98,17 @@ public class ModelData
           vertices[ vertex_index++ ] = v.getZ();
         }
 
-        short base_index = index_index;
+
 
         indices[ index_index++ ] = (short)( base_index + 0 );
         indices[ index_index++ ] = (short)( base_index + 1 );
         indices[ index_index++ ] = (short)( base_index + 2 );
 
-        indices[ index_index++ ] = (short)( base_index + 2 );
         indices[ index_index++ ] = (short)( base_index + 1 );
+        indices[ index_index++ ] = (short)( base_index + 2 );
         indices[ index_index++ ] = (short)( base_index + 3 );
+
+        base_index = ( short ) (base_index + 4);
       }
 
     return new ModelData( vertices, indices, GLES20.GL_TRIANGLES );
@@ -181,7 +185,7 @@ public class ModelData
         indices[index_index++] = i3;
       }
 
-    return new ModelData( vertices, indices, GLES20.GL_TRIANGLES );
+    return new ModelData( vertices, indices, GLES20.GL_TRIANGLE_STRIP );
   }
 
   public static ModelData generate_sphere( float radius, int split )
