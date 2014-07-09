@@ -10,6 +10,7 @@ varying vec2 var_texcoord;
 varying vec3 var_normal;
 
 uniform sampler2D diffuse_sampler;
+
 uniform vec3 diffuse;
 uniform vec3 ambient;
 uniform vec3 specular;
