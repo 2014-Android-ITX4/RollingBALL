@@ -56,6 +56,8 @@ public class FieldGameObject extends GameObject
   // ファイル読み込み
   public void load_from_file( String path )
   {
+    final float abyss_height = -1.0e+38f;
+
     Bitmap bitmap = _scene.scene_manager.view.load_bitmap_from_asset( path );
 
     ArrayList< Float > field_line = new ArrayList< Float >(  );
@@ -68,8 +70,15 @@ public class FieldGameObject extends GameObject
       {
         int   pixel  = bitmap.getPixel( x, z );
         float height = (float)Color.red( pixel ) * normalize_factor;
-        field_line.add( height );
-        Log.d("FieldGameObject.load_from_file", String.valueOf( x ) + "," + z + ": " + height );
+
+        boolean abyss = ( Color.green( pixel ) & 0x00000001 ) == 0x00000001;
+
+        if ( abyss )
+          field_line.add( abyss_height );
+        else
+          field_line.add( height );
+
+        Log.d( "FieldGameObject.load_from_file", String.valueOf( x ) + "," + z + ": " + height );
       }
       field_planes.add( field_line );
       field_line = new ArrayList< Float >(  );
