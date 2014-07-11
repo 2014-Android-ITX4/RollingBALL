@@ -105,6 +105,7 @@ public class Scene implements IUpdatable, IDrawable
     if ( Math.abs( theta ) > ( float )( Math.PI * 0.5 ) ){
       if ( b.field_planes.get( position_x + 1 ).get( position_z ) == 1 || b.field_planes.get( position_x - 1 ).get( position_z ) == 1 ){
         a.velocity.subtract( reflection_z );
+
       }else if ( b.field_planes.get( position_x ).get( position_z + 1 ) == 1 || b.field_planes.get( position_x ).get( position_z - 1) == 1 ){
         a.velocity.subtract( reflection_x );
       }
