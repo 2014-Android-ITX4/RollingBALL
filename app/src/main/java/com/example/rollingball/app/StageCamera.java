@@ -62,7 +62,7 @@ public class StageCamera extends Camera
         , dst * (float) Math.sin( _theta )
       );
     //Log.d( "x","="+delta_position.getX() );
-    Log.d( "y","="+delta_position.getY() );
+    //Log.d( "y","="+delta_position.getY() );
 
     // プレイヤーオブジェクトが未設定の可能性があるのでテスト
     if ( _player_game_object == null )
@@ -91,19 +91,23 @@ public class StageCamera extends Camera
     //Log.d( "screen size" , screen_size.toString() );
 
     Vec3 dp = scene.scene_manager.view.activity.swipe_delta_position();
-    Vec3 rotation_ratio = new Vec3( dp.getX() / screen_size.getX(), dp.getY() / screen_size.getY() / 4, 0.0f );
+    Vec3 rotation_ratio = new Vec3( dp.getX() / screen_size.getX(), dp.getY() / screen_size.getY() , 0.0f );
 
     final float rotation_magnifier = (float)Math.PI;
+    final float pi_per_2 = rotation_magnifier * 0.5f;
+
+    final float increment_phi = _phi + rotation_magnifier * rotation_ratio.getY();
+    final float _max_phi = 29.8f + rotation_magnifier * 0.5f;
+    final float _min_phi = 30.0f - rotation_magnifier * 0.5f;
 
 
-    if ( Math.abs( dp.getX() ) > Math.abs( dp.getY() ) )
-    {
+    if ( Math.abs( dp.getX() ) > Math.abs( dp.getY() ) ){
       _theta += rotation_magnifier * rotation_ratio.getX();
-    }else{
-      if(_phi + rotation_magnifier * rotation_ratio.getY() < 29.8f + rotation_magnifier / 2 && _phi + rotation_magnifier * rotation_ratio.getY() > 30.0f - rotation_magnifier / 2 )
-      {
-        _phi   += rotation_magnifier * rotation_ratio.getY();
-      }
+    }
+    else
+    {
+      if( increment_phi < _max_phi && increment_phi > _min_phi )
+        _phi   += rotation_magnifier * rotation_ratio.getY() * 0.25f;
     }
     Log.d("θ, φ", "" + _theta + " " + _phi);
 
