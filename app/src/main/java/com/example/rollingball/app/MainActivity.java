@@ -7,10 +7,13 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 
 import com.hackoeur.jglm.Vec3;
+import com.hackoeur.jglm.Vec4;
 
 import java.util.List;
 
@@ -18,13 +21,17 @@ import java.util.List;
 public class MainActivity
   extends ActionBarActivity implements SensorEventListener
 {
-  private MainView _view;
   public SensorManager sensor_manager;
-  private boolean _is_magnetic_sensor, _is_accelerometer_sensor;
-
-  private final int MATRIX_SIZE = 16;
 
   public Vec3 rotation = new Vec3( 0.0f, 0.0f, 0.0f );
+
+  private MainView _view;
+  private boolean _is_magnetic_sensor, _is_accelerometer_sensor;
+
+  private GestureDetector _gestureDetector;
+
+  private Vec3 _swipe_delta_position = new Vec3( 0.0f, 0.0f, 0.0f );
+  private Vec3 _swipe_velocity = new Vec3( 0.0f, 0.0f, 0.0f );
 
   @Override
   protected void onCreate( Bundle savedInstanceState )
@@ -36,6 +43,8 @@ public class MainActivity
 
     //センサ・マネージャの取得
     sensor_manager = ( SensorManager )getSystemService( SENSOR_SERVICE );
+
+    _gestureDetector = new GestureDetector( this, onGestureListener );
 
   }
 
@@ -132,9 +141,6 @@ public class MainActivity
   @Override
   public boolean onOptionsItemSelected( MenuItem item )
   {
-    // Handle action bar item clicks here. The action bar will
-    // automatically handle clicks on the Home/Up button, so long
-    // as you specify a parent activity in AndroidManifest.xml.
     int id = item.getItemId();
     if ( id == R.id.action_settings )
     {
@@ -142,4 +148,53 @@ public class MainActivity
     }
     return super.onOptionsItemSelected( item );
   }
+
+  @Override
+  public boolean onTouchEvent( MotionEvent event ) {
+    _gestureDetector.onTouchEvent( event );
+    return false;
+  }
+
+  public Vec3 swipe_delta_position()
+  { return _swipe_delta_position; }
+
+  public Vec3 swipe_velocity()
+  { return _swipe_velocity; }
+
+  public void attenuate_swipe_state()
+  {
+    final float attenuation = 0.90f;
+
+    if ( _swipe_delta_position.getLengthSquared() > 0.05f )
+      _swipe_delta_position = _swipe_delta_position.multiply( attenuation );
+    else
+      _swipe_delta_position = Vec3.VEC3_ZERO;
+
+    if ( _swipe_velocity.getLengthSquared() > 0.05f )
+      _swipe_velocity = _swipe_velocity.multiply( attenuation );
+    else
+      _swipe_velocity = Vec3.VEC3_ZERO;
+  }
+
+  public void reset_swipe_state()
+  {
+    _swipe_delta_position = Vec3.VEC3_ZERO;
+    _swipe_velocity       = Vec3.VEC3_ZERO;
+  }
+
+  private GestureDetector.SimpleOnGestureListener onGestureListener = new GestureDetector.SimpleOnGestureListener()
+  {
+    @Override
+    public boolean onFling(MotionEvent motion_event_1, MotionEvent motion_event_2, float velocity_x, float velocity_y )
+    {
+      _swipe_delta_position = new Vec3( motion_event_2.getX() - motion_event_1.getX(), motion_event_2.getY() - motion_event_1.getY(), 0.0f );
+      _swipe_velocity = new Vec3( velocity_x, velocity_y, 0.0f );
+
+      Log.d( "swipe delta position", _swipe_delta_position.toString() );
+      Log.d( "swipe velocity", _swipe_velocity.toString() );
+
+      return false;
+    }
+  };
+
 }

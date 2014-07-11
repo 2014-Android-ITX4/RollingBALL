@@ -1,26 +1,33 @@
 package com.example.rollingball.app;
 
-/**
- * Created by sakamoto on 2014/05/21.
- */
 public class StageScene extends Scene
 {
-  protected float _stage_time;
-  protected int _count_of_continue_ticket = 0;
-  protected float _death_height;
-  protected boolean _pause;
+  protected float            _stage_time_in_seconds    = 0.0f;
+  protected int              _count_of_continue_ticket = 0;
+  protected float            _death_height             = -5.0f;
+  protected boolean          _pause                    = false;
+  protected PlayerGameObject _player                   = null;
+  protected FieldGameObject  _field                    = null;
 
-  StageScene( final SceneManager s )
+  public StageScene( final SceneManager s )
   {
     super( s );
+
+    push( _player = new PlayerGameObject( this, input_manager ) );
+    this.camera = new StageCamera( this );
   }
 
   @Override
-  public void update( final long delta_time_in_ns )
+  public void update( final float delta_time_in_seconds )
   {
-    if ( ! _pause ) _stage_time++;
-    super.update( delta_time_in_ns );
+    if ( ! _pause )
+      _stage_time_in_seconds += delta_time_in_seconds;
+
+    super.update( delta_time_in_seconds );
   }
+
+  public float death_height()
+  { return  _death_height; }
 
   //TODO:update()で_pauseの判定とフラグセット
 
