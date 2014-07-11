@@ -10,7 +10,7 @@ import com.hackoeur.jglm.Vec4;
 public class StageCamera extends Camera
 {
   // プレイヤーゲームオブジェクトを基準に方位角θ、仰角φ、距離distanceを保持
-  private float _distance = 10.0f; //r
+  private float _distance = 20.0f; //r
   private float _theta    =  0.0f; //θ
   private float _phi      = 30.0f; //φ
 
@@ -53,14 +53,16 @@ public class StageCamera extends Camera
   private  void update_position()
   {
     // 複数回使うので事前に1回だけ計算して保持
-    final float dst  = _distance * (float) Math.sin( _theta );
+    final float dst  = _distance * (float) Math.sin( _phi );
 
     // プレイヤーオブジェクトに対するカメラの位置差
     final Vec3 delta_position = new Vec3
-      ( dst * (float) Math.cos( _phi )
-        , dst * (float) Math.sin( _phi )
-        , _distance * (float) Math.cos( _theta )
+      ( dst * (float) Math.cos( _theta )
+        , _distance * (float) Math.cos( _phi )
+        , dst * (float) Math.sin( _theta )
       );
+    //Log.d( "x","="+delta_position.getX() );
+    Log.d( "y","="+delta_position.getY() );
 
     // プレイヤーオブジェクトが未設定の可能性があるのでテスト
     if ( _player_game_object == null )
@@ -89,12 +91,20 @@ public class StageCamera extends Camera
     //Log.d( "screen size" , screen_size.toString() );
 
     Vec3 dp = scene.scene_manager.view.activity.swipe_delta_position();
-    Vec3 rotation_ratio = new Vec3( dp.getX() / screen_size.getX(), dp.getY() / screen_size.getY(), 0.0f );
+    Vec3 rotation_ratio = new Vec3( dp.getX() / screen_size.getX(), dp.getY() / screen_size.getY() / 4, 0.0f );
 
     final float rotation_magnifier = (float)Math.PI;
 
-    _theta += rotation_magnifier * rotation_ratio.getX();
-    _phi   += rotation_magnifier * rotation_ratio.getY();
+
+    if ( Math.abs( dp.getX() ) > Math.abs( dp.getY() ) )
+    {
+      _theta += rotation_magnifier * rotation_ratio.getX();
+    }else{
+      if(_phi + rotation_magnifier * rotation_ratio.getY() < 29.8f + rotation_magnifier / 2 && _phi + rotation_magnifier * rotation_ratio.getY() > 30.0f - rotation_magnifier / 2 )
+      {
+        _phi   += rotation_magnifier * rotation_ratio.getY();
+      }
+    }
     Log.d("θ, φ", "" + _theta + " " + _phi);
 
     scene.scene_manager.view.activity.attenuate_swipe_state();
