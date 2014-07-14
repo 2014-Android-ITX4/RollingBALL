@@ -2,8 +2,10 @@ package com.example.rollingball.app;
 
 import android.opengl.GLES20;
 import android.util.Log;
+
 import com.hackoeur.jglm.Mat4;
 import com.hackoeur.jglm.Vec3;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -23,8 +25,7 @@ public class ModelData
   private int _indices_buffer_type;
   private int _polygon_mode;
 
-  // TODO: Texture 使う必要が生じたらどうぞ
-  //private int _texture_buffer_id;
+  public Material material = new Material();
 
   public ModelData( float[] arg_vertices, byte[] arg_indices, int polygon_mode )
   {
@@ -37,7 +38,7 @@ public class ModelData
 
   public ModelData( float[] arg_vertices, byte[] arg_indices )
   {
-    this( arg_vertices, arg_indices, GLES20.GL_TRIANGLE_STRIP );
+    this( arg_vertices, arg_indices, GLES20.GL_TRIANGLES );
   }
 
   public ModelData( float[] arg_vertices, short[] arg_indices, int polygon_mode )
@@ -51,7 +52,7 @@ public class ModelData
 
   public ModelData( float[] arg_vertices, short[] arg_indices )
   {
-    this(arg_vertices, arg_indices, GLES20.GL_TRIANGLE_STRIP);
+    this(arg_vertices, arg_indices, GLES20.GL_TRIANGLES);
   }
 
   public static ModelData generate_from_field( ArrayList< ArrayList< Float > > field )
@@ -81,6 +82,8 @@ public class ModelData
       , new Vec3( +0.5f, +0.5f, 0.0f )
       };
 
+    short base_index = 0;
+
     for ( int x = 0; x < field_size_x; ++x )
       for ( int z = 0; z < field_size_z; ++z )
       {
@@ -94,15 +97,17 @@ public class ModelData
           vertices[ vertex_index++ ] = v.getZ();
         }
 
-        short base_index = index_index;
+
 
         indices[ index_index++ ] = (short)( base_index + 0 );
         indices[ index_index++ ] = (short)( base_index + 1 );
         indices[ index_index++ ] = (short)( base_index + 2 );
 
-        indices[ index_index++ ] = (short)( base_index + 2 );
         indices[ index_index++ ] = (short)( base_index + 1 );
+        indices[ index_index++ ] = (short)( base_index + 2 );
         indices[ index_index++ ] = (short)( base_index + 3 );
+
+        base_index = ( short ) (base_index + 4);
       }
 
     return new ModelData( vertices, indices, GLES20.GL_TRIANGLES );
@@ -179,7 +184,7 @@ public class ModelData
         indices[index_index++] = i3;
       }
 
-    return new ModelData( vertices, indices, GLES20.GL_TRIANGLES );
+    return new ModelData( vertices, indices, GLES20.GL_TRIANGLE_STRIP );
   }
 
   public static ModelData generate_sphere( float radius, int split )
@@ -246,24 +251,9 @@ public class ModelData
     // ワールド変換
     GLES20.glUniformMatrix4fv( GLES20.glGetUniformLocation( program_id , "world_transformation" ), 1, false, transformation.getBuffer( ) );
 
-    // TODO: ライティングの実装に伴い、 Lighting クラスのインスタンスを保持しておき、その .draw を呼ぶように変更するところ
-    {
-      // 並行光源の向き
-      GLES20.glUniform3fv( GLES20.glGetUniformLocation( program_id, "light_direction" ), 1, new Vec3( -1.0f, -1.0f, -1.0f ).getBuffer( ) );
+    // 材質の適用
+    material.draw( program_id );
 
-      // 環境光の色
-      GLES20.glUniform3fv( GLES20.glGetUniformLocation( program_id, "ambient" ), 1, new Vec3( 0.05f, 0.051f, 0.05f ).getBuffer( ) );
-
-      // 拡散反射光の色
-      GLES20.glUniform3fv( GLES20.glGetUniformLocation( program_id, "diffuse" ), 1, new Vec3( 0.0f, 1.0f, 0.0f ).getBuffer( ) );
-
-      // 不透明度
-      GLES20.glUniform1f( GLES20.glGetUniformLocation( program_id, "transparent" ), 1.0f );
-
-      // TODO: テクスチャー対応用。テクスチャーに対応する際にどうぞ
-      // テクスチャーのブレンド比
-      //GLES20.glUniform1f( GLES20.glGetUniformLocation( program_id, "location_of_diffuse_texture_blending_factor" ), 0.0f );
-    }
     // 面群の描画
     GLES20.glDrawElements( _polygon_mode, _number_of_indices, _indices_buffer_type, 0 );
 
@@ -346,4 +336,5 @@ public class ModelData
 
   private static int generate_index_buffer( short[] short_array )
   { return generate_index_buffer( create_buffer( short_array ) ); }
+
 }
