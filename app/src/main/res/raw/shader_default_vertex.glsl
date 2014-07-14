@@ -6,16 +6,14 @@ attribute vec3 normal;
 
 varying vec2 var_texcoord;
 varying vec3 var_normal;
-varying vec4 vPosition;
-varying vec3 vNormal;
 
 uniform mat4 world_transformation;
 uniform mat4 view_transformation;
 uniform mat4 projection_transformation;
 
-void main(void)
+void main()
 {
-  vPosition = gl_ModelViewMatrix * gl_Vertex;
-  vNormal = normalize(gl_NormalMatrix * gl_Normal);
-  gl_Position = ftransform();
+  gl_Position  = projection_transformation * view_transformation * world_transformation * position;
+  var_texcoord = texcoord;
+  var_normal   = normal;
 }

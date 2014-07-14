@@ -8,8 +8,6 @@
 
 varying vec2 var_texcoord;
 varying vec3 var_normal;
-varying vec4 vPosition;
-varying vec3 vNormal;
 
 uniform sampler2D diffuse_sampler;
 uniform vec3 diffuse;
@@ -19,20 +17,25 @@ uniform vec3 emisive;
 uniform float transparent;
 uniform float diffuse_texture_blending_factor;
 
+uniform vec3 light_direction;
+
 bool is_nan( float );
 
-void main(void)
+void main()
 {
-  vec3 light = normalize((gl_LightSource[0].position * vPosition.w - gl_LightSource[0].position.w * vPosition).xyz);
-  vec3 fnormal = normalize(vNormal);
-  float diffuse = max(dot(light, fnormal), 0.0);
+  gl_FragColor = vec4( diffuse, 1.0 );
+  if ( diffuse_texture_blending_factor > 0.0 )
+  {
+    gl_FragColor.rgb *= 1.0 - diffuse_texture_blending_factor;
+    gl_FragColor     += texture2D( diffuse_sampler, var_texcoord ) * diffuse_texture_blending_factor;
+  }
 
-  vec3 view = -normalize(vPosition.xyz);
-  vec3 halfway = normalize(light + view);
-  float specular = pow(max(dot(fnormal, halfway), 0.0), gl_FrontMaterial.shininess);
-  gl_FragColor = gl_FrontLightProduct[0].diffuse * diffuse
-                + gl_FrontLightProduct[0].specular * specular
-                + gl_FrontLightProduct[0].ambient;
+  // lighting parallel, without specular in currently
+  gl_FragColor.rgb += ambient;
+  if ( length( var_normal ) > 0.0 )
+    gl_FragColor.rgb *= dot( var_normal, light_direction );
+
+  gl_FragColor.a *= transparent;
 }
 
 bool is_nan( float val )

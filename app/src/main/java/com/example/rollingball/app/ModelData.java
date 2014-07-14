@@ -246,16 +246,24 @@ public class ModelData
     // ワールド変換
     GLES20.glUniformMatrix4fv( GLES20.glGetUniformLocation( program_id , "world_transformation" ), 1, false, transformation.getBuffer( ) );
 
-    // 拡散反射光の色
-    GLES20.glUniform3fv( GLES20.glGetUniformLocation( program_id, "diffuse" ), 1, new Vec3( 0.0f, 1.0f, 0.0f ).getBuffer( ) );
+    // TODO: ライティングの実装に伴い、 Lighting クラスのインスタンスを保持しておき、その .draw を呼ぶように変更するところ
+    {
+      // 並行光源の向き
+      GLES20.glUniform3fv( GLES20.glGetUniformLocation( program_id, "light_direction" ), 1, new Vec3( -1.0f, -1.0f, -1.0f ).getBuffer( ) );
 
-    // 不透明度
-    GLES20.glUniform1f( GLES20.glGetUniformLocation( program_id, "transparent" ), 1.0f );
+      // 環境光の色
+      GLES20.glUniform3fv( GLES20.glGetUniformLocation( program_id, "ambient" ), 1, new Vec3( 0.05f, 0.051f, 0.05f ).getBuffer( ) );
 
-    // TODO: テクスチャー対応用。テクスチャーに対応する際にどうぞ
-    // テクスチャーのブレンド比
-    //GLES20.glUniform1f( GLES20.glGetUniformLocation( program_id, "location_of_diffuse_texture_blending_factor" ), 0.0f );
+      // 拡散反射光の色
+      GLES20.glUniform3fv( GLES20.glGetUniformLocation( program_id, "diffuse" ), 1, new Vec3( 0.0f, 1.0f, 0.0f ).getBuffer( ) );
 
+      // 不透明度
+      GLES20.glUniform1f( GLES20.glGetUniformLocation( program_id, "transparent" ), 1.0f );
+
+      // TODO: テクスチャー対応用。テクスチャーに対応する際にどうぞ
+      // テクスチャーのブレンド比
+      //GLES20.glUniform1f( GLES20.glGetUniformLocation( program_id, "location_of_diffuse_texture_blending_factor" ), 0.0f );
+    }
     // 面群の描画
     GLES20.glDrawElements( _polygon_mode, _number_of_indices, _indices_buffer_type, 0 );
 
@@ -338,24 +346,4 @@ public class ModelData
 
   private static int generate_index_buffer( short[] short_array )
   { return generate_index_buffer( create_buffer( short_array ) ); }
-
-  // 3Dデータ実装
-  protected void moveLight()
-  {
-    //generate_vertex_buffer();
-
-    //フラグメントシェーダに値を渡すための変数
-    varying vec3 vPositon; // 頂点→光源のベクトル
-    varying vec3 vNormal; // 法線
-
-    //材質
-    //拡散反射色
-    //diffuse_color
-
-    // 鏡面反射の計算
-    vec3 specular = vec3(0.0);
-    if(Light > 0.0){}
-
-
-  }
 }
