@@ -76,10 +76,10 @@ public class ModelData
     short index_index  = 0;
 
     Vec3[] ds =
-      { new Vec3( -0.5f, -0.5f, 0.0f )
-      , new Vec3( +0.5f, -0.5f, 0.0f )
-      , new Vec3( -0.5f, +0.5f, 0.0f )
-      , new Vec3( +0.5f, +0.5f, 0.0f )
+      { new Vec3( -0.5f, 0.0f, -0.5f )
+      , new Vec3( +0.5f, 0.0f, -0.5f )
+      , new Vec3( -0.5f, 0.0f, +0.5f )
+      , new Vec3( +0.5f, 0.0f, +0.5f )
       };
 
     short base_index = 0;
@@ -87,7 +87,7 @@ public class ModelData
     for ( int x = 0; x < field_size_x; ++x )
       for ( int z = 0; z < field_size_z; ++z )
       {
-        Vec3 p = new Vec3( (float)x, (float)z, field.get( x ).get( z ) );
+        Vec3 p = new Vec3( (float)x, field.get( x ).get( z ), (float)z );
         for ( Vec3 d : ds )
         {
           Vec3 v = p.add( d );
