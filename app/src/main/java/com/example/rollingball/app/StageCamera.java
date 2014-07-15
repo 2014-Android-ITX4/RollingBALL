@@ -3,6 +3,8 @@ package com.example.rollingball.app;
 import android.opengl.GLU;
 import android.util.Log;
 
+import com.hackoeur.jglm.Mat4;
+import com.hackoeur.jglm.Matrices;
 import com.hackoeur.jglm.Vec;
 import com.hackoeur.jglm.Vec3;
 import com.hackoeur.jglm.Vec4;
@@ -12,7 +14,7 @@ public class StageCamera extends Camera
   // プレイヤーゲームオブジェクトを基準に方位角θ、仰角φ、距離distanceを保持
   private float _distance = 20.0f; //r
   private float _theta    =  0.0f; //θ
-  private float _phi      = 30.0f; //φ
+  private float _phi      =  0.0f; //φ
 
   // 最小 distance 、 最大 distance
   private final float _min_distance =  1.0f;
@@ -52,17 +54,18 @@ public class StageCamera extends Camera
 
   private  void update_position()
   {
-    // 複数回使うので事前に1回だけ計算して保持
-    final float dst  = _distance * (float) Math.sin( _phi );
-
     // プレイヤーオブジェクトに対するカメラの位置差
+    //*
     final Vec3 delta_position = new Vec3
-      ( dst * (float) Math.cos( _theta )
-        , _distance * (float) Math.cos( _phi )
-        , dst * (float) Math.sin( _theta )
-      );
+      ( (float)Math.sin( _theta ) * (float)Math.cos( _phi )
+      , (float)Math.sin( _phi )
+      , (float)Math.cos( _theta ) * (float)Math.cos( _phi )
+      ).multiply( _distance );
+    //*/
     //Log.d( "x","="+delta_position.getX() );
     //Log.d( "y","="+delta_position.getY() );
+
+    Log.d("θ, φ", "" + _theta + " " + _phi + " " + delta_position.toString() );
 
     // プレイヤーオブジェクトが未設定の可能性があるのでテスト
     if ( _player_game_object == null )
@@ -91,25 +94,25 @@ public class StageCamera extends Camera
     //Log.d( "screen size" , screen_size.toString() );
 
     Vec3 dp = scene.scene_manager.view.activity.swipe_delta_position();
-    Vec3 rotation_ratio = new Vec3( dp.getX() / screen_size.getX(), dp.getY() / screen_size.getY() , 0.0f );
+    Vec3 rotation_ratio = new Vec3( dp.getX() / screen_size.getX(), dp.getY() / screen_size.getY(), 0.0f );
 
-    final float rotation_magnifier = (float)Math.PI;
-    final float pi_per_2 = rotation_magnifier * 0.5f;
-
-    final float increment_phi = _phi + rotation_magnifier * rotation_ratio.getY();
-    final float _max_phi = 29.8f + rotation_magnifier * 0.5f;
-    final float _min_phi = 30.0f - rotation_magnifier * 0.5f;
-
-
-    if ( Math.abs( dp.getX() ) > Math.abs( dp.getY() ) ){
+    if ( Math.abs( dp.getX() ) > Math.abs( dp.getY() ) )
+    {
+      final float rotation_magnifier = (float)Math.PI / 4.0f;
       _theta += rotation_magnifier * rotation_ratio.getX();
     }
     else
     {
-      if( increment_phi < _max_phi && increment_phi > _min_phi )
-        _phi   += rotation_magnifier * rotation_ratio.getY() * 0.25f;
+      final float rotation_magnifier = (float)Math.PI / 8.0f;
+      _phi += rotation_magnifier * rotation_ratio.getY();
+
+      // ジンバルロックを回避とカメラのUP反転の対応として仰角を制限します。
+      final float phi_min = -(float)Math.PI * 0.5f * 0.98f;
+      final float phi_max = +(float)Math.PI * 0.5f * 0.98f;
+      _phi = Math.min( Math.max( _phi, phi_min ), phi_max );
     }
-    Log.d("θ, φ", "" + _theta + " " + _phi);
+
+    //Log.d("θ, φ", "" + _theta + " " + _phi);
 
     scene.scene_manager.view.activity.attenuate_swipe_state();
     //scene.scene_manager.view.activity.reset_swipe_state();
