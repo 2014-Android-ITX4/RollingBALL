@@ -1,10 +1,14 @@
 package com.example.rollingball.app;
 
+import com.hackoeur.jglm.Vec3;
+
 import java.util.InputMismatchException;
 import java.util.LinkedList;
 
 public class Scene implements IUpdatable, IDrawable
 {
+  private Vec3 _gravity_in_m_per_s_s = new Vec3( 0.0f, -9.8f, 0.0f);
+
   public LinkedList<GameObject> game_objects  = new LinkedList< GameObject >( );
   public boolean                to_exit       = false;
   public Camera                 camera        = new Camera( this );
@@ -35,7 +39,10 @@ public class Scene implements IUpdatable, IDrawable
     camera.update( delta_time_in_seconds );
 
     for ( GameObject g : game_objects )
+    {
       g.update( delta_time_in_seconds );
+      g.effect_gravity( _gravity_in_m_per_s_s );
+    }
   }
 
   @Override

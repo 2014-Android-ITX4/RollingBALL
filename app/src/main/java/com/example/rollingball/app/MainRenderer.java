@@ -78,7 +78,7 @@ class MainRenderer implements GLSurfaceView.Renderer
 
     GLES20.glEnableVertexAttribArray( GLES20.glGetAttribLocation( _program, "position" ) );
     // TODO: テクスチャーを使うようになったらどうぞ。
-    //GLES20.glEnableVertexAttribArray( GLES20.glGetAttribLocation( program, "texcoord" ) );
+    //GLES20.glEnableVertexAttribArray( GLES20.glGetAttribLocation( _program, "texcoord" ) );
 
     // デプスバッファの有効化
     GLES20.glEnable( GLES20.GL_DEPTH_TEST );
