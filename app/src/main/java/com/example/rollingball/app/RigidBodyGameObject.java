@@ -16,17 +16,16 @@ public class RigidBodyGameObject extends GameObject
   @Override
   public void update( final float delta_time_in_seconds )
   {
-    Vec3 acceleration = new Vec3( 0.0f, 0.0f, 0.0f );
-    Vec3 force_sum    = new Vec3( 0.0f, 0.0f, 0.0f );
+    Vec3 force_sum = new Vec3( 0.0f, 0.0f, 0.0f );
 
     for( Vec3 f: forces )
       force_sum = force_sum.add( f );
 
     forces.clear();
 
-    acceleration = force_sum.multiply( 1.0f / mass );
+    Vec3 acceleration = force_sum.multiply( 1.0f / mass );
     velocity = velocity.add( acceleration.multiply( delta_time_in_seconds ) );
-    position = velocity.add( velocity.multiply( delta_time_in_seconds ) );
+    position = position.add( velocity.multiply( delta_time_in_seconds ) );
 
     if ( StageScene.class.isInstance( _scene ) )
     {

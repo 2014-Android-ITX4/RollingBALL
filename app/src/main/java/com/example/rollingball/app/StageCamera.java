@@ -63,7 +63,7 @@ public class StageCamera extends Camera
     //Log.d( "x","="+delta_position.getX() );
     //Log.d( "y","="+delta_position.getY() );
 
-    Log.d("θ, φ", "" + _theta + " " + _phi + " " + delta_position.toString() );
+    //Log.d("θ, φ", "" + _theta + " " + _phi + " " + delta_position.toString() );
 
     // プレイヤーオブジェクトが未設定の可能性があるのでテスト
     if ( _player_game_object == null )
