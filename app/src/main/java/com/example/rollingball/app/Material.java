@@ -13,11 +13,26 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class Material implements IDrawable
 {
-  Vec3  _diffuse_color = new Vec3( 1.0f, 0.9f, 0.9f );
+  Vec3  _diffuse_color = new Vec3( 1.0f, 0.8f, 0.8f );
   float _transparent   = 0.0f;
+
+  Vec3 _light_direction = new Vec3( -1.0f, -1.0f, -1.0f );
+  Vec3 _ambient_color = new Vec3( 0.05f, 0.05f, 0.05f );
 
   float _diffuse_texture_blending_factor = 0.0f;
   int   _diffuse_texture_id = 0;
+
+  public Material ambient_color( final Vec3 ambient_color )
+  {
+    _ambient_color = ambient_color;
+    return this;
+  }
+
+  public Material light_direction( final Vec3 light_direction )
+  {
+    _light_direction = light_direction;
+    return this;
+  }
 
   public Material diffuse_color( final Vec3 diffuse_color )
   {
@@ -76,11 +91,20 @@ public class Material implements IDrawable
 
   public void draw( int program_id )
   {
+    // 並行光源の向き
+    GLES20.glUniform3fv( GLES20.glGetUniformLocation( program_id, "light_direction" ), 1, _light_direction.getBuffer() );
+
+    // 環境光の色
+    GLES20.glUniform3fv(
+      GLES20.glGetUniformLocation( program_id, "ambient" ),
+      1,
+      _ambient_color.getBuffer()
+    );
 
     // 拡散反射光の色
     GLES20.glUniform3fv( GLES20.glGetUniformLocation( program_id, "diffuse" ), 1, _diffuse_color.getBuffer( ) );
 
-    // 不透明度
+    // 透明度
     GLES20.glUniform1f( GLES20.glGetUniformLocation( program_id, "transparent" ), _transparent );
 
     if ( _diffuse_texture_id > 0 )
@@ -94,7 +118,6 @@ public class Material implements IDrawable
       // テクスチャーの有効化
       GLES20.glBindTexture( GLES20.GL_TEXTURE_2D, _diffuse_texture_id );
     }
-
   }
 
   @Override
