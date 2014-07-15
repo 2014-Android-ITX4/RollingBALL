@@ -55,13 +55,11 @@ public class StageCamera extends Camera
   private  void update_position()
   {
     // プレイヤーオブジェクトに対するカメラの位置差
-    //*
     final Vec3 delta_position = new Vec3
       ( (float)Math.sin( _theta ) * (float)Math.cos( _phi )
       , (float)Math.sin( _phi )
       , (float)Math.cos( _theta ) * (float)Math.cos( _phi )
       ).multiply( _distance );
-    //*/
     //Log.d( "x","="+delta_position.getX() );
     //Log.d( "y","="+delta_position.getY() );
 
