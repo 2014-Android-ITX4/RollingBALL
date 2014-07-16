@@ -32,7 +32,6 @@ public class MainView extends GLSurfaceView
 
     this.setEGLContextClientVersion( 2 );
     renderer = new MainRenderer( this );
-    setDebugFlags( DEBUG_LOG_GL_CALLS | DEBUG_CHECK_GL_ERROR  );
     setRenderer( renderer );
 
     scene_manager = new SceneManager( this );

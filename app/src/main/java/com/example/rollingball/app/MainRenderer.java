@@ -87,6 +87,7 @@ class MainRenderer implements GLSurfaceView.Renderer
 
     uniform_projection_transformation( _field_of_view, _aspect_ratio, _near_clip, _far_clip );
 
+    // ポーズフラグがtrueになっていたら各ModelDataの頂点・インデックスを再読込させる
     if ( _main_view.activity.pause_flag == true )
     {
       _main_view.scene_manager.on_resume();

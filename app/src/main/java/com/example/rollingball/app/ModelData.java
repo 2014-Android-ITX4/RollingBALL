@@ -25,6 +25,7 @@ public class ModelData
   private int _indices_buffer_type;
   private int _polygon_mode;
 
+  // 再開用に頂点・インデックスの値を残しておくための変数
   private float[] _vertices;
   private byte[] _indices_byte;
   private short[] _indices_short;
@@ -75,15 +76,17 @@ public class ModelData
 
   public void on_resume()
   {
+    // 改めて頂点・インデックスを設定してidを取得
 
     _vertices_buffer_id = generate_vertex_buffer( _vertices );
 
+    // 以前取得したインデックスがbyteかshortかを判別
     if ( _indices_byte.length != 0 )
       _indices_buffer_id = generate_index_buffer( _indices_byte );
     else
       _indices_buffer_id = generate_index_buffer( _indices_short );
 
-    Log.d("ModelData on_resume()", String.valueOf( GLES20.glGetError() ));
+//    Log.d("ModelData on_resume()", String.valueOf( GLES20.glGetError() ));
 
   }
 
