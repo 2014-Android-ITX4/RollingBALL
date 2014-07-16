@@ -77,11 +77,18 @@ class MainRenderer implements GLSurfaceView.Renderer
     GLES20.glUseProgram( _program );
 
     GLES20.glEnableVertexAttribArray( GLES20.glGetAttribLocation( _program, "position" ) );
+    GLES20.glEnableVertexAttribArray( GLES20.glGetAttribLocation( _program, "normal"   ) );
     // TODO: テクスチャーを使うようになったらどうぞ。
     //GLES20.glEnableVertexAttribArray( GLES20.glGetAttribLocation( _program, "texcoord" ) );
 
     // デプスバッファの有効化
     GLES20.glEnable( GLES20.GL_DEPTH_TEST );
+    GLES20.glDepthFunc( GLES20.GL_LEQUAL );
+    GLES20.glDepthMask( true );
+
+    // カリング
+    GLES20.glEnable( GLES20.GL_CULL_FACE );
+    GLES20.glCullFace( GLES20.GL_BACK );
 
     uniform_projection_transformation( _field_of_view, _aspect_ratio, _near_clip, _far_clip );
   }
