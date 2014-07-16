@@ -55,4 +55,10 @@ public class Scene implements IUpdatable, IDrawable
       g.draw();
   }
 
+  public void on_resume()
+  {
+    for ( GameObject g : game_objects )
+      g.on_resume();
+  }
+
 }

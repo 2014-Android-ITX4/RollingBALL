@@ -25,12 +25,24 @@ public class ModelData
   private int _indices_buffer_type;
   private int _polygon_mode;
 
+  // 再開用に頂点・インデックスの値を残しておくための変数
+  private float[] _vertices;
+  private byte[] _indices_byte;
+  private short[] _indices_short;
+
   public Material material = new Material();
 
   public ModelData( float[] arg_vertices, byte[] arg_indices, int polygon_mode )
   {
-    _vertices_buffer_id  = generate_vertex_buffer( arg_vertices );
-    _indices_buffer_id   = generate_index_buffer( arg_indices );
+    _vertices = new float[0];
+    _indices_byte = new byte[0];
+    _indices_short = new short[0];
+
+    _vertices = arg_vertices;
+    _indices_byte = arg_indices;
+
+    _vertices_buffer_id  = generate_vertex_buffer( _vertices );
+    _indices_buffer_id   = generate_index_buffer( _indices_byte );
     _number_of_indices   = arg_indices.length;
     _indices_buffer_type = GLES20.GL_UNSIGNED_BYTE;
     _polygon_mode        = polygon_mode;
@@ -43,8 +55,15 @@ public class ModelData
 
   public ModelData( float[] arg_vertices, short[] arg_indices, int polygon_mode )
   {
-    _vertices_buffer_id  = generate_vertex_buffer( arg_vertices );
-    _indices_buffer_id   = generate_index_buffer( arg_indices );
+    _vertices = new float[0];
+    _indices_byte = new byte[0];
+    _indices_short = new short[0];
+
+    _vertices = arg_vertices;
+    _indices_short = arg_indices;
+
+    _vertices_buffer_id  = generate_vertex_buffer( _vertices );
+    _indices_buffer_id   = generate_index_buffer( _indices_short );
     _number_of_indices   = arg_indices.length;
     _indices_buffer_type = GLES20.GL_UNSIGNED_SHORT;
     _polygon_mode        = polygon_mode;
@@ -53,6 +72,22 @@ public class ModelData
   public ModelData( float[] arg_vertices, short[] arg_indices )
   {
     this(arg_vertices, arg_indices, GLES20.GL_TRIANGLES);
+  }
+
+  public void on_resume()
+  {
+    // 改めて頂点・インデックスを設定してidを取得
+
+    _vertices_buffer_id = generate_vertex_buffer( _vertices );
+
+    // 以前取得したインデックスがbyteかshortかを判別
+    if ( _indices_byte.length != 0 )
+      _indices_buffer_id = generate_index_buffer( _indices_byte );
+    else
+      _indices_buffer_id = generate_index_buffer( _indices_short );
+
+//    Log.d("ModelData on_resume()", String.valueOf( GLES20.glGetError() ));
+
   }
 
   public static ModelData generate_from_field( ArrayList< ArrayList< Float > > field )
@@ -282,6 +317,7 @@ public class ModelData
     GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, 0 );
     GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, 0 );
 
+//    Log.d( "ModelData draw", String.valueOf( GLES20.glGetError() ) );
     //Log.d( "GL_NO_ERROR", String.valueOf( GLES20.glGetError() == GLES20.GL_NO_ERROR ) );
   }
 
