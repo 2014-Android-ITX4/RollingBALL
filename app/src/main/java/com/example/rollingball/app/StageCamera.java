@@ -60,8 +60,8 @@ public class StageCamera extends Camera
       , (float)Math.sin( _phi )
       , (float)Math.cos( _theta ) * (float)Math.cos( _phi )
       ).multiply( _distance );
-    //Log.d( "x","="+delta_position.getX() );
-    //Log.d( "y","="+delta_position.getY() );
+    //Log.d( "x=","x="+delta_position.getX() );
+    //Log.d( "y=","y="+delta_position.getY() );
 
     Log.d("θ, φ", "" + _theta + " " + _phi + " " + delta_position.toString() );
 
@@ -79,6 +79,9 @@ public class StageCamera extends Camera
 
     // カメラの視点位置をプレイヤーゲームオブジェクトを基準に軌道上の差分位置を加算して設定
     eye = look_at.add( delta_position );
+    Log.d( "asd1","x="+eye.getX() );
+    Log.d( "asd2", "y="+eye.getY() );
+    Log.d("asd3", "z="+eye.getZ());
   }
 
   private void update_swipe( float delta_time_in_seconds )
@@ -88,6 +91,7 @@ public class StageCamera extends Camera
       , scene.scene_manager.view.screen_height()
       , 0.0f
       );
+    //Vec3 rotation_copy =  scene.scene_manager.view.activity.rotation;
 
     //Log.d( "screen size" , screen_size.toString() );
 
@@ -98,6 +102,7 @@ public class StageCamera extends Camera
     {
       final float rotation_magnifier = (float)Math.PI / 4.0f;
       _theta += rotation_magnifier * rotation_ratio.getX();
+      theta_camera( _theta );
     }
     else
     {

@@ -15,6 +15,8 @@ public class Camera implements IUpdatable
   public Vec3 look_at = new Vec3( 0, 0, 0 );
   public Vec3 up = new Vec3( 0, 1, 0 );
   public Scene scene;
+  private float theta_camera;
+  private float distance;
 
   public Camera( final Scene scene_ )
   {
@@ -34,5 +36,13 @@ public class Camera implements IUpdatable
     int location_of_view_transformation = GLES20.glGetUniformLocation( id , "view_transformation" );
 
     GLES20.glUniformMatrix4fv( location_of_view_transformation, 1, false, view.getBuffer() );
+  }
+  public  float theta_camera(float value)
+  {
+    theta_camera = value;
+  }
+  public float theta_camera()
+  {
+    return theta_camera;
   }
 }
