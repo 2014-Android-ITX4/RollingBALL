@@ -12,6 +12,7 @@ public class Scene implements IUpdatable, IDrawable
   public LinkedList<GameObject> game_objects  = new LinkedList< GameObject >( );
   public boolean                to_exit       = false;
   public Camera                 camera        = new Camera( this );
+  public Lighting               lighting      = new Lighting();
   public InputManager           input_manager = new InputManager( this );
   public SceneManager           scene_manager = null;
 
@@ -49,8 +50,16 @@ public class Scene implements IUpdatable, IDrawable
   @Override
   public void draw()
   {
+    lighting.draw();
+
     for ( GameObject g : game_objects )
       g.draw();
+  }
+
+  public void on_resume()
+  {
+    for ( GameObject g : game_objects )
+      g.on_resume();
   }
 
   protected void _update_collision()

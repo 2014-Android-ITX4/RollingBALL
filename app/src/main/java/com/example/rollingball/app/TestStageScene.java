@@ -20,6 +20,8 @@ public class TestStageScene extends StageScene
 
     // テスト用NPCを配置
     random_npc( 32 );
+
+    this.lighting.position( new Vec3( _player.position.getX(), _player.position.getY() + 25.0f, _player.position.getZ() ) );
   }
 
   @Override

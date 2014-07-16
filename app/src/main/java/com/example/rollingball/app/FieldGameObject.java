@@ -80,7 +80,7 @@ public class FieldGameObject extends GameObject
         else
           field_line.add( height );
 
-        Log.d( "FieldGameObject.load_from_file", String.valueOf( x ) + "," + z + ": " + height );
+//        Log.d( "FieldGameObject.load_from_file", String.valueOf( x ) + "," + z + ": " + height );
       }
       field_planes.add( field_line );
       field_line = new ArrayList< Float >(  );

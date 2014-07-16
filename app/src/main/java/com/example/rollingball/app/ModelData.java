@@ -25,12 +25,24 @@ public class ModelData
   private int _indices_buffer_type;
   private int _polygon_mode;
 
+  // 再開用に頂点・インデックスの値を残しておくための変数
+  private float[] _vertices;
+  private byte[] _indices_byte;
+  private short[] _indices_short;
+
   public Material material = new Material();
 
   public ModelData( float[] arg_vertices, byte[] arg_indices, int polygon_mode )
   {
-    _vertices_buffer_id  = generate_vertex_buffer( arg_vertices );
-    _indices_buffer_id   = generate_index_buffer( arg_indices );
+    _vertices = new float[0];
+    _indices_byte = new byte[0];
+    _indices_short = new short[0];
+
+    _vertices = arg_vertices;
+    _indices_byte = arg_indices;
+
+    _vertices_buffer_id  = generate_vertex_buffer( _vertices );
+    _indices_buffer_id   = generate_index_buffer( _indices_byte );
     _number_of_indices   = arg_indices.length;
     _indices_buffer_type = GLES20.GL_UNSIGNED_BYTE;
     _polygon_mode        = polygon_mode;
@@ -43,8 +55,15 @@ public class ModelData
 
   public ModelData( float[] arg_vertices, short[] arg_indices, int polygon_mode )
   {
-    _vertices_buffer_id  = generate_vertex_buffer( arg_vertices );
-    _indices_buffer_id   = generate_index_buffer( arg_indices );
+    _vertices = new float[0];
+    _indices_byte = new byte[0];
+    _indices_short = new short[0];
+
+    _vertices = arg_vertices;
+    _indices_short = arg_indices;
+
+    _vertices_buffer_id  = generate_vertex_buffer( _vertices );
+    _indices_buffer_id   = generate_index_buffer( _indices_short );
     _number_of_indices   = arg_indices.length;
     _indices_buffer_type = GLES20.GL_UNSIGNED_SHORT;
     _polygon_mode        = polygon_mode;
@@ -55,6 +74,22 @@ public class ModelData
     this(arg_vertices, arg_indices, GLES20.GL_TRIANGLES);
   }
 
+  public void on_resume()
+  {
+    // 改めて頂点・インデックスを設定してidを取得
+
+    _vertices_buffer_id = generate_vertex_buffer( _vertices );
+
+    // 以前取得したインデックスがbyteかshortかを判別
+    if ( _indices_byte.length != 0 )
+      _indices_buffer_id = generate_index_buffer( _indices_byte );
+    else
+      _indices_buffer_id = generate_index_buffer( _indices_short );
+
+//    Log.d("ModelData on_resume()", String.valueOf( GLES20.glGetError() ));
+
+  }
+
   public static ModelData generate_from_field( ArrayList< ArrayList< Float > > field )
   {
     final int field_size_x = field.size();
@@ -62,11 +97,14 @@ public class ModelData
 
     final int field_area = field_size_x * field_size_z;
 
-    final int elements_per_vertices = 3;
+    final int elements_per_position = 3; // x,y,z
+    final int elements_per_normal   = 3; // x,y,z
+    final int elements_per_vertex   = elements_per_position + elements_per_normal;
+
     final int vertices_per_cell     = 4;
     final int vertices_per_triangle = 3;
     final int triangles_per_cell    = 2;
-    final int number_of_vertices = field_area * elements_per_vertices * vertices_per_cell;
+    final int number_of_vertices = field_area * elements_per_vertex * vertices_per_cell;
     final int number_of_indices  = field_area * vertices_per_triangle * triangles_per_cell;
 
     float[] vertices = new float[ number_of_vertices ];
@@ -88,21 +126,29 @@ public class ModelData
       for ( int z = 0; z < field_size_z; ++z )
       {
         Vec3 p = new Vec3( (float)x, field.get( x ).get( z ), (float)z );
+        ArrayList< Vec3 > ps = new ArrayList< Vec3 >( );
         for ( Vec3 d : ds )
         {
           Vec3 v = p.add( d );
+          ps.add( v );
 
+          // position
           vertices[ vertex_index++ ] = v.getX();
           vertices[ vertex_index++ ] = v.getY();
           vertices[ vertex_index++ ] = v.getZ();
+
+          // normal
+          vertices[ vertex_index++ ] = 0.0f;
+          vertices[ vertex_index++ ] = 1.0f;
+          vertices[ vertex_index++ ] = 0.0f;
         }
 
-
-
-        indices[ index_index++ ] = (short)( base_index + 0 );
+        // triangle 1
         indices[ index_index++ ] = (short)( base_index + 1 );
+        indices[ index_index++ ] = (short)( base_index + 0 );
         indices[ index_index++ ] = (short)( base_index + 2 );
 
+        // triangle 2
         indices[ index_index++ ] = (short)( base_index + 1 );
         indices[ index_index++ ] = (short)( base_index + 2 );
         indices[ index_index++ ] = (short)( base_index + 3 );
@@ -115,8 +161,12 @@ public class ModelData
 
   public static ModelData generate_sphere( float radius, int rings, int sectors )
   {
-    int   number_of_vertices = rings * sectors * 3;
-    short number_of_indices  = (short)( rings * sectors * 6 );
+    final int elements_per_position = 3; // x,y,z
+    final int elements_per_normal   = 3; // x,y,z
+    final int elements_per_vertex   = elements_per_position + elements_per_normal;
+
+    final int   number_of_vertices = rings * sectors * elements_per_vertex;
+    final short number_of_indices  = (short)( rings * sectors * 6 );
 
     float[] vertices = new float[ number_of_vertices ];
     short[] indices  = new short[ number_of_indices  ];
@@ -138,22 +188,23 @@ public class ModelData
 
         final Vec3 v = new Vec3
           ( ( float ) ( Math.cos( 2.0f * pi * sf * sector_step ) * Math.sin( pi * rf * ring_step ) )
-          , ( float ) ( Math.sin( pi * ( 0.5f + rf * ring_step - 1.0f ) ) )
+          , ( float ) ( Math.sin( pi * ( rf * ring_step - 0.5f ) ) )
           , ( float ) ( Math.sin( 2.0f * pi * sf * sector_step ) * Math.sin( pi * rf * ring_step ) )
           );
 
+        // position
         vertices[ vertex_index++ ] = v.getX() * radius;
         vertices[ vertex_index++ ] = v.getY() * radius;
         vertices[ vertex_index++ ] = v.getZ() * radius;
 
+        // normal
+        vertices[ vertex_index++ ] = v.getX();
+        vertices[ vertex_index++ ] = v.getY();
+        vertices[ vertex_index++ ] = v.getZ();
+
         // TODO: テクスチャーUV座標を頂点構造に入れる事になったらどうぞ
         //vertices[vertex_index++] = s * sector_step;
         //vertices[vertex_index++] = r * ring_step;
-
-        // TODO: 法線ベクターを頂点構造に入れる事になったらどうぞ
-        //vertices[vertex_index++] = v.getX();
-        //vertices[vertex_index++] = v.getY();
-        //vertices[vertex_index++] = v.getZ();
       }
     }
 
@@ -163,20 +214,13 @@ public class ModelData
         short r1 = (short)(r + 1);
         short s1 = (short)(s + 1);
 
-        /*
-        indices[index_index++] = (short)( r  * sectors + s  );
-        indices[index_index++] = (short)( r  * sectors + s1 );
-        indices[index_index++] = (short)( r1 * sectors + s1 );
-        indices[index_index++] = (short)( r1 * sectors + s  );
-        */
-
         short i0 = (short)( r  * sectors + s  );
         short i1 = (short)( r  * sectors + s1 );
         short i2 = (short)( r1 * sectors + s1 );
         short i3 = (short)( r1 * sectors + s  );
 
-        indices[index_index++] = i0;
         indices[index_index++] = i1;
+        indices[index_index++] = i0;
         indices[index_index++] = i2;
 
         indices[index_index++] = i0;
@@ -202,17 +246,17 @@ public class ModelData
 
     float[] vertices =
     {
-      +vl, +vl, +vl,//頂点0
-      +vl, +vl, -vl,//頂点1
-      -vl, +vl, +vl,//頂点2
-      -vl, +vl, -vl,//頂点3
-      +vl, -vl, +vl,//頂点4
-      +vl, -vl, -vl,//頂点5
-      -vl, -vl, +vl,//頂点6
-      -vl, -vl, -vl,//頂点7
+      +vl, +vl, +vl, +vl, +vl, +vl, //頂点0
+      +vl, +vl, -vl, +vl, +vl, -vl,//頂点1
+      -vl, +vl, +vl, -vl, +vl, +vl,//頂点2
+      -vl, +vl, -vl, -vl, +vl, -vl,//頂点3
+      +vl, -vl, +vl, +vl, -vl, +vl,//頂点4
+      +vl, -vl, -vl, +vl, -vl, -vl,//頂点5
+      -vl, -vl, +vl, -vl, -vl, +vl,//頂点6
+      -vl, -vl, -vl, vl, -vl, -vl,//頂点7
     };
 
-    //インデックスバッファの元データ配列を定義
+    //インデックスバッファーの元データ配列を定義
     byte[] indices =
     {
       0, 1, 2, 3, 6, 7, 4, 5, 0, 1,//面0
@@ -245,8 +289,20 @@ public class ModelData
     // インデックスバッファの束縛
     GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, _indices_buffer_id );
 
+    final int size_of_float    = 4;
+    final int offset_of_normal = 3;
+    final int position_stride  = 0;
+    final int normal_stride    = size_of_float * offset_of_normal;
+    final int elements_per_position = 3;
+    final int elements_per_normal   = 3;
+    final int elements_per_vertex   = elements_per_position + elements_per_normal;
+    final int vertex_size           = size_of_float * elements_per_vertex;
+
     // 頂点レイアウトの指定
-    GLES20.glVertexAttribPointer( GLES20.glGetAttribLocation( program_id, "position" ), 3, GLES20.GL_FLOAT, false, 0, 0  );
+    GLES20.glVertexAttribPointer( GLES20.glGetAttribLocation( program_id, "position" ), 3, GLES20.GL_FLOAT, false, vertex_size, position_stride );
+
+    // 頂点レイアウトの指定
+    GLES20.glVertexAttribPointer( GLES20.glGetAttribLocation( program_id, "normal" ), 3, GLES20.GL_FLOAT, false, vertex_size, normal_stride );
 
     // ワールド変換
     GLES20.glUniformMatrix4fv( GLES20.glGetUniformLocation( program_id , "world_transformation" ), 1, false, transformation.getBuffer( ) );
@@ -261,6 +317,7 @@ public class ModelData
     GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, 0 );
     GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, 0 );
 
+//    Log.d( "ModelData draw", String.valueOf( GLES20.glGetError() ) );
     //Log.d( "GL_NO_ERROR", String.valueOf( GLES20.glGetError() == GLES20.GL_NO_ERROR ) );
   }
 
