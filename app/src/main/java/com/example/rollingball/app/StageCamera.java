@@ -17,7 +17,7 @@ public class StageCamera extends Camera
   private float _phi      =  (float)Math.PI / 3.0f; //φ
 
   // 最小 distance 、 最大 distance
-  private final float _min_distance =  1.0f;
+  private final float _min_distance =  5.0f;
   private final float _max_distance = 30.0f;
 
   // プレイヤーゲームオブジェクトを保持しておく
@@ -46,10 +46,17 @@ public class StageCamera extends Camera
   {
     update_swipe( delta_time_in_seconds );
 
+    distance(distance() - scene.input_manager.result_scale);
+
     update_position();
 
     // override 元の親クラスの update も呼んでおく
     super.update( delta_time_in_seconds );
+  }
+
+  private void update_distance()
+  {
+
   }
 
   private  void update_position()

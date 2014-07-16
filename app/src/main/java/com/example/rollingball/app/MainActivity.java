@@ -11,6 +11,7 @@ import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 
 import com.hackoeur.jglm.Vec3;
 import com.hackoeur.jglm.Vec4;
@@ -24,12 +25,14 @@ public class MainActivity
   public SensorManager sensor_manager;
 
   public Vec3 rotation = new Vec3( 0.0f, 0.0f, 0.0f );
+  public float scale = 0;
 
   private MainView _view;
   private boolean _is_magnetic_sensor, _is_accelerometer_sensor;
   public boolean pause_flag;  // onResumeが呼び出された時初回か再開かを判定するためのフラグ
 
   private GestureDetector _gestureDetector;
+  private ScaleGestureDetector _scale_gesture_detector;
 
   private Vec3 _swipe_delta_position = new Vec3( 0.0f, 0.0f, 0.0f );
   private Vec3 _swipe_velocity = new Vec3( 0.0f, 0.0f, 0.0f );
@@ -50,6 +53,7 @@ public class MainActivity
     sensor_manager = ( SensorManager )getSystemService( SENSOR_SERVICE );
 
     _gestureDetector = new GestureDetector( this, onGestureListener );
+    _scale_gesture_detector = new ScaleGestureDetector( this, onScaleGestureListener );
 
   }
 
@@ -163,6 +167,7 @@ public class MainActivity
   @Override
   public boolean onTouchEvent( MotionEvent event ) {
     _gestureDetector.onTouchEvent( event );
+    _scale_gesture_detector.onTouchEvent( event );
     return false;
   }
 
@@ -206,6 +211,39 @@ public class MainActivity
 
       return false;
     }
+
   };
+
+  // ピンチイン・ピンチアウト
+  private ScaleGestureDetector.SimpleOnScaleGestureListener onScaleGestureListener = new ScaleGestureDetector.SimpleOnScaleGestureListener()
+  {
+    @Override
+    public boolean onScaleBegin( final ScaleGestureDetector detector )
+    {
+//      Log.d("onScaleBegin" , "onScaleBegin : "+ detector.getScaleFactor());
+      scale = 1.0f;
+
+      return super.onScaleBegin( detector );
+    }
+
+    @Override
+    public void onScaleEnd( final ScaleGestureDetector detector )
+    {
+//      Log.d("onScaleEnd" , "onScaleEnd : "+ detector.getScaleFactor());
+      scale = 1.0f;
+
+      super.onScaleEnd( detector );
+    }
+
+    @Override
+    public boolean onScale( final ScaleGestureDetector detector )
+    {
+//      Log.d("onScale" , "onScale : "+ detector.getScaleFactor());
+      scale = detector.getScaleFactor();
+
+      return super.onScale( detector );
+    }
+  };
+
 
 }

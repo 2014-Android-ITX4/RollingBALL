@@ -21,10 +21,13 @@ public class StageScene extends Scene
   public void update( final float delta_time_in_seconds )
   {
     if ( ! _pause )
+
       _stage_time_in_seconds += delta_time_in_seconds;
 
     super.update( delta_time_in_seconds );
   }
+
+
 
   public float death_height()
   { return  _death_height; }
