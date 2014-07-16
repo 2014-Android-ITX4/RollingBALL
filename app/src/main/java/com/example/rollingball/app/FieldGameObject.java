@@ -9,9 +9,11 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.util.Log;
 
+import com.hackoeur.jglm.Vec3;
+
 public class FieldGameObject extends GameObject
 {
-  private ArrayList< ArrayList< Float > > field_planes = new ArrayList< ArrayList< Float > >();
+  public ArrayList< ArrayList< Float > > field_planes = new ArrayList< ArrayList< Float > >();
 
   public FieldGameObject( Scene scene, int arris_x, int arris_z )
   {
@@ -95,4 +97,10 @@ public class FieldGameObject extends GameObject
   // see more: #123 https://github.com/2014-Android-ITX4/RollingBALL/issues/123
   //@Override
   //public void draw() { }
+
+  public float length_x()
+  { return field_planes.size(); }
+
+  public float length_z()
+  { return field_planes.get(0).size(); }
 }
