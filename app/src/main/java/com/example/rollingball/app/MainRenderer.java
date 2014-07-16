@@ -54,6 +54,7 @@ class MainRenderer implements GLSurfaceView.Renderer
   @Override
   public void onSurfaceChanged( final GL10 gl10, final int width, final int height )
   {
+    Log.d( "MainRenderer","Call onSurfaceChanged" );
     Log.d( "change screen width" , String.valueOf( width ) );
     Log.d( "change screen height", String.valueOf( height ) );
 
@@ -69,6 +70,7 @@ class MainRenderer implements GLSurfaceView.Renderer
   @Override
   public void onSurfaceCreated( final GL10 gl10, final EGLConfig eglConfig )
   {
+    Log.d( "MainRenderer","Call onSurfaceCreated" );
     _program = create_program_from_sources
       ( _main_view.load_text_from_raw_resource( R.raw.shader_default_vertex )
       , _main_view.load_text_from_raw_resource( R.raw.shader_default_fragment )
@@ -84,6 +86,13 @@ class MainRenderer implements GLSurfaceView.Renderer
     GLES20.glEnable( GLES20.GL_DEPTH_TEST );
 
     uniform_projection_transformation( _field_of_view, _aspect_ratio, _near_clip, _far_clip );
+
+    if ( _main_view.activity.pause_flag == true )
+    {
+      _main_view.scene_manager.on_resume();
+      _main_view.activity.pause_flag = false;
+    }
+
   }
 
   public int screen_width( )
