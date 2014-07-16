@@ -55,10 +55,10 @@ public class Scene implements IUpdatable, IDrawable
 
   protected void _update_collision()
   {
-    LinkedList<GameObject> _object = new LinkedList< GameObject >();
-    for ( int na = 0; na < _object.size(); ++na )
-      for ( int nb = na + 1; nb < _object.size(); ++nb )
-        _collision(_object.get( na ),_object.get( nb ));
+   // LinkedList<GameObject> _object = new LinkedList< GameObject >();
+    for ( int na = 0; na < game_objects.size(); ++na )
+      for ( int nb = na + 1; nb < game_objects.size(); ++nb )
+        _collision(game_objects.get( na ),game_objects.get( nb ));
 
   }
 
@@ -95,23 +95,41 @@ public class Scene implements IUpdatable, IDrawable
 
   protected void _collision_body_field( RigidBodyGameObject a, FieldGameObject b )
   {
-    Vec3 reflection_x = new Vec3( a.velocity.getX() * 2, 0, 0 );
-    Vec3 reflection_z = new Vec3( 0, 0, a.velocity.getZ() * 2 );
-    int position_x = (int)b.position.getX();
-    int position_z = (int)b.position.getZ();
-    float a_dot_b = a.velocity.dot( b.position );
-    double theta = Math.acos( a_dot_b );
+    for ( float ar : a.collision_radiuses )
+    {
+      Vec3 reflection_x = new Vec3( a.velocity.getX() * 2, 0, 0 );
+      Vec3 reflection_y = new Vec3( 0, ar - a.position.getY(), 0 );
+      Vec3 reflection_z = new Vec3( 0, 0, a.velocity.getZ() * 2 );
+      int position_x = ( int ) b.position.getX();
+      int position_z = ( int ) b.position.getZ();
+      float a_dot_b = a.velocity.dot( b.position );
+      double theta = Math.acos( a_dot_b );
 
-    if ( Math.abs( theta ) > ( float )( Math.PI * 0.5 ) ){
-      if ( b.field_planes.get( position_x + 1 ).get( position_z ) == 1 || b.field_planes.get( position_x - 1 ).get( position_z ) == 1 ){
-        a.velocity.subtract( reflection_z );
+      if ( a.position.getY() < ar )
+        a.position.add( reflection_y );
 
-      }else if ( b.field_planes.get( position_x ).get( position_z + 1 ) == 1 || b.field_planes.get( position_x ).get( position_z - 1) == 1 ){
-        a.velocity.subtract( reflection_x );
+      if ( Math.abs( theta ) > ( float ) ( Math.PI * 0.5 ) )
+      {
+        if ( b.field_planes.get( position_x + 1 ).get( position_z ) == 1 || b.field_planes.get(
+          position_x - 1
+        ).get( position_z ) == 1 )
+        {
+          a.velocity.subtract( reflection_z );
+
+        }
+        else if ( b.field_planes.get( position_x ).get( position_z + 1 ) == 1 || b.field_planes.get(
+          position_x
+        ).get( position_z - 1 ) == 1 )
+        {
+          a.velocity.subtract( reflection_x );
+        }
       }
-    }else{
+      else
+      {
 
+      }
     }
+
 
 
   }
