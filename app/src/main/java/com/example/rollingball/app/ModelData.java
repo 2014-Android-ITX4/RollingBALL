@@ -82,6 +82,7 @@ public class ModelData
       _indices_buffer_id = generate_index_buffer( _indices_byte );
     else
       _indices_buffer_id = generate_index_buffer( _indices_short );
+
     Log.d("ModelData on_resume()", String.valueOf( GLES20.glGetError() ));
 
   }

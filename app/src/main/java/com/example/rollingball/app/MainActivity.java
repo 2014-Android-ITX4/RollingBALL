@@ -27,6 +27,7 @@ public class MainActivity
 
   private MainView _view;
   private boolean _is_magnetic_sensor, _is_accelerometer_sensor;
+  public boolean pause_flag;
 
   private GestureDetector _gestureDetector;
 
@@ -36,7 +37,11 @@ public class MainActivity
   @Override
   protected void onCreate( Bundle savedInstanceState )
   {
+    Log.d( "MainActivity","Call onCreate" );
+    pause_flag = false;
+
     super.onCreate( savedInstanceState );
+
     _view = new MainView( this, this );
 
     setContentView( _view );
@@ -51,6 +56,7 @@ public class MainActivity
   @Override
   protected void onResume()
   {
+    Log.d( "MainActivity","Call onResume" );
     super.onResume();
 
     //センサの取得
@@ -67,13 +73,15 @@ public class MainActivity
     }
 
 //    _view = new MainView( this, this );
-
+    setContentView( _view );
     _view.onResume();
+
   }
 
   @Override
   protected void onPause()
   {
+    Log.d( "MainActivity","Call onPause" );
     super.onPause();
 
     //センサーマネージャーのリスナー登録破棄
@@ -84,6 +92,7 @@ public class MainActivity
     }
 
     _view.onPause();
+    pause_flag = true;
   }
 
   // センサーの精度が変更された時に呼び出されるメソッド

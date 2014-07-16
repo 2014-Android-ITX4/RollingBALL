@@ -3,6 +3,7 @@ package com.example.rollingball.app;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.view.View;
 
@@ -16,7 +17,6 @@ public class MainView extends GLSurfaceView
   public MainRenderer renderer;
   public SceneManager scene_manager;
   public MainActivity activity;
-  private boolean _pause_flag = false;
 
   public MainView( Context context, MainActivity arg_activity )
   {
@@ -32,31 +32,10 @@ public class MainView extends GLSurfaceView
 
     this.setEGLContextClientVersion( 2 );
     renderer = new MainRenderer( this );
-    this.setRenderer( renderer );
+    setDebugFlags( DEBUG_LOG_GL_CALLS | DEBUG_CHECK_GL_ERROR  );
+    setRenderer( renderer );
 
     scene_manager = new SceneManager( this );
-  }
-
-  @Override
-  public void onPause()
-  {
-    super.onPause();
-
-    _pause_flag = true;
-  }
-
-  @Override
-  public void onResume()
-  {
-    super.onResume();
-
-    if ( _pause_flag == true )
-    {
-      scene_manager.on_resume();
-
-      _pause_flag = false;
-    }
-
   }
 
   public Bitmap load_bitmap_from_asset( String path )
