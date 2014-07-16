@@ -1,13 +1,11 @@
 package com.example.rollingball.app;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
 import android.view.View;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +16,7 @@ public class MainView extends GLSurfaceView
   public MainRenderer renderer;
   public SceneManager scene_manager;
   public MainActivity activity;
+  private boolean _pause_flag = false;
 
   public MainView( Context context, MainActivity arg_activity )
   {
@@ -36,6 +35,28 @@ public class MainView extends GLSurfaceView
     this.setRenderer( renderer );
 
     scene_manager = new SceneManager( this );
+  }
+
+  @Override
+  public void onPause()
+  {
+    super.onPause();
+
+    _pause_flag = true;
+  }
+
+  @Override
+  public void onResume()
+  {
+    super.onResume();
+
+    if ( _pause_flag == true )
+    {
+      scene_manager.on_resume();
+
+      _pause_flag = false;
+    }
+
   }
 
   public Bitmap load_bitmap_from_asset( String path )

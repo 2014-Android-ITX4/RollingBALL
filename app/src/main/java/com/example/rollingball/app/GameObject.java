@@ -27,6 +27,11 @@ public class GameObject implements IUpdatable, IDrawable
     model.draw( Mat4.MAT4_IDENTITY.translate( position ) );
   }
 
+  public void on_resume()
+  {
+    model.on_resume();
+  }
+
   public void effect_gravity( final Vec3 g_in_m_per_s_s )
   {
 

@@ -65,6 +65,9 @@ public class MainActivity
         _is_accelerometer_sensor = true;
       }
     }
+
+//    _view = new MainView( this, this );
+
     _view.onResume();
   }
 

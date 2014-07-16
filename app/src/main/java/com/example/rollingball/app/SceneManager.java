@@ -69,4 +69,10 @@ public class SceneManager implements IUpdatable, IDrawable
     _scenes.peek().draw();
   }
 
+  public void on_resume()
+  {
+    _scenes.peek().on_resume();
+  }
+
 }
+
