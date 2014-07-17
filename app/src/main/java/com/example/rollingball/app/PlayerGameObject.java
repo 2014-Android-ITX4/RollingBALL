@@ -14,7 +14,7 @@ public class PlayerGameObject extends LifeGameObject implements IUpdatable
     super( scene );
 
     this.mass = 0.1f;
-    this.collision_radiuses.add( 0.5f );
+    this.collision_boundings.add( new BoundingSphere( this, 0.5f ) );
     input_manager = s;
   }
 

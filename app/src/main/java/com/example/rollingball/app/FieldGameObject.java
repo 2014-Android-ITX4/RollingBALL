@@ -14,6 +14,7 @@ import com.hackoeur.jglm.Vec3;
 public class FieldGameObject extends GameObject
 {
   public ArrayList< ArrayList< Float > > field_planes = new ArrayList< ArrayList< Float > >();
+  static private float height_magnifier = 10.0f;
 
   public FieldGameObject( Scene scene, int arris_x, int arris_z )
   {
@@ -42,9 +43,9 @@ public class FieldGameObject extends GameObject
       for ( int z = 0; z < arris_z; ++z )
       {
         if ( x == 0 || x == arris_x - 1 )
-          field_line.add( 1.0f );
+          field_line.add( height_magnifier );
         else if (z == 0 || z == arris_z - 1 )
-          field_line.add( 1.0f );
+          field_line.add( height_magnifier );
         else
           field_line.add( 0.0f );
       }
@@ -64,7 +65,7 @@ public class FieldGameObject extends GameObject
 
     ArrayList< Float > field_line = new ArrayList< Float >(  );
 
-    float normalize_factor = 1.0f / 255.0f;
+    float normalize_factor = height_magnifier / 255.0f;
 
     for ( int x = 0; x < bitmap.getWidth(); ++x )
     {

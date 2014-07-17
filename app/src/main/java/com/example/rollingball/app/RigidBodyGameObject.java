@@ -7,8 +7,8 @@ public class RigidBodyGameObject extends GameObject
 {
   public float mass = 1.0f;             //質量
   public Vec3 velocity = new Vec3( 0, 0, 0 );          //速度
-  public ArrayList<Vec3> forces = new ArrayList< Vec3 >(); //力
-  public ArrayList<Float> collision_radiuses = new ArrayList< Float >( );
+  public ArrayList<Vec3> forces = new ArrayList< Vec3 >( ); //力
+  public ArrayList< BoundingSphere > collision_boundings = new ArrayList< BoundingSphere>( );
 
   public RigidBodyGameObject( Scene scene )
   { super( scene );}

@@ -84,64 +84,122 @@ public class Scene implements IUpdatable, IDrawable
 
   protected void _collision_body_body(RigidBodyGameObject a,RigidBodyGameObject b)
   {
-    for ( float ar : a.collision_radiuses )
-      for ( float br : b.collision_radiuses )
-      {
-        Vec3 delta = new Vec3( b.position.subtract( a.position ) );
-        float distance = ( float ) Math.sqrt(
-          Math.pow( delta.getX(), 2 ) + Math.pow( delta.getY(), 2 ) + Math.pow( delta.getZ(), 2 )
-        );
-        if ( distance <= ar + br )
+    for ( BoundingSphere ab : a.collision_boundings )
+      for ( BoundingSphere bb : b.collision_boundings )
+        if ( ab.intersect_bool( bb ) )
         {
           // 当たり処理
-          a.forces.add( b.forces.get( b.forces.size() - 1 ) );
-          b.forces.add( a.forces.get( a.forces.size() - 2 ) );
-
+          a.forces.add( b.velocity.cross( b.velocity ).multiply( b.mass * 0.5f ) );
+          b.forces.add( a.velocity.cross( a.velocity ).multiply( a.mass * 0.5f ) );
         }
-      }
-
   }
 
   protected void _collision_body_field( RigidBodyGameObject a, FieldGameObject b )
   {
-    for ( float ar : a.collision_radiuses )
+    for ( BoundingSphere ab : a.collision_boundings )
     {
-      Vec3 reflection_x = new Vec3( a.velocity.getX() * 2, 0, 0 );
-      Vec3 reflection_y = new Vec3( 0, ar - a.position.getY(), 0 );
-      Vec3 reflection_z = new Vec3( 0, 0, a.velocity.getZ() * 2 );
-      int position_x = ( int ) b.position.getX();
-      int position_z = ( int ) b.position.getZ();
-      float a_dot_b = a.velocity.dot( b.position );
-      double theta = Math.acos( a_dot_b );
+      // a の位置におけるフィールドの整数座標値
+      final int field_x = (int)a.position.getX();
+      final int field_z = (int)a.position.getZ();
 
-      if ( a.position.getY() < ar )
-        a.position.add( reflection_y );
+      // a がフィールド外の x または z 座標に居る場合は判定をスキップ
+      if ( field_x < 0 || field_x >= b.length_x() || field_z < 0 || field_z >= b.length_z() )
+        continue;
 
-      if ( Math.abs( theta ) > ( float ) ( Math.PI * 0.5 ) )
+      // Y 判定
       {
-        if ( b.field_planes.get( position_x + 1 ).get( position_z ) == 1 || b.field_planes.get(
-          position_x - 1
-        ).get( position_z ) == 1 )
-        {
-          a.velocity.subtract( reflection_z );
+        // フィールドは足元にのみ存在する
+        final float field_y = b.field_planes.get( field_x ).get( field_z );
+        final Vec3 floor_position = new Vec3( a.position.getX(), field_y, a.position.getZ() );
 
-        }
-        else if ( b.field_planes.get( position_x ).get( position_z + 1 ) == 1 || b.field_planes.get(
-          position_x
-        ).get( position_z - 1 ) == 1 )
+        final float distance = ab.intersect_field( floor_position );
+
+        if ( distance <= 0.0f )
+          a.position = a.position.subtract( new Vec3( 0.0f, distance, 0.0f ) );
+      }
+
+      // X
+      //   フィールドにより存在する可能性のある段差（壁）は x ± 1 に存在する可能性がある
+      //   但し、フィールドの最も外側のセルに a が存在する場合はそれよりも外の座標のテストはスキップ
+      {
+        // X + 1
+        if ( field_x < b.length_x() - 2 )
         {
-          a.velocity.subtract( reflection_x );
+          final int field_xm = field_x + 1;
+          final float field_y = b.field_planes.get( field_xm ).get( field_z );
+
+          final Vec3 wall_position = new Vec3( field_xm, 0, field_z );
+          final Vec3 wall_normal   = new Vec3( -1.0f, 0.0f, 0.0f );
+
+          final float distance = ab.intersect_field( wall_position, wall_normal );
+
+          // もし壁が無限の高さをもっているのなら当たっているか判定
+          // &&
+          // もし壁の高さが当たり判定球の中心座標以下ならば、当たり判定とする。
+          // これは厳密ではないが、たぶんゲーム内では差し当たりはそこそこ上手く行く。
+          if ( distance <= 0.0f && field_y <= ab.position().getY() )
+          {
+            a.velocity = new Vec3( -a.velocity.getX(), a.velocity.getY(), a.velocity.getZ() );
+            a.position = a.position.subtract( new Vec3( distance, 0.0f, 0.0f ) );
+          }
+        }
+        // X - 1
+        if ( field_x > 0 )
+        {
+          final int field_xm = field_x - 1;
+          final float field_y = b.field_planes.get( field_xm ).get( field_z );
+
+          final Vec3 wall_position = new Vec3( field_xm, 0, field_z );
+          final Vec3 wall_normal   = new Vec3( +1.0f, 0.0f, 0.0f );
+
+          final float distance = ab.intersect_field( wall_position, wall_normal );
+
+          if ( distance <= 0.0f && field_y <= ab.position().getY() )
+          {
+            a.velocity = new Vec3( -a.velocity.getX(), a.velocity.getY(), a.velocity.getZ() );
+            a.position = a.position.subtract( new Vec3( distance, 0.0f, 0.0f ) );
+          }
         }
       }
-      else
-      {
 
+      // Z
+      //   X と同様
+      {
+        // Z + 1
+        if ( field_z < b.length_z() - 2 )
+        {
+          final int field_zm = field_z + 1;
+          final float field_y = b.field_planes.get( field_x ).get( field_zm );
+
+          final Vec3 wall_position = new Vec3( field_x, 0, field_zm );
+          final Vec3 wall_normal   = new Vec3( 0.0f, 0.0f, -1.0f );
+
+          final float distance = ab.intersect_field( wall_position, wall_normal );
+
+          if ( distance <= 0.0f && field_y <= ab.position().getY() )
+          {
+            a.velocity = new Vec3( a.velocity.getX(), a.velocity.getY(), -a.velocity.getZ() );
+            a.position = a.position.subtract( new Vec3( 0.0f, 0.0f, distance ) );
+          }
+        }
+        // X - 1
+        if ( field_z > 0 )
+        {
+          final int field_zm = field_z - 1;
+          final float field_y = b.field_planes.get( field_x ).get( field_zm );
+
+          final Vec3 wall_position = new Vec3( field_x, 0, field_zm );
+          final Vec3 wall_normal   = new Vec3( 0.0f, 0.0f, +1.0f );
+
+          final float distance = ab.intersect_field( wall_position, wall_normal );
+
+          if ( distance <= 0.0f && field_y <= ab.position().getY() )
+          {
+            a.velocity = new Vec3( a.velocity.getX(), a.velocity.getY(), -a.velocity.getZ() );
+            a.position = a.position.subtract( new Vec3( 0.0f, 0.0f, distance ) );
+          }
+        }
       }
     }
-
-
-
   }
-
-
 }
