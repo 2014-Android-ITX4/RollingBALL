@@ -48,7 +48,7 @@ public class BoundingSphere
   // return: 距離、0.0f以下なら接触またはめり込んでいる
   public float intersect_field( final Vec3 field_position, final Vec3 field_normal )
   {
-    final float distance = field_normal.dot( position().subtract( field_position ) ) / field_normal.getLength();
+    final float distance = (field_normal.dot( position().subtract( field_position ) ) / field_normal.getLength()) - _radius;
     return distance;
   }
 
