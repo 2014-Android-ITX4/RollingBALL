@@ -26,7 +26,7 @@ public class PlayerGameObject extends LifeGameObject implements IUpdatable
     // 力ベクターの値の範囲 [ -10 .. 10 ] [N] ( = [kg・m/(s・s)] )
     // ハムスターの標準体重: 1.0e-1 [kg]
     // 標準体重のハムスターを1[秒間]に1[m/(ss)]加速する程度の力f: 1.0e-1 [N]
-    final float max_force = 1.0e-1f;
+    final float max_force = 1.0e+1f;
 
     // 傾きに応じてオブジェクトの力群forcesに力fを追加する
     forces.add( input_manager.rotation.multiply( max_force ) );

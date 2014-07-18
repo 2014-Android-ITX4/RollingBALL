@@ -129,7 +129,11 @@ public class Scene implements IUpdatable, IDrawable
         final float distance = ab.intersect_field( floor_position );
 
         if ( distance <= 0.0f )
+        {
+          //a.forces.add( new Vec3( 0.0f, -0.5f * a.mass * a.velocity.getY() * a.velocity.getY(), 0.0f ) );
+          a.velocity = new Vec3( a.velocity.getX(), -0.3f * a.velocity.getY(), a.velocity.getZ() );
           a.position = a.position.subtract( new Vec3( 0.0f, distance, 0.0f ) );
+        }
       }
 
       // X

@@ -3,6 +3,7 @@ package com.example.rollingball.app;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.opengl.EGLConfig;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.view.View;
@@ -31,6 +32,7 @@ public class MainView extends GLSurfaceView
     activity = arg_activity;
 
     this.setEGLContextClientVersion( 2 );
+    this.setEGLConfigChooser( new MainEGLConfigChooser() );
     renderer = new MainRenderer( this );
     setRenderer( renderer );
 

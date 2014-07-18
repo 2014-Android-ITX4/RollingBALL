@@ -15,9 +15,9 @@ public class Lighting implements IDrawable
   Vec3 _direction = new Vec3( 0.0f, -1.0f, 0.0f );
 
   // 距離に線形比例して光を弱めたい場合に0.0以上の値を設定する
-  float _constant_attenuation  = 1.0f;
+  float _constant_attenuation  = 0.0f;
   float _linear_attenuation    = 0.0f;
-  float _quadratic_attenuation = 0.0005f;
+  float _quadratic_attenuation = 0.01f;
 
   // 環境光
   Vec3 _ambient_color = new Vec3( 0.05f, 0.05f, 0.05f );
