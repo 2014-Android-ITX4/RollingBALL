@@ -20,6 +20,8 @@ public class StageCamera extends Camera
   private final float _min_distance =  5.0f;
   private final float _max_distance = 30.0f;
 
+  private float _update_swipe_wait = 0.0f;
+
   // プレイヤーゲームオブジェクトを保持しておく
   private PlayerGameObject _player_game_object = null;
 
@@ -44,9 +46,15 @@ public class StageCamera extends Camera
   @Override
   public void update( float delta_time_in_seconds )
   {
-    update_swipe( delta_time_in_seconds );
+    distance( distance() - scene.input_manager.result_scale );
 
-    distance(distance() - scene.input_manager.result_scale);
+    // # 235 ピンチでカメラ距離を操作した直後にスワイプ判定が意図せず動作する問題の対応
+    if ( scene.input_manager.result_scale != 0.0f )
+      _update_swipe_wait = 0.3f;
+    else if ( _update_swipe_wait > 0.0f )
+      _update_swipe_wait -= delta_time_in_seconds;
+    else
+      update_swipe( delta_time_in_seconds );
 
     update_position();
 
