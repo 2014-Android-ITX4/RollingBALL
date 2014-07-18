@@ -1,5 +1,7 @@
 package com.example.rollingball.app;
 
+import android.util.Log;
+
 import com.hackoeur.jglm.Vec3;
 import java.util.ArrayList;
 
@@ -33,6 +35,16 @@ public class RigidBodyGameObject extends GameObject
       if ( position.getY() < s.death_height() )
         position = new Vec3( position.getX(), s.death_height(), position.getZ() );
     }
+
+    // #233 擬似的な摩擦の実装
+    Log.d( "", ""+velocity.toString() );
+    final float pseudo_friction_factor_horizon  = 0.998f;
+    final float pseudo_friction_factor_vertical = 1.0f;
+    velocity = new Vec3
+      ( velocity.getX() * pseudo_friction_factor_horizon
+      , velocity.getY() * pseudo_friction_factor_vertical
+      , velocity.getZ() * pseudo_friction_factor_horizon
+      );
 
     super.update( delta_time_in_seconds );
   }
