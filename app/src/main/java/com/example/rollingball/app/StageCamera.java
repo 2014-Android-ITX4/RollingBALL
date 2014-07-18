@@ -81,7 +81,7 @@ public class StageCamera extends Camera
     eye = look_at.add( delta_position );
     Log.d( "asd1","x="+eye.getX() );
     Log.d( "asd2", "y="+eye.getY() );
-    Log.d("asd3", "z="+eye.getZ());
+    //Log.d("asd3", "z="+eye.getZ());
   }
 
   private void update_swipe( float delta_time_in_seconds )

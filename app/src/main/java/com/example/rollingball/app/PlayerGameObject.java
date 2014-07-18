@@ -44,8 +44,19 @@ public class PlayerGameObject extends LifeGameObject implements IUpdatable
     }*/
     float x = input_manager.rotation.getX();
     float z = input_manager.rotation.getZ();
-
-    float rotation_theta = (float)Math.acos( z );
+    float rotation_distance = ( float )Math.sqrt( ( float )Math.pow( x, 2 ) + ( float )Math.pow( z, 2 ) );
+    float rotation_theta = ( float )Math.atan2( x, z );
+    //Log.d( "asd3","distance="+rotation_distance );
+    //Log.d("asd3", "theta="+rotation_theta);
+    //if ( rotation_theta != _scene.camera.theta_camera() )
+      rotation_theta += _scene.camera.theta_camera();
+    x = rotation_distance * ( float )Math.sin( rotation_theta );
+    z = rotation_distance * ( float )Math.cos( rotation_theta );
+    input_manager.rotation = new Vec3( -x, 0.0f, -z );
+    /*Log.d( "asd3","x="+input_manager.rotation.getX() );
+    Log.d( "asd3","y="+input_manager.rotation.getY() );
+    Log.d( "asd3","z="+input_manager.rotation.getZ() );
+    */
 
     // 傾きに応じてオブジェクトの力群forcesに力fを追加する
     forces.add( input_manager.rotation.multiply( max_force ) );
