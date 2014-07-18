@@ -28,6 +28,7 @@ public class TestStageScene extends StageScene
   public void update( float delta_time_in_seconds )
   {
     super.update( delta_time_in_seconds );
+    lighting.position( _player.position.add( new Vec3( 0.0f, 5.0f, 0.0f ) ) );
   }
 
   private void random_npc( int num_of_npcs )
