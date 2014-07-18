@@ -37,7 +37,7 @@ public class RigidBodyGameObject extends GameObject
     }
 
     // #233 擬似的な摩擦の実装
-    Log.d( "", ""+velocity.toString() );
+    //Log.d( "", ""+velocity.toString() );
     final float pseudo_friction_factor_horizon  = 0.998f;
     final float pseudo_friction_factor_vertical = 1.0f;
     velocity = new Vec3
