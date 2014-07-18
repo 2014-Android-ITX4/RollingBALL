@@ -1,5 +1,7 @@
 package com.example.rollingball.app;
 
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -41,6 +43,12 @@ public class MainActivity
   protected void onCreate( Bundle savedInstanceState )
   {
     Log.d( "MainActivity","Call onCreate" );
+
+    {
+      ActivityManager a = ( ( ActivityManager ) getSystemService( Activity.ACTIVITY_SERVICE ) );
+      Log.d( "ActivityManager.getLargeMemoryClass()", "" + a.getLargeMemoryClass() );
+    }
+
     pause_flag = false;
 
     super.onCreate( savedInstanceState );
