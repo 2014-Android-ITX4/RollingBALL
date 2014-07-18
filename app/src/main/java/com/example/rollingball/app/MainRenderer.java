@@ -31,6 +31,8 @@ class MainRenderer implements GLSurfaceView.Renderer
 
   private int _program = 0;
 
+  private boolean first_update = false;
+
   public MainRenderer( final MainView main_view )
   { _main_view = main_view; }
 
@@ -44,9 +46,10 @@ class MainRenderer implements GLSurfaceView.Renderer
 
     _main_view.scene_manager.update( 1.0e-9f * (float)delta_time_in_ns );
 
+
     GLES20.glClear( GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT );
 
-    _main_view.scene_manager.draw();
+//    _main_view.scene_manager.draw();
 
     _before_time_in_ns = System.nanoTime();
   }

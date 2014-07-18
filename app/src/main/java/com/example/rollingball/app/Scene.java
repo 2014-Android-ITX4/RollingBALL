@@ -39,12 +39,12 @@ public class Scene implements IUpdatable, IDrawable
     input_manager.update( delta_time_in_seconds );
     camera.update( delta_time_in_seconds );
 
-    for ( GameObject g : game_objects )
+    for ( int i = 0; i < game_objects.size(); i++ )
     {
-      g.update( delta_time_in_seconds );
-      g.effect_gravity( _gravity_in_m_per_s_s );
+      game_objects.get( i ).update( delta_time_in_seconds );
+      game_objects.get( i ).effect_gravity( _gravity_in_m_per_s_s );
     }
-    _update_collision();
+    //_update_collision();
   }
 
   @Override
@@ -52,14 +52,14 @@ public class Scene implements IUpdatable, IDrawable
   {
     lighting.draw();
 
-    for ( GameObject g : game_objects )
-      g.draw();
+    for ( int i = 0; i < game_objects.size(); i++ )
+      game_objects.get( i ).draw();
   }
 
   public void on_resume()
   {
-    for ( GameObject g : game_objects )
-      g.on_resume();
+    for ( int i = 0; i < game_objects.size(); i++ )
+      game_objects.get( i ).on_resume();
   }
 
   protected void _update_collision()
@@ -84,20 +84,34 @@ public class Scene implements IUpdatable, IDrawable
 
   protected void _collision_body_body(RigidBodyGameObject a,RigidBodyGameObject b)
   {
-    for ( BoundingSphere ab : a.collision_boundings )
-      for ( BoundingSphere bb : b.collision_boundings )
+    BoundingSphere ab, bb;
+
+    for ( int i = 0; i < a.collision_boundings.size(); i++ )
+    {
+      ab = a.collision_boundings.get( i );
+
+      for ( int j = 0; j < b.collision_boundings.size(); j++ )
+      {
+        bb = b.collision_boundings.get( j );
+
         if ( ab.intersect_bool( bb ) )
         {
           // 当たり処理
           a.forces.add( b.velocity.cross( b.velocity ).multiply( b.mass * 0.5f ) );
           b.forces.add( a.velocity.cross( a.velocity ).multiply( a.mass * 0.5f ) );
         }
-  }
+      }
+    }
+   }
+
 
   protected void _collision_body_field( RigidBodyGameObject a, FieldGameObject b )
   {
-    for ( BoundingSphere ab : a.collision_boundings )
+    BoundingSphere ab;
+
+    for ( int i = 0; i < a.collision_boundings.size(); i++ )
     {
+      ab = a.collision_boundings.get( i );
       // a の位置におけるフィールドの整数座標値
       final int field_x = (int)a.position.getX();
       final int field_z = (int)a.position.getZ();

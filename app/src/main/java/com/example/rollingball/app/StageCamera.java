@@ -16,9 +16,17 @@ public class StageCamera extends Camera
   private float _theta    =  -(float)Math.PI * 3.0f / 4.0f; //θ
   private float _phi      =  (float)Math.PI / 3.0f; //φ
 
+  private Vec3 _delta_position;
+
+  private Vec3 _screen_size;
+  private Vec3 _dp;
+  private Vec3 _rotation_ratio;
+
   // 最小 distance 、 最大 distance
   private final float _min_distance =  5.0f;
   private final float _max_distance = 30.0f;
+
+
 
   // プレイヤーゲームオブジェクトを保持しておく
   private PlayerGameObject _player_game_object = null;
@@ -62,7 +70,7 @@ public class StageCamera extends Camera
   private  void update_position()
   {
     // プレイヤーオブジェクトに対するカメラの位置差
-    final Vec3 delta_position = new Vec3
+    _delta_position = new Vec3
       ( (float)Math.sin( _theta ) * (float)Math.cos( _phi )
       , (float)Math.sin( _phi )
       , (float)Math.cos( _theta ) * (float)Math.cos( _phi )
@@ -85,12 +93,12 @@ public class StageCamera extends Camera
     look_at = _player_game_object.position;
 
     // カメラの視点位置をプレイヤーゲームオブジェクトを基準に軌道上の差分位置を加算して設定
-    eye = look_at.add( delta_position );
+    eye = look_at.add( _delta_position );
   }
 
   private void update_swipe( float delta_time_in_seconds )
   {
-    Vec3 screen_size = new Vec3
+    _screen_size = new Vec3
       ( scene.scene_manager.view.screen_width()
       , scene.scene_manager.view.screen_height()
       , 0.0f
@@ -98,18 +106,18 @@ public class StageCamera extends Camera
 
     //Log.d( "screen size" , screen_size.toString() );
 
-    Vec3 dp = scene.scene_manager.view.activity.swipe_delta_position();
-    Vec3 rotation_ratio = new Vec3( dp.getX() / screen_size.getX(), dp.getY() / screen_size.getY(), 0.0f );
+    _dp = scene.scene_manager.view.activity.swipe_delta_position();
+    _rotation_ratio = new Vec3( _dp.getX() / _screen_size.getX(), _dp.getY() / _screen_size.getY(), 0.0f );
 
-    if ( Math.abs( dp.getX() ) > Math.abs( dp.getY() ) )
+    if ( Math.abs( _dp.getX() ) > Math.abs( _dp.getY() ) )
     {
       final float rotation_magnifier = (float)Math.PI / 4.0f;
-      _theta += rotation_magnifier * rotation_ratio.getX();
+      _theta += rotation_magnifier * _rotation_ratio.getX();
     }
     else
     {
       final float rotation_magnifier = (float)Math.PI / 8.0f;
-      _phi += rotation_magnifier * rotation_ratio.getY();
+      _phi += rotation_magnifier * _rotation_ratio.getY();
 
       // ジンバルロックを回避とカメラのUP反転の対応として仰角を制限します。
       final float phi_min = -(float)Math.PI * 0.5f * 0.98f;
