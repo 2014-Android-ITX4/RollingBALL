@@ -94,9 +94,6 @@ public class StageCamera extends Camera
 
     // カメラの視点位置をプレイヤーゲームオブジェクトを基準に軌道上の差分位置を加算して設定
     eye = look_at.add( delta_position );
-    Log.d( "asd1","x="+eye.getX() );
-    Log.d( "asd2", "y="+eye.getY() );
-    //Log.d("asd3", "z="+eye.getZ());
   }
 
   private void update_swipe( float delta_time_in_seconds )

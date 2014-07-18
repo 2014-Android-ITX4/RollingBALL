@@ -35,9 +35,8 @@ public class PlayerGameObject extends LifeGameObject implements IUpdatable
     float z = input_manager.rotation.getZ();
     float rotation_distance = ( float )Math.sqrt( ( float )Math.pow( x, 2 ) + ( float )Math.pow( z, 2 ) );
     float rotation_theta = ( float )Math.atan2( x, z );
-    //Log.d( "asd3","distance="+rotation_distance );
-    //Log.d("asd3", "theta="+rotation_theta);
 
+    if ( rotation_theta != _scene.camera.theta_camera())
       rotation_theta += _scene.camera.theta_camera();
     x = rotation_distance * ( float )Math.sin( rotation_theta );
     z = rotation_distance * ( float )Math.cos( rotation_theta );
