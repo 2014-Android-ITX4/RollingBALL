@@ -43,7 +43,7 @@ void main()
     float l = length( light_ray );
     gl_FragColor.rgb *= d;
     
-    float attenuation = 1.0 / ( light_constant_attenuation + l * light_linear_attenuation + l * l * light_quadratic_attenuation );
+    float attenuation = min( 1.0, 1.0 / ( light_constant_attenuation + l * light_linear_attenuation + l * l * light_quadratic_attenuation ) );
     gl_FragColor.rgb *= attenuation;
   }
   

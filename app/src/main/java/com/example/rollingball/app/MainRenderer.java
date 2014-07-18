@@ -26,8 +26,10 @@ class MainRenderer implements GLSurfaceView.Renderer
 
   private float _field_of_view = (float)( Math.PI / 3.0 );
   private float _aspect_ratio  = 1.0f;
-  private float _near_clip     = 1.0e-3f;
-  private float _far_clip      = 1.0e+3f;
+  // far/near が大きいほど、深度バッファー(16bitしか無い！)が荒くなって、
+  // 描画の前後関係が正しく描画しきれなくなります。注意。
+  private float _near_clip     = 1.0e-1f;
+  private float _far_clip      = 1.0e+2f;
 
   private int _program = 0;
 

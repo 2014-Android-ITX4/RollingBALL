@@ -90,6 +90,50 @@ public class ModelData
 
   }
 
+  // base_index: 頂点データを放り込む最初のインデックス
+  // vs: 頂点データを放り込む配列
+  // position: 位置
+  // normal: 法線
+  // return: 次の頂点の開始インデックス
+  private static int vertices_helper( int vertex_index, float[] vertices, Vec3 position, Vec3 normal )
+  {
+    // position
+    vertices[ vertex_index++ ] = position.getX();
+    vertices[ vertex_index++ ] = position.getY();
+    vertices[ vertex_index++ ] = position.getZ();
+
+    // normal
+    vertices[ vertex_index++ ] = normal.getX();
+    vertices[ vertex_index++ ] = normal.getY();
+    vertices[ vertex_index++ ] = normal.getZ();
+
+    return vertex_index;
+  }
+
+  private static short[] indices_helper( short index_index, short base_index, short[] indices )
+  {
+    // triangle 1
+    indices[ index_index++ ] = (short)( base_index + 1 );
+    indices[ index_index++ ] = (short)( base_index + 0 );
+    indices[ index_index++ ] = (short)( base_index + 2 );
+
+    // triangle 2
+    indices[ index_index++ ] = (short)( base_index + 1 );
+    indices[ index_index++ ] = (short)( base_index + 2 );
+    indices[ index_index++ ] = (short)( base_index + 3 );
+
+    base_index = ( short ) (base_index + 4);
+
+    short[] r = new short[2];
+    r[0] = index_index;
+    r[1] = base_index;
+
+    return r;
+  }
+
+  private static int vertices_helper( int vertex_index, float[] vertices, Vec3 position )
+  { return vertices_helper( vertex_index, vertices, position, new Vec3( 0.0f, 1.0f, 0.0f ) ); }
+
   public static ModelData generate_from_field( ArrayList< ArrayList< Float > > field )
   {
     final int field_size_x = field.size();
@@ -101,11 +145,14 @@ public class ModelData
     final int elements_per_normal   = 3; // x,y,z
     final int elements_per_vertex   = elements_per_position + elements_per_normal;
 
-    final int vertices_per_cell     = 4;
-    final int vertices_per_triangle = 3;
-    final int triangles_per_cell    = 2;
-    final int number_of_vertices = field_area * elements_per_vertex * vertices_per_cell;
-    final int number_of_indices  = field_area * vertices_per_triangle * triangles_per_cell;
+    final int vertices_per_surface  = 4; // 1つの面に頂点は4つ
+    final int surfaces_per_cell     = 6; // 床1 + 底1 + 側面壁4 = 6
+    final int vertices_per_cell     = vertices_per_surface * surfaces_per_cell;
+    final int vertices_per_triangle = 3; // 1つの三角に3つの頂点
+    final int triangles_per_surface = 2; // 1つの面に2つの三角
+    final int triangles_per_cell    = triangles_per_surface * surfaces_per_cell;
+    final int number_of_vertices    = field_area * elements_per_vertex * vertices_per_cell;
+    final int number_of_indices     = field_area * vertices_per_triangle * triangles_per_cell;
 
     float[] vertices = new float[ number_of_vertices ];
     short[] indices  = new short[ number_of_indices  ];
@@ -113,11 +160,65 @@ public class ModelData
     int   vertex_index = 0;
     short index_index  = 0;
 
-    Vec3[] ds =
+    Vec3[] yp_delta =
       { new Vec3( -0.5f, 0.0f, -0.5f )
       , new Vec3( +0.5f, 0.0f, -0.5f )
       , new Vec3( -0.5f, 0.0f, +0.5f )
       , new Vec3( +0.5f, 0.0f, +0.5f )
+      };
+
+    Vec3[] yn_delta =
+      { new Vec3( -0.5f, 0.0f, -0.5f )
+      , new Vec3( -0.5f, 0.0f, +0.5f )
+      , new Vec3( +0.5f, 0.0f, -0.5f )
+      , new Vec3( +0.5f, 0.0f, +0.5f )
+      };
+
+    Vec3[] xp_delta =
+      { new Vec3( +0.5f, 0.0f, +0.5f )
+      , new Vec3( +0.5f, 0.0f, -0.5f )
+      , new Vec3( +0.5f, 0.0f, +0.5f )
+      , new Vec3( +0.5f, 0.0f, -0.5f )
+      };
+
+    Vec3[] xn_delta =
+      { new Vec3( -0.5f, 0.0f, -0.5f )
+      , new Vec3( -0.5f, 0.0f, +0.5f )
+      , new Vec3( -0.5f, 0.0f, -0.5f )
+      , new Vec3( -0.5f, 0.0f, +0.5f )
+      };
+
+    Vec3[] zp_delta =
+      { new Vec3( -0.5f, 0.0f, +0.5f )
+      , new Vec3( +0.5f, 0.0f, +0.5f )
+      , new Vec3( -0.5f, 0.0f, +0.5f )
+      , new Vec3( +0.5f, 0.0f, +0.5f )
+      };
+
+    Vec3[] zn_delta =
+      { new Vec3( +0.5f, 0.0f, -0.5f )
+      , new Vec3( -0.5f, 0.0f, -0.5f )
+      , new Vec3( +0.5f, 0.0f, -0.5f )
+      , new Vec3( -0.5f, 0.0f, -0.5f )
+      };
+
+    Vec3[][] deltas =
+      { yp_delta, yn_delta
+      , xp_delta, xn_delta
+      , zp_delta, zn_delta
+      };
+
+    Vec3 normal_yp = new Vec3(  0, +1,  0 );
+    Vec3 normal_yn = new Vec3(  0, -1,  0 );
+    Vec3 normal_xp = new Vec3( +1,  0,  0 );
+    Vec3 normal_xn = new Vec3( -1,  0,  0 );
+    Vec3 normal_zp = new Vec3(  0,  0, +1 );
+    Vec3 normal_zn = new Vec3(  0,  0, -1 );
+
+    Vec3[] normals =
+      { normal_yp, normal_yn
+      , normal_xp, normal_xn
+      , normal_zp, normal_zn
       };
 
     short base_index = 0;
@@ -125,35 +226,56 @@ public class ModelData
     for ( int x = 0; x < field_size_x; ++x )
       for ( int z = 0; z < field_size_z; ++z )
       {
+        // セルの点
         Vec3 p = new Vec3( (float)x, field.get( x ).get( z ), (float)z );
-        ArrayList< Vec3 > ps = new ArrayList< Vec3 >( );
-        for ( Vec3 d : ds )
+
+        // yp --> yn --> xp --> xn --> zp --> zn
+        //   p: positive as (+)
+        //   n: negative as (-)
+        for ( int surface_n = 0; surface_n < surfaces_per_cell; ++surface_n )
         {
-          Vec3 v = p.add( d );
-          ps.add( v );
-
-          // position
-          vertices[ vertex_index++ ] = v.getX();
-          vertices[ vertex_index++ ] = v.getY();
-          vertices[ vertex_index++ ] = v.getZ();
-
-          // normal
-          vertices[ vertex_index++ ] = 0.0f;
-          vertices[ vertex_index++ ] = 1.0f;
-          vertices[ vertex_index++ ] = 0.0f;
+          // セルの点に対する頂点の差分を面ごとに取り出す
+          //   頂点は1つの面に4つあるから4回ループは回る
+          for ( int delta_n = 0; delta_n < deltas[0].length; ++delta_n )
+          //for ( Vec3 delta : deltas[ n ] )
+          {
+            Vec3 delta = deltas[ surface_n ][ delta_n ];
+            Vec3 position;
+            switch ( surface_n )
+            { case 1: // yn
+                position = p.add( delta );
+                position = new Vec3( position.getX(), 0.0f, position.getZ() );
+                break;
+              case 2: // xp
+                position = p.add( delta );
+                if ( delta_n > 1 )
+                  position = new Vec3( position.getX(), 0.0f, position.getZ() );
+                break;
+              case 3: // xn
+                position = p.add( delta );
+                if ( delta_n > 1 )
+                  position = new Vec3( position.getX(), 0.0f, position.getZ() );
+                break;
+              case 4: // zp
+                position = p.add( delta );
+                if ( delta_n > 1 )
+                  position = new Vec3( position.getX(), 0.0f, position.getZ() );
+                break;
+              case 5: // zn
+                position = p.add( delta );
+                if ( delta_n > 1 )
+                  position = new Vec3( position.getX(), 0.0f, position.getZ() );
+                break;
+              default: // yp
+                position = p.add( delta );
+                break;
+            }
+            vertex_index = vertices_helper( vertex_index, vertices, position );
+          }
+          short[] r   = indices_helper( index_index, base_index, indices );
+          index_index = r[0];
+          base_index  = r[1];
         }
-
-        // triangle 1
-        indices[ index_index++ ] = (short)( base_index + 1 );
-        indices[ index_index++ ] = (short)( base_index + 0 );
-        indices[ index_index++ ] = (short)( base_index + 2 );
-
-        // triangle 2
-        indices[ index_index++ ] = (short)( base_index + 1 );
-        indices[ index_index++ ] = (short)( base_index + 2 );
-        indices[ index_index++ ] = (short)( base_index + 3 );
-
-        base_index = ( short ) (base_index + 4);
       }
 
     return new ModelData( vertices, indices, GLES20.GL_TRIANGLES );
