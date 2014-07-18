@@ -43,9 +43,9 @@ public class FieldGameObject extends GameObject
       for ( int z = 0; z < arris_z; ++z )
       {
         if ( x == 0 || x == arris_x - 1 )
-          field_line.add( height_magnifier );
+          field_line.add( height_magnifier * 31.0f / 255.0f );
         else if (z == 0 || z == arris_z - 1 )
-          field_line.add( height_magnifier );
+          field_line.add( height_magnifier * 31.0f / 255.0f );
         else
           field_line.add( 0.0f );
       }
