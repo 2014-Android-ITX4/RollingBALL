@@ -75,8 +75,8 @@ public class StageCamera extends Camera
       , (float)Math.sin( _phi )
       , (float)Math.cos( _theta ) * (float)Math.cos( _phi )
       ).multiply( _distance );
-    //Log.d( "x","="+delta_position.getX() );
-    //Log.d( "y","="+delta_position.getY() );
+    //Log.d( "x=","x="+delta_position.getX() );
+    //Log.d( "y=","y="+delta_position.getY() );
 
 //    Log.d("θ, φ", "" + _theta + " " + _phi + " " + delta_position.toString() );
 
@@ -103,6 +103,7 @@ public class StageCamera extends Camera
       , scene.scene_manager.view.screen_height()
       , 0.0f
       );
+    //Vec3 rotation_copy =  scene.scene_manager.view.activity.rotation;
 
     //Log.d( "screen size" , screen_size.toString() );
 
@@ -113,6 +114,7 @@ public class StageCamera extends Camera
     {
       final float rotation_magnifier = (float)Math.PI / 4.0f;
       _theta += rotation_magnifier * rotation_ratio.getX();
+      theta_camera( _theta );
     }
     else
     {
