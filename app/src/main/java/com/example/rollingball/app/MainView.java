@@ -1,13 +1,13 @@
 package com.example.rollingball.app;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.opengl.EGLConfig;
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.view.View;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,8 +32,9 @@ public class MainView extends GLSurfaceView
     activity = arg_activity;
 
     this.setEGLContextClientVersion( 2 );
+    this.setEGLConfigChooser( new MainEGLConfigChooser() );
     renderer = new MainRenderer( this );
-    this.setRenderer( renderer );
+    setRenderer( renderer );
 
     scene_manager = new SceneManager( this );
   }

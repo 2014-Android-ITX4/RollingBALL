@@ -8,14 +8,16 @@ import java.nio.IntBuffer;
 
 public class Lighting implements IDrawable
 {
-  Vec3 _position = new Vec3( 0.0f, 1.0f, 0.0f );
+  Vec3 _position = new Vec3( 0.0f, 20.0f, 0.0f );
   Vec3 _target = Vec3.VEC3_ZERO;
 
   // updateで更新
   Vec3 _direction = new Vec3( 0.0f, -1.0f, 0.0f );
 
   // 距離に線形比例して光を弱めたい場合に0.0以上の値を設定する
-  float _linear_attenuation = 0.05f;
+  float _constant_attenuation  = 0.0f;
+  float _linear_attenuation    = 0.0f;
+  float _quadratic_attenuation = 0.01f;
 
   // 環境光
   Vec3 _ambient_color = new Vec3( 0.05f, 0.05f, 0.05f );
@@ -74,11 +76,25 @@ public class Lighting implements IDrawable
 
   public void draw( int program_id )
   {
-    // 並行光源の向き
+    // 光源の位置
     GLES20.glUniform3fv(
-      GLES20.glGetUniformLocation( program_id, "light_direction" ),
+      GLES20.glGetUniformLocation( program_id, "light_position" ),
       1,
-      _direction.getBuffer()
+      _position.getBuffer()
+    );
+
+    // 光源の減衰
+    GLES20.glUniform1f(
+      GLES20.glGetUniformLocation( program_id, "light_constant_attenuation" ),
+      _constant_attenuation
+    );
+    GLES20.glUniform1f(
+      GLES20.glGetUniformLocation( program_id, "light_linear_attenuation" ),
+      _linear_attenuation
+    );
+    GLES20.glUniform1f(
+      GLES20.glGetUniformLocation( program_id, "light_quadratic_attenuation" ),
+      _quadratic_attenuation
     );
 
     // 環境光の色

@@ -13,12 +13,14 @@ public class StageCamera extends Camera
 {
   // プレイヤーゲームオブジェクトを基準に方位角θ、仰角φ、距離distanceを保持
   private float _distance = 20.0f; //r
-  private float _theta    =  0.0f; //θ
-  private float _phi      =  0.0f; //φ
+  private float _theta    =  -(float)Math.PI * 3.0f / 4.0f; //θ
+  private float _phi      =  (float)Math.PI / 3.0f; //φ
 
   // 最小 distance 、 最大 distance
-  private final float _min_distance =  1.0f;
+  private final float _min_distance =  5.0f;
   private final float _max_distance = 30.0f;
+
+  private float _update_swipe_wait = 0.0f;
 
   // プレイヤーゲームオブジェクトを保持しておく
   private PlayerGameObject _player_game_object = null;
@@ -44,12 +46,25 @@ public class StageCamera extends Camera
   @Override
   public void update( float delta_time_in_seconds )
   {
-    update_swipe( delta_time_in_seconds );
+    distance( distance() - scene.input_manager.result_scale );
+
+    // # 235 ピンチでカメラ距離を操作した直後にスワイプ判定が意図せず動作する問題の対応
+    if ( scene.input_manager.result_scale != 0.0f )
+      _update_swipe_wait = 0.3f;
+    else if ( _update_swipe_wait > 0.0f )
+      _update_swipe_wait -= delta_time_in_seconds;
+    else
+      update_swipe( delta_time_in_seconds );
 
     update_position();
 
     // override 元の親クラスの update も呼んでおく
     super.update( delta_time_in_seconds );
+  }
+
+  private void update_distance()
+  {
+
   }
 
   private  void update_position()
@@ -63,7 +78,7 @@ public class StageCamera extends Camera
     //Log.d( "x=","x="+delta_position.getX() );
     //Log.d( "y=","y="+delta_position.getY() );
 
-    Log.d("θ, φ", "" + _theta + " " + _phi + " " + delta_position.toString() );
+//    Log.d("θ, φ", "" + _theta + " " + _phi + " " + delta_position.toString() );
 
     // プレイヤーオブジェクトが未設定の可能性があるのでテスト
     if ( _player_game_object == null )

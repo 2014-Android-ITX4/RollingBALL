@@ -26,8 +26,10 @@ class MainRenderer implements GLSurfaceView.Renderer
 
   private float _field_of_view = (float)( Math.PI / 3.0 );
   private float _aspect_ratio  = 1.0f;
-  private float _near_clip     = 1.0e-3f;
-  private float _far_clip      = 1.0e+3f;
+  // far/near が大きいほど、深度バッファー(16bitしか無い！)が荒くなって、
+  // 描画の前後関係が正しく描画しきれなくなります。注意。
+  private float _near_clip     = 1.0e-1f;
+  private float _far_clip      = 1.0e+2f;
 
   private int _program = 0;
 
@@ -54,6 +56,7 @@ class MainRenderer implements GLSurfaceView.Renderer
   @Override
   public void onSurfaceChanged( final GL10 gl10, final int width, final int height )
   {
+    Log.d( "MainRenderer","Call onSurfaceChanged" );
     Log.d( "change screen width" , String.valueOf( width ) );
     Log.d( "change screen height", String.valueOf( height ) );
 
@@ -69,6 +72,7 @@ class MainRenderer implements GLSurfaceView.Renderer
   @Override
   public void onSurfaceCreated( final GL10 gl10, final EGLConfig eglConfig )
   {
+    Log.d( "MainRenderer","Call onSurfaceCreated" );
     _program = create_program_from_sources
       ( _main_view.load_text_from_raw_resource( R.raw.shader_default_vertex )
       , _main_view.load_text_from_raw_resource( R.raw.shader_default_fragment )
@@ -77,13 +81,28 @@ class MainRenderer implements GLSurfaceView.Renderer
     GLES20.glUseProgram( _program );
 
     GLES20.glEnableVertexAttribArray( GLES20.glGetAttribLocation( _program, "position" ) );
+    GLES20.glEnableVertexAttribArray( GLES20.glGetAttribLocation( _program, "normal"   ) );
     // TODO: テクスチャーを使うようになったらどうぞ。
     //GLES20.glEnableVertexAttribArray( GLES20.glGetAttribLocation( _program, "texcoord" ) );
 
     // デプスバッファの有効化
     GLES20.glEnable( GLES20.GL_DEPTH_TEST );
+    GLES20.glDepthFunc( GLES20.GL_LEQUAL );
+    GLES20.glDepthMask( true );
+
+    // カリング
+    GLES20.glEnable( GLES20.GL_CULL_FACE );
+    GLES20.glCullFace( GLES20.GL_BACK );
 
     uniform_projection_transformation( _field_of_view, _aspect_ratio, _near_clip, _far_clip );
+
+    // ポーズフラグがtrueになっていたら各ModelDataの頂点・インデックスを再読込させる
+    if ( _main_view.activity.pause_flag == true )
+    {
+      _main_view.scene_manager.on_resume();
+      _main_view.activity.pause_flag = false;
+    }
+
   }
 
   public int screen_width( )
