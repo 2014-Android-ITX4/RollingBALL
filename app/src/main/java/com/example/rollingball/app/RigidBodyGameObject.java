@@ -12,20 +12,22 @@ public class RigidBodyGameObject extends GameObject
   public ArrayList<Vec3> forces = new ArrayList< Vec3 >( ); //力
   public ArrayList< BoundingSphere > collision_boundings = new ArrayList< BoundingSphere>( );
 
+  private Vec3 _force_sum;
+
   public RigidBodyGameObject( Scene scene )
   { super( scene );}
 
   @Override
   public void update( final float delta_time_in_seconds )
   {
-    Vec3 force_sum = new Vec3( 0.0f, 0.0f, 0.0f );
+    _force_sum = new Vec3( 0.0f, 0.0f, 0.0f );
 
-    for( Vec3 f: forces )
-      force_sum = force_sum.add( f );
+    for( int i = 0; i < forces.size(); i++ )
+      _force_sum = _force_sum.add( forces.get( i ) );
 
     forces.clear();
 
-    Vec3 acceleration = force_sum.multiply( 1.0f / mass );
+    Vec3 acceleration = _force_sum.multiply( 1.0f / mass );
     velocity = velocity.add( acceleration.multiply( delta_time_in_seconds ) );
     position = position.add( velocity.multiply( delta_time_in_seconds ) );
 
@@ -37,7 +39,7 @@ public class RigidBodyGameObject extends GameObject
     }
 
     // #233 擬似的な摩擦の実装
-    Log.d( "", ""+velocity.toString() );
+//    Log.d( "", ""+velocity.toString() );
     final float pseudo_friction_factor_horizon  = 0.998f;
     final float pseudo_friction_factor_vertical = 1.0f;
     velocity = new Vec3
