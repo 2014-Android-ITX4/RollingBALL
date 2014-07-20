@@ -21,13 +21,13 @@ public class RigidBodyGameObject extends GameObject
     Vec3 force_sum = new Vec3( 0.0f, 0.0f, 0.0f );
 
     for( Vec3 f: forces )
-      force_sum = force_sum.add( f );
+      force_sum = Helper.add_high_precision( force_sum, f );
 
     forces.clear();
 
-    Vec3 acceleration = force_sum.multiply( 1.0f / mass );
-    velocity = velocity.add( acceleration.multiply( delta_time_in_seconds ) );
-    position = position.add( velocity.multiply( delta_time_in_seconds ) );
+    Vec3 acceleration = Helper.multiply_high_precision( force_sum, 1.0f / mass );
+    velocity = Helper.add_high_precision( velocity, Helper.multiply_high_precision( acceleration, delta_time_in_seconds ) );
+    position = Helper.add_high_precision( position, Helper.multiply_high_precision( velocity, delta_time_in_seconds ) );
 
     if ( StageScene.class.isInstance( _scene ) )
     {

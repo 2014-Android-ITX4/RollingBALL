@@ -1,5 +1,7 @@
 package com.example.rollingball.app;
 
+import android.util.Log;
+
 import com.hackoeur.jglm.Vec3;
 
 public class StageScene extends Scene
@@ -80,8 +82,8 @@ public class StageScene extends Scene
     for ( BoundingSphere ab : a.collision_boundings )
     {
       // a の位置におけるフィールドの整数座標値
-      final int field_x = (int)a.position.getX();
-      final int field_z = (int)a.position.getZ();
+      final int field_x = StrictMath.round( a.position.getX() );
+      final int field_z = StrictMath.round( a.position.getZ() );
 
       // a がフィールド外の x または z 座標に居る場合は判定をスキップ
       if ( field_x < 0 || field_x >= b.length_x() || field_z < 0 || field_z >= b.length_z() )
@@ -97,9 +99,8 @@ public class StageScene extends Scene
 
         if ( distance <= 0.0f )
         {
-          //a.forces.add( new Vec3( 0.0f, -0.5f * a.mass * a.velocity.getY() * a.velocity.getY(), 0.0f ) );
-          a.velocity = new Vec3( a.velocity.getX(), -0.3f * a.velocity.getY(), a.velocity.getZ() );
-          a.position = a.position.subtract( new Vec3( 0.0f, distance, 0.0f ) );
+          a.velocity = Helper.multiply_y_high_precision( a.velocity, -0.3f );
+          a.position = Helper.y( a.position, Helper.add_high_precision( field_y, ab.radius() ) );
         }
       }
 
@@ -108,41 +109,45 @@ public class StageScene extends Scene
       //   但し、フィールドの最も外側のセルに a が存在する場合はそれよりも外の座標のテストはスキップ
       {
         // X + 1
-        if ( field_x < b.length_x() - 2 )
+        if ( field_x < b.length_x() - 1 )
         {
-          final int field_xm = field_x + 1;
+          final int field_xm = StrictMath.round( Helper.add_high_precision( ab.position().getX(), ab.radius() ) );
           final float field_y = b.field_planes.get( field_xm ).get( field_z );
 
-          final Vec3 wall_position = new Vec3( field_xm, 0, field_z );
+          final Vec3 wall_position = new Vec3( Helper.subtract_high_precision( field_xm, 0.5f ), 0, field_z );
           final Vec3 wall_normal   = new Vec3( -1.0f, 0.0f, 0.0f );
 
-          final float distance = ab.intersect_field( wall_position, wall_normal );
-
-          // もし壁が無限の高さをもっているのなら当たっているか判定
-          // &&
-          // もし壁の高さが当たり判定球の中心座標以下ならば、当たり判定とする。
+          // もし壁の高さが当たり判定球の中心座標以上ならば、当たり判定とする。
           // これは厳密ではないが、たぶんゲーム内では差し当たりはそこそこ上手く行く。
-          if ( distance <= 0.0f && field_y <= ab.position().getY() )
+          if ( field_y - ab.floor().getY() > Helper.positive_bias )
           {
-            a.velocity = new Vec3( -a.velocity.getX(), a.velocity.getY(), a.velocity.getZ() );
-            a.position = a.position.add( new Vec3( distance, 0.0f, 0.0f ) );
+            final float distance = ab.intersect_field( wall_position, wall_normal );
+            // 当たっているか判定
+            if ( distance <= 0.0f )
+            {
+              a.velocity = Helper.multiply_x_high_precision( a.velocity, -Helper.wall_friction_factor );
+              a.position = Helper.x( a.position, Helper.subtract_high_precision( wall_position.getX(), ab.radius() )  );
+            }
           }
         }
         // X - 1
         if ( field_x > 0 )
         {
-          final int field_xm = field_x - 1;
+          final int field_xm = StrictMath.round( Helper.subtract_high_precision( ab.position().getX(), ab.radius() ) );
           final float field_y = b.field_planes.get( field_xm ).get( field_z );
 
-          final Vec3 wall_position = new Vec3( field_xm, 0, field_z );
+          final Vec3 wall_position = new Vec3( Helper.add_high_precision( field_xm, 0.5f ), 0, field_z );
           final Vec3 wall_normal   = new Vec3( +1.0f, 0.0f, 0.0f );
 
-          final float distance = ab.intersect_field( wall_position, wall_normal );
-
-          if ( distance <= 0.0f && field_y <= ab.position().getY() )
+          if ( field_y - ab.floor().getY() > Helper.positive_bias )
           {
-            a.velocity = new Vec3( -a.velocity.getX(), a.velocity.getY(), a.velocity.getZ() );
-            a.position = a.position.subtract( new Vec3( distance, 0.0f, 0.0f ) );
+            final float distance = ab.intersect_field( wall_position, wall_normal );
+
+            if ( distance <= 0.0f )
+            {
+              a.velocity = Helper.multiply_x_high_precision( a.velocity, -Helper.wall_friction_factor );
+              a.position = Helper.x( a.position, Helper.add_high_precision( wall_position.getX(), ab.radius() )  );
+            }
           }
         }
       }
@@ -151,39 +156,44 @@ public class StageScene extends Scene
       //   X と同様
       {
         // Z + 1
-        if ( field_z < b.length_z() - 2 )
+        if ( field_z < b.length_z() - 1 )
         {
-          final int field_zm = field_z + 1;
-          final float field_y = b.field_planes.get( field_x ).get( field_zm );
+          final int field_zm = StrictMath.round(Helper.add_high_precision( ab.position().getZ(), ab.radius() ) );
+          final float field_y = b.y( field_x, field_zm );
 
-          final Vec3 wall_position = new Vec3( field_x, 0, field_zm );
+          final Vec3 wall_position = new Vec3( field_x, 0, Helper.subtract_high_precision( field_zm, 0.5f ) );
           final Vec3 wall_normal   = new Vec3( 0.0f, 0.0f, -1.0f );
 
-          final float distance = ab.intersect_field( wall_position, wall_normal );
-
-          if ( distance <= 0.0f && field_y <= ab.position().getY() )
+          if ( field_y - ab.floor().getY() > Helper.positive_bias )
           {
-            a.velocity = new Vec3( a.velocity.getX(), a.velocity.getY(), -a.velocity.getZ() );
-            a.position = a.position.add( new Vec3( 0.0f, 0.0f, distance ) );
+            final float distance = ab.intersect_field( wall_position, wall_normal );
+            if ( distance <= 0.0f )
+            {
+              a.velocity = Helper.multiply_z_high_precision( a.velocity, -Helper.wall_friction_factor );
+              a.position = Helper.z( a.position, Helper.subtract_high_precision( wall_position.getZ(), ab.radius() )  );
+            }
           }
         }
         // X - 1
         if ( field_z > 0 )
         {
-          final int field_zm = field_z - 1;
-          final float field_y = b.field_planes.get( field_x ).get( field_zm );
+          final int field_zm = StrictMath.round( Helper.subtract_high_precision( ab.position().getZ(), ab.radius() ) );
+          final float field_y = b.y( field_x, field_zm );
 
-          final Vec3 wall_position = new Vec3( field_x, 0, field_zm );
+          final Vec3 wall_position = new Vec3( field_x, 0, Helper.add_high_precision( field_zm, 0.5f ) );
           final Vec3 wall_normal   = new Vec3( 0.0f, 0.0f, +1.0f );
 
-          final float distance = ab.intersect_field( wall_position, wall_normal );
-
-          if ( distance <= 0.0f && field_y <= ab.position().getY() )
+          if ( field_y - ab.floor().getY() > Helper.positive_bias )
           {
-            a.velocity = new Vec3( a.velocity.getX(), a.velocity.getY(), -a.velocity.getZ() );
-            a.position = a.position.subtract( new Vec3( 0.0f, 0.0f, distance ) );
+            final float distance = ab.intersect_field( wall_position, wall_normal );
+            if ( distance <= 0.0f )
+            {
+              a.velocity = Helper.multiply_z_high_precision( a.velocity, -Helper.wall_friction_factor );
+              a.position = Helper.z( a.position, Helper.add_high_precision( wall_position.getZ(), ab.radius() )  );
+            }
           }
         }
+
       }
     }
   }
