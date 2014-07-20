@@ -1,12 +1,18 @@
 package com.example.rollingball.app;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.EGLConfig;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
+import android.view.DragEvent;
+import android.view.MotionEvent;
 import android.view.View;
+
+import com.hackoeur.jglm.Vec3;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -18,6 +24,11 @@ public class MainView extends GLSurfaceView
   public MainRenderer renderer;
   public SceneManager scene_manager;
   public MainActivity activity;
+
+  private float drag_base_x = 0.0f;
+  private float drag_base_y = 0.0f;
+  private float drag_current_x = 0.0f;
+  private float drag_current_y = 0.0f;
 
   public MainView( Context context, MainActivity arg_activity )
   {
@@ -37,6 +48,77 @@ public class MainView extends GLSurfaceView
     setRenderer( renderer );
 
     scene_manager = new SceneManager( this );
+
+    setOnTouchListener
+      (
+        new View.OnTouchListener()
+        {
+          @Override
+          public boolean onTouch( View v, MotionEvent e )
+          {
+            // ドラッグとして受け付ける画面端からの距離
+            final float margin = 50.0f;
+
+            // ドラッグとして判定するべきか
+            if ( e.getX() < margin || e.getX() > screen_width() - margin
+              || e.getY() < margin || e.getY() > screen_height() - margin
+            )
+            {
+              // ドラッグ処理（カメラワーク）
+              ClipData data = ClipData.newPlainText( "", "" );
+              v.startDrag( data, new DragShadowBuilder( v ), ( Object ) v, 0 );
+              return true;
+            }
+
+            // Activity の各種タッチ系が発動（ピンチとか）
+            return false;
+          }
+        }
+      );
+  }
+
+  public Vec3 drag_delta()
+  {
+    float dx = drag_current_x - drag_base_x;
+    float dy = drag_current_y - drag_base_y;
+
+    drag_base_x = drag_current_x;
+    drag_base_y = drag_current_y;
+
+    return new Vec3( dx, dy, 0.0f );
+  }
+
+  @Override
+  public boolean onDragEvent( DragEvent e )
+  {
+    boolean result = false;
+
+    switch ( e.getAction() )
+    { case DragEvent.ACTION_DRAG_ENTERED:
+        Log.d("drag", "started");
+        drag_base_x = e.getX();
+        drag_base_y = e.getY();
+        result = true;
+        break;
+      case DragEvent.ACTION_DRAG_LOCATION:
+        Log.d("drag", "location: " + e.getX() + " " + e.getY());
+        drag_current_x = e.getX();
+        drag_current_y = e.getY();
+        result = true;
+        break;
+      case DragEvent.ACTION_DROP:
+        Log.d("drag", "drop");
+        drag_base_x = 0.0f;
+        drag_base_y = 0.0f;
+        drag_current_x = 0.0f;
+        drag_current_y = 0.0f;
+        result = true;
+        break;
+      default:
+        result = true;
+    }
+
+    return result;
   }
 
   public Bitmap load_bitmap_from_asset( String path )
@@ -82,5 +164,4 @@ public class MainView extends GLSurfaceView
 
   public int screen_height()
   { return renderer.screen_height(); }
-
 }
