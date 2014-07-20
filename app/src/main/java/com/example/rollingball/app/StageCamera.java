@@ -12,7 +12,7 @@ import com.hackoeur.jglm.Vec4;
 public class StageCamera extends Camera
 {
   // プレイヤーゲームオブジェクトを基準に方位角θ、仰角φ、距離distanceを保持
-  private float _distance = 20.0f; //r
+  private float _distance = 10.0f; //r
   private float _theta    =  -(float)Math.PI * 3.0f / 4.0f; //θ
   private float _phi      =  (float)Math.PI / 3.0f; //φ
 
@@ -60,11 +60,6 @@ public class StageCamera extends Camera
 
     // override 元の親クラスの update も呼んでおく
     super.update( delta_time_in_seconds );
-  }
-
-  private void update_distance()
-  {
-
   }
 
   private  void update_position()
