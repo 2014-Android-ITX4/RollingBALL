@@ -14,7 +14,7 @@ public class StageCamera extends Camera
   // プレイヤーゲームオブジェクトを基準に方位角θ、仰角φ、距離distanceを保持
   private float _distance = 10.0f; //r
   private float _theta    =  -(float)Math.PI * 3.0f / 4.0f; //θ
-  private float _phi      =  (float)Math.PI / 3.0f; //φ
+  private float _phi      =  +(float)Math.PI / 3.0f; //φ
 
   // 最小 distance 、 最大 distance
   private final float _min_distance =  5.0f;
@@ -109,7 +109,6 @@ public class StageCamera extends Camera
     {
       final float rotation_magnifier = (float)Math.PI / 4.0f;
       _theta += rotation_magnifier * rotation_ratio.getX();
-      theta_camera( _theta );
     }
     else
     {
@@ -147,4 +146,3 @@ public class StageCamera extends Camera
   public float phi()
   { return _phi; }
 }
-
