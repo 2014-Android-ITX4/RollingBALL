@@ -19,7 +19,7 @@ public class TestStageScene extends StageScene
     //game_objects.clear();
 
     // テスト用NPCを配置
-    random_npc( 3 );
+    random_npc( 24 );
 
     this.lighting.position( new Vec3( _player.position.getX(), _player.position.getY() + 25.0f, _player.position.getZ() ) );
   }
@@ -40,6 +40,11 @@ public class TestStageScene extends StageScene
         ( (float)Math.random() * _field.length_x()
         , ( (float)Math.random() - 0.5f ) * _player.position.getY() + _player.position.getY()
         , (float)Math.random() * _field.length_z()
+        );
+      npc.velocity = new Vec3
+        ( (float)Math.random() * 10.0f - 5.0f
+        , (float)Math.random() * 10.0f - 5.0f
+        , (float)Math.random() * 10.0f - 5.0f
         );
       npc.model = ModelData.generate_sphere();
       npc.model.material.diffuse_color( new Vec3( 0.6f, 1.0f, 0.6f ) );
