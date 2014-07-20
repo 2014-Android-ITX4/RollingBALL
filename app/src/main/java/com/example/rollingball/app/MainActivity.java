@@ -31,11 +31,11 @@ public class MainActivity
   private boolean _is_magnetic_sensor, _is_accelerometer_sensor;
   public boolean pause_flag;  // onResumeが呼び出された時初回か再開かを判定するためのフラグ
 
-  private GestureDetector _gestureDetector;
+  //private GestureDetector _gestureDetector;
   private ScaleGestureDetector _scale_gesture_detector;
 
   private Vec3 _swipe_delta_position = new Vec3( 0.0f, 0.0f, 0.0f );
-  private Vec3 _swipe_velocity = new Vec3( 0.0f, 0.0f, 0.0f );
+  private Vec3 _swipe_velocity       = new Vec3( 0.0f, 0.0f, 0.0f );
 
   @Override
   protected void onCreate( Bundle savedInstanceState )
@@ -52,7 +52,7 @@ public class MainActivity
     //センサ・マネージャの取得
     sensor_manager = ( SensorManager )getSystemService( SENSOR_SERVICE );
 
-    _gestureDetector = new GestureDetector( this, onGestureListener );
+    //_gestureDetector = new GestureDetector( this, onGestureListener );
     _scale_gesture_detector = new ScaleGestureDetector( this, onScaleGestureListener );
 
   }
@@ -166,11 +166,13 @@ public class MainActivity
 
   @Override
   public boolean onTouchEvent( MotionEvent event ) {
-    _gestureDetector.onTouchEvent( event );
+    //_gestureDetector.onTouchEvent( event );
     _scale_gesture_detector.onTouchEvent( event );
     return false;
   }
 
+  // スワイプ
+  /*
   public Vec3 swipe_delta_position()
   { return _swipe_delta_position; }
 
@@ -206,13 +208,13 @@ public class MainActivity
       _swipe_delta_position = new Vec3( motion_event_2.getX() - motion_event_1.getX(), motion_event_2.getY() - motion_event_1.getY(), 0.0f );
       _swipe_velocity = new Vec3( velocity_x, velocity_y, 0.0f );
 
-      Log.d( "swipe delta position", _swipe_delta_position.toString() );
-      Log.d( "swipe velocity", _swipe_velocity.toString() );
+      //Log.d( "swipe delta position", _swipe_delta_position.toString() );
+      //Log.d( "swipe velocity", _swipe_velocity.toString() );
 
-      return false;
+      return super.onFling( motion_event_1, motion_event_2, velocity_x, velocity_y );
     }
-
   };
+  */
 
   // ピンチイン・ピンチアウト
   private ScaleGestureDetector.SimpleOnScaleGestureListener onScaleGestureListener = new ScaleGestureDetector.SimpleOnScaleGestureListener()
@@ -244,6 +246,5 @@ public class MainActivity
       return super.onScale( detector );
     }
   };
-
 
 }

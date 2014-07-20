@@ -160,4 +160,7 @@ public class Helper
 
   static public Vec3 vec3( final float v )
   { return new Vec3( v, v, v ); }
+
+  static public float xy_length( final Vec3 v )
+  { return (float)Math.sqrt( v.getX() * v.getX() + v.getY() * v.getY() ); }
 }
