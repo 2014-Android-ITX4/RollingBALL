@@ -57,7 +57,7 @@ public class StageScene extends Scene
   protected void _collision(GameObject a, GameObject b)
   {
     if ( a instanceof RigidBodyGameObject && b instanceof RigidBodyGameObject )
-      _collision_body_body( ( RigidBodyGameObject )a, ( RigidBodyGameObject )b );
+      _collision_body_body( ( RigidBodyGameObject ) a, ( RigidBodyGameObject ) b );
     else if ( a instanceof RigidBodyGameObject && b instanceof FieldGameObject )
       _collision_body_field( ( RigidBodyGameObject )a, ( FieldGameObject )b);
     else if ( b instanceof RigidBodyGameObject && a instanceof FieldGameObject )
@@ -69,12 +69,25 @@ public class StageScene extends Scene
   {
     for ( BoundingSphere ab : a.collision_boundings )
       for ( BoundingSphere bb : b.collision_boundings )
-        if ( ab.intersect_bool( bb ) )
+      {
+        final float distance =  ab.intersect( bb );
+        if ( distance <= 0.0f )
         {
           // 当たり処理
-          a.forces.add( b.velocity.cross( b.velocity ).multiply( b.mass * 0.5f ) );
-          b.forces.add( a.velocity.cross( a.velocity ).multiply( a.mass * 0.5f ) );
+
+          // 速度
+          Vec3[] collided_velocities = Helper.collided_velocities(
+            a.mass, b.mass, a.velocity, b.velocity
+          );
+          a.velocity = collided_velocities[ 0 ];
+          b.velocity = collided_velocities[ 1 ];
+
+          // 位置
+          Vec3[] collided_positions = Helper.collided_positions( a.position, b.position, distance );
+          a.position = collided_positions[ 0 ];
+          b.position = collided_positions[ 1 ];
         }
+      }
   }
 
   protected void _collision_body_field( RigidBodyGameObject a, FieldGameObject b )
@@ -111,7 +124,10 @@ public class StageScene extends Scene
         // X + 1
         if ( field_x < b.length_x() - 1 )
         {
-          final int field_xm = StrictMath.round( Helper.add_high_precision( ab.position().getX(), ab.radius() ) );
+          final int field_xm = StrictMath.round( Helper.add_high_precision(
+                                                   ab.position().getX(),
+                                                   ab.radius()
+                                                 ) );
           final float field_y = b.field_planes.get( field_xm ).get( field_z );
 
           final Vec3 wall_position = new Vec3( Helper.subtract_high_precision( field_xm, 0.5f ), 0, field_z );
@@ -125,7 +141,10 @@ public class StageScene extends Scene
             // 当たっているか判定
             if ( distance <= 0.0f )
             {
-              a.velocity = Helper.multiply_x_high_precision( a.velocity, -Helper.wall_friction_factor );
+              a.velocity = Helper.multiply_x_high_precision(
+                a.velocity,
+                -Helper.wall_friction_factor
+              );
               a.position = Helper.x( a.position, Helper.subtract_high_precision( wall_position.getX(), ab.radius() )  );
             }
           }
@@ -145,7 +164,10 @@ public class StageScene extends Scene
 
             if ( distance <= 0.0f )
             {
-              a.velocity = Helper.multiply_x_high_precision( a.velocity, -Helper.wall_friction_factor );
+              a.velocity = Helper.multiply_x_high_precision(
+                a.velocity,
+                -Helper.wall_friction_factor
+              );
               a.position = Helper.x( a.position, Helper.add_high_precision( wall_position.getX(), ab.radius() )  );
             }
           }
@@ -169,7 +191,10 @@ public class StageScene extends Scene
             final float distance = ab.intersect_field( wall_position, wall_normal );
             if ( distance <= 0.0f )
             {
-              a.velocity = Helper.multiply_z_high_precision( a.velocity, -Helper.wall_friction_factor );
+              a.velocity = Helper.multiply_z_high_precision(
+                a.velocity,
+                -Helper.wall_friction_factor
+              );
               a.position = Helper.z( a.position, Helper.subtract_high_precision( wall_position.getZ(), ab.radius() )  );
             }
           }
@@ -188,7 +213,10 @@ public class StageScene extends Scene
             final float distance = ab.intersect_field( wall_position, wall_normal );
             if ( distance <= 0.0f )
             {
-              a.velocity = Helper.multiply_z_high_precision( a.velocity, -Helper.wall_friction_factor );
+              a.velocity = Helper.multiply_z_high_precision(
+                a.velocity,
+                -Helper.wall_friction_factor
+              );
               a.position = Helper.z( a.position, Helper.add_high_precision( wall_position.getZ(), ab.radius() )  );
             }
           }
