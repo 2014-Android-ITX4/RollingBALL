@@ -104,4 +104,7 @@ public class FieldGameObject extends GameObject
 
   public float length_z()
   { return field_planes.get(0).size(); }
+
+  public float y( final int x, final int z )
+  { return field_planes.get( x ).get( z ); }
 }
