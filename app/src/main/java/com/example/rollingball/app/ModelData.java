@@ -389,6 +389,23 @@ public class ModelData
     return new ModelData( vertices, indices );
   }
 
+  public static ModelData generate_board( float arris_length )
+  {
+    float vl = arris_length * 0.5f;
+
+    float[] vertices =
+      { -vl, +vl, 0.0f, 0.0f, 0.0f, 1.0f
+      , -vl, -vl, 0.0f, 0.0f, 0.0f, 1.0f
+      , +vl, +vl, 0.0f, 0.0f, 0.0f, 1.0f
+      , +vl, -vl, 0.0f, 0.0f, 0.0f, 1.0f
+      };
+
+    //インデックスバッファーの元データ配列を定義
+    byte[] indices = { 0, 1, 2, 2, 1, 3 };
+
+    return new ModelData( vertices, indices );
+  }
+
   public static ModelData generate_cube( )
   { return generate_cube( 1.0f ); }
 
