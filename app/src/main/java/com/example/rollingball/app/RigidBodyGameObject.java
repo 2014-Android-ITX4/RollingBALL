@@ -13,6 +13,14 @@ public class RigidBodyGameObject extends GameObject
   public ArrayList< BoundingSphere > collision_boundings = new ArrayList< BoundingSphere>( );
 
   private Vec3 _force_sum;
+  private Vec3 _force_sum_reset = new Vec3( 0.0f, 0.0f, 0.0f );
+
+  private Vec3 _acceleration;
+
+  private StageScene _s;
+
+  final float pseudo_friction_factor_horizon  = 0.998f;
+  final float pseudo_friction_factor_vertical = 1.0f;
 
   public RigidBodyGameObject( Scene scene )
   { super( scene );}
@@ -20,28 +28,26 @@ public class RigidBodyGameObject extends GameObject
   @Override
   public void update( final float delta_time_in_seconds )
   {
-    _force_sum = new Vec3( 0.0f, 0.0f, 0.0f );
+    _force_sum = _force_sum_reset;
 
     for( int i = 0; i < forces.size(); i++ )
       _force_sum = _force_sum.add( forces.get( i ) );
 
     forces.clear();
 
-    Vec3 acceleration = _force_sum.multiply( 1.0f / mass );
-    velocity = velocity.add( acceleration.multiply( delta_time_in_seconds ) );
+    _acceleration = _force_sum.multiply( 1.0f / mass );
+    velocity = velocity.add( _acceleration.multiply( delta_time_in_seconds ) );
     position = position.add( velocity.multiply( delta_time_in_seconds ) );
 
     if ( StageScene.class.isInstance( _scene ) )
     {
-      StageScene s = (StageScene)_scene;
-      if ( position.getY() < s.death_height() )
-        position = new Vec3( position.getX(), s.death_height(), position.getZ() );
+       _s = (StageScene)_scene;
+      if ( position.getY() < _s.death_height() )
+        position = new Vec3( position.getX(), _s.death_height(), position.getZ() );
     }
 
     // #233 擬似的な摩擦の実装
 //    Log.d( "", ""+velocity.toString() );
-    final float pseudo_friction_factor_horizon  = 0.998f;
-    final float pseudo_friction_factor_vertical = 1.0f;
     velocity = new Vec3
       ( velocity.getX() * pseudo_friction_factor_horizon
       , velocity.getY() * pseudo_friction_factor_vertical

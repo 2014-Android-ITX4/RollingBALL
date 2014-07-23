@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.hackoeur.jglm.Vec3;
 
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -19,9 +20,13 @@ public class Material implements IDrawable
   float _diffuse_texture_blending_factor = 0.0f;
   int   _diffuse_texture_id = 0;
 
+  FloatBuffer diffuse_color_buffer = _diffuse_color.getBuffer();
+
   public Material diffuse_color( final Vec3 diffuse_color )
   {
     _diffuse_color = diffuse_color;
+    diffuse_color_buffer = _diffuse_color.getBuffer();
+
     return this;
   }
 
@@ -77,7 +82,7 @@ public class Material implements IDrawable
   public void draw( int program_id )
   {
     // 拡散反射光の色
-    GLES20.glUniform3fv( GLES20.glGetUniformLocation( program_id, "diffuse" ), 1, _diffuse_color.getBuffer( ) );
+    GLES20.glUniform3fv( GLES20.glGetUniformLocation( program_id, "diffuse" ), 1, diffuse_color_buffer );
 
     // 透明度
     GLES20.glUniform1f( GLES20.glGetUniformLocation( program_id, "transparent" ), _transparent );

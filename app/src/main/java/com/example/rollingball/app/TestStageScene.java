@@ -7,6 +7,8 @@ import com.hackoeur.jglm.Vec3;
 public class TestStageScene extends StageScene
 {
 
+  private Vec3 _position = new Vec3( 0.0f, 5.0f, 0.0f );
+
   public TestStageScene( final SceneManager s )
   {
     super( s );
@@ -19,7 +21,7 @@ public class TestStageScene extends StageScene
     //game_objects.clear();
 
     // テスト用NPCを配置
-    random_npc( 10 );
+    random_npc( 32 );
 
     this.lighting.position( new Vec3( _player.position.getX(), _player.position.getY() + 25.0f, _player.position.getZ() ) );
   }
@@ -28,7 +30,7 @@ public class TestStageScene extends StageScene
   public void update( float delta_time_in_seconds )
   {
     super.update( delta_time_in_seconds );
-    lighting.position( _player.position.add( new Vec3( 0.0f, 5.0f, 0.0f ) ) );
+    lighting.position( _player.position.add( _position ) );
   }
 
   private void random_npc( int num_of_npcs )

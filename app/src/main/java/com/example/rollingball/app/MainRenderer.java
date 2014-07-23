@@ -51,7 +51,7 @@ class MainRenderer implements GLSurfaceView.Renderer
 
     GLES20.glClear( GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT );
 
-//    _main_view.scene_manager.draw();
+    _main_view.scene_manager.draw();
 
     _before_time_in_ns = System.nanoTime();
   }

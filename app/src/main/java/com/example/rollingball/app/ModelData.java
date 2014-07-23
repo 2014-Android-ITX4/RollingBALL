@@ -32,6 +32,15 @@ public class ModelData
 
   public Material material = new Material();
 
+  final int size_of_float    = 4;
+  final int offset_of_normal = 3;
+  final int position_stride  = 0;
+  final int normal_stride    = size_of_float * offset_of_normal;
+  final int elements_per_position = 3;
+  final int elements_per_normal   = 3;
+  final int elements_per_vertex   = elements_per_position + elements_per_normal;
+  final int vertex_size           = size_of_float * elements_per_vertex;
+
   public ModelData( float[] arg_vertices, byte[] arg_indices, int polygon_mode )
   {
     _vertices = new float[0];
@@ -410,15 +419,6 @@ public class ModelData
 
     // インデックスバッファの束縛
     GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, _indices_buffer_id );
-
-    final int size_of_float    = 4;
-    final int offset_of_normal = 3;
-    final int position_stride  = 0;
-    final int normal_stride    = size_of_float * offset_of_normal;
-    final int elements_per_position = 3;
-    final int elements_per_normal   = 3;
-    final int elements_per_vertex   = elements_per_position + elements_per_normal;
-    final int vertex_size           = size_of_float * elements_per_vertex;
 
     // 頂点レイアウトの指定
     GLES20.glVertexAttribPointer( GLES20.glGetAttribLocation( program_id, "position" ), 3, GLES20.GL_FLOAT, false, vertex_size, position_stride );

@@ -9,6 +9,7 @@ public class BoundingSphere
   final Vec3       _center_diff;
   final float      _radius;
 
+
   public BoundingSphere( final GameObject master, final float radius, final Vec3 center_diff )
   {
     _master      = master;

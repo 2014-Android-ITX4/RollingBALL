@@ -16,6 +16,30 @@ public class Scene implements IUpdatable, IDrawable
   public InputManager           input_manager = new InputManager( this );
   public SceneManager           scene_manager = null;
 
+
+
+  // GC対策のため移動したローカル変数
+  BoundingSphere ab;
+  private int _field_x;
+  private int _field_z;
+  private float _field_y;
+  private Vec3 _floor_position;
+
+  private int _field_xm;
+  private int _field_zm;
+
+  private Vec3 _wall_position;
+  private Vec3 _wall_normal;
+
+  private final Vec3 _WALL_PZZ = new Vec3( 1.0f, 0.0f, 0.0f );
+  private final Vec3 _WALL_MZZ = new Vec3( -1.0f, 0.0f, 0.0f );
+  private final Vec3 _WALL_ZZP = new Vec3( 0.0f, 0.0f, +1.0f );
+  private final Vec3 _WALL_ZZM = new Vec3( 0.0f, 0.0f, -1.0f );
+
+
+  private float _distance;
+
+
   protected Message[] _massages;
 
   public Scene( final SceneManager scene_manager_ )
@@ -44,7 +68,7 @@ public class Scene implements IUpdatable, IDrawable
       game_objects.get( i ).update( delta_time_in_seconds );
       game_objects.get( i ).effect_gravity( _gravity_in_m_per_s_s );
     }
-    //_update_collision();
+    _update_collision();
   }
 
   @Override
@@ -107,26 +131,26 @@ public class Scene implements IUpdatable, IDrawable
 
   protected void _collision_body_field( RigidBodyGameObject a, FieldGameObject b )
   {
-    BoundingSphere ab;
+    // a の位置におけるフィールドの整数座標値
+    _field_x = (int)a.position.getX();
+    _field_z = (int)a.position.getZ();
 
     for ( int i = 0; i < a.collision_boundings.size(); i++ )
     {
       ab = a.collision_boundings.get( i );
-      // a の位置におけるフィールドの整数座標値
-      final int field_x = (int)a.position.getX();
-      final int field_z = (int)a.position.getZ();
+
 
       // a がフィールド外の x または z 座標に居る場合は判定をスキップ
-      if ( field_x < 0 || field_x >= b.length_x() || field_z < 0 || field_z >= b.length_z() )
+      if ( _field_x < 0 || _field_x >= b.length_x() || _field_z < 0 || _field_z >= b.length_z() )
         continue;
 
       // Y 判定
       {
         // フィールドは足元にのみ存在する
-        final float field_y = b.field_planes.get( field_x ).get( field_z );
-        final Vec3 floor_position = new Vec3( a.position.getX(), field_y, a.position.getZ() );
+        _field_y = b.field_planes.get( _field_x ).get( _field_z );
+        _floor_position = new Vec3( a.position.getX(), _field_y, a.position.getZ() );
 
-        final float distance = ab.intersect_field( floor_position );
+        final float distance = ab.intersect_field( _floor_position );
 
         if ( distance <= 0.0f )
         {
@@ -141,41 +165,41 @@ public class Scene implements IUpdatable, IDrawable
       //   但し、フィールドの最も外側のセルに a が存在する場合はそれよりも外の座標のテストはスキップ
       {
         // X + 1
-        if ( field_x < b.length_x() - 2 )
+        if ( _field_x < b.length_x() - 2 )
         {
-          final int field_xm = field_x + 1;
-          final float field_y = b.field_planes.get( field_xm ).get( field_z );
+          _field_xm = _field_x + 1;
+          _field_y = b.field_planes.get( _field_xm ).get( _field_z );
 
-          final Vec3 wall_position = new Vec3( field_xm, 0, field_z );
-          final Vec3 wall_normal   = new Vec3( -1.0f, 0.0f, 0.0f );
+          _wall_position = new Vec3( _field_xm, 0, _field_z );
+          _wall_normal   = _WALL_MZZ;
 
-          final float distance = ab.intersect_field( wall_position, wall_normal );
+          _distance = ab.intersect_field( _wall_position, _wall_normal );
 
           // もし壁が無限の高さをもっているのなら当たっているか判定
           // &&
           // もし壁の高さが当たり判定球の中心座標以下ならば、当たり判定とする。
           // これは厳密ではないが、たぶんゲーム内では差し当たりはそこそこ上手く行く。
-          if ( distance <= 0.0f && field_y <= ab.position().getY() )
+          if ( _distance <= 0.0f && _field_y <= ab.position().getY() )
           {
             a.velocity = new Vec3( -a.velocity.getX(), a.velocity.getY(), a.velocity.getZ() );
-            a.position = a.position.subtract( new Vec3( distance, 0.0f, 0.0f ) );
+            a.position = a.position.subtract( new Vec3( _distance, 0.0f, 0.0f ) );
           }
         }
         // X - 1
-        if ( field_x > 0 )
+        if ( _field_x > 0 )
         {
-          final int field_xm = field_x - 1;
-          final float field_y = b.field_planes.get( field_xm ).get( field_z );
+          _field_xm = _field_x - 1;
+          _field_y = b.field_planes.get( _field_xm ).get( _field_z );
 
-          final Vec3 wall_position = new Vec3( field_xm, 0, field_z );
-          final Vec3 wall_normal   = new Vec3( +1.0f, 0.0f, 0.0f );
+          _wall_position = new Vec3( _field_xm, 0, _field_z );
+          _wall_normal   = _WALL_PZZ;
 
-          final float distance = ab.intersect_field( wall_position, wall_normal );
+          _distance = ab.intersect_field( _wall_position, _wall_normal );
 
-          if ( distance <= 0.0f && field_y <= ab.position().getY() )
+          if ( _distance <= 0.0f && _field_y <= ab.position().getY() )
           {
             a.velocity = new Vec3( -a.velocity.getX(), a.velocity.getY(), a.velocity.getZ() );
-            a.position = a.position.subtract( new Vec3( distance, 0.0f, 0.0f ) );
+            a.position = a.position.subtract( new Vec3( _distance, 0.0f, 0.0f ) );
           }
         }
       }
@@ -184,37 +208,37 @@ public class Scene implements IUpdatable, IDrawable
       //   X と同様
       {
         // Z + 1
-        if ( field_z < b.length_z() - 2 )
+        if ( _field_z < b.length_z() - 2 )
         {
-          final int field_zm = field_z + 1;
-          final float field_y = b.field_planes.get( field_x ).get( field_zm );
+          _field_zm = _field_z + 1;
+          _field_y = b.field_planes.get( _field_x ).get( _field_zm );
 
-          final Vec3 wall_position = new Vec3( field_x, 0, field_zm );
-          final Vec3 wall_normal   = new Vec3( 0.0f, 0.0f, -1.0f );
+          _wall_position = new Vec3( _field_x, 0, _field_zm );
+          _wall_normal   = _WALL_ZZM;
 
-          final float distance = ab.intersect_field( wall_position, wall_normal );
+          _distance = ab.intersect_field( _wall_position, _wall_normal );
 
-          if ( distance <= 0.0f && field_y <= ab.position().getY() )
+          if ( _distance <= 0.0f && _field_y <= ab.position().getY() )
           {
             a.velocity = new Vec3( a.velocity.getX(), a.velocity.getY(), -a.velocity.getZ() );
-            a.position = a.position.subtract( new Vec3( 0.0f, 0.0f, distance ) );
+            a.position = a.position.subtract( new Vec3( 0.0f, 0.0f, _distance ) );
           }
         }
         // X - 1
-        if ( field_z > 0 )
+        if ( _field_z > 0 )
         {
-          final int field_zm = field_z - 1;
-          final float field_y = b.field_planes.get( field_x ).get( field_zm );
+          _field_zm = _field_z - 1;
+          _field_y = b.field_planes.get( _field_x ).get( _field_zm );
 
-          final Vec3 wall_position = new Vec3( field_x, 0, field_zm );
-          final Vec3 wall_normal   = new Vec3( 0.0f, 0.0f, +1.0f );
+          _wall_position = new Vec3( _field_x, 0, _field_zm );
+          _wall_normal   = _WALL_ZZP;
 
-          final float distance = ab.intersect_field( wall_position, wall_normal );
+          _distance = ab.intersect_field( _wall_position, _wall_normal );
 
-          if ( distance <= 0.0f && field_y <= ab.position().getY() )
+          if ( _distance <= 0.0f && _field_y <= ab.position().getY() )
           {
             a.velocity = new Vec3( a.velocity.getX(), a.velocity.getY(), -a.velocity.getZ() );
-            a.position = a.position.subtract( new Vec3( 0.0f, 0.0f, distance ) );
+            a.position = a.position.subtract( new Vec3( 0.0f, 0.0f, _distance ) );
           }
         }
       }
