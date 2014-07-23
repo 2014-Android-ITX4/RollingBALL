@@ -11,7 +11,8 @@ public class TestStageScene extends StageScene
   {
     super( s );
 
-    field( new FieldGameObject( this, 16, 16 ) );
+    //field( new FieldGameObject( this, 16, 16 ) );
+    field( new FieldGameObject( this, "test_1_64x64.png" ) );
 
     _player.position = new Vec3( _field.length_x() * 0.5f, 10.0f, _field.length_z() * 0.5f );
     _player.model = ModelData.generate_sphere();
