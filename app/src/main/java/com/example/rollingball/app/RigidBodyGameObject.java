@@ -1,5 +1,7 @@
 package com.example.rollingball.app;
 
+import android.util.Log;
+
 import com.hackoeur.jglm.Vec3;
 import java.util.ArrayList;
 
@@ -7,8 +9,8 @@ public class RigidBodyGameObject extends GameObject
 {
   public float mass = 1.0f;             //質量
   public Vec3 velocity = new Vec3( 0, 0, 0 );          //速度
-  public ArrayList<Vec3> forces = new ArrayList< Vec3 >(); //力
-  public ArrayList<Float> collision_radiuses = new ArrayList< Float >( );
+  public ArrayList<Vec3> forces = new ArrayList< Vec3 >( ); //力
+  public ArrayList< BoundingSphere > collision_boundings = new ArrayList< BoundingSphere>( );
 
   public RigidBodyGameObject( Scene scene )
   { super( scene );}
@@ -16,17 +18,16 @@ public class RigidBodyGameObject extends GameObject
   @Override
   public void update( final float delta_time_in_seconds )
   {
-    Vec3 acceleration = new Vec3( 0.0f, 0.0f, 0.0f );
-    Vec3 force_sum    = new Vec3( 0.0f, 0.0f, 0.0f );
+    Vec3 force_sum = new Vec3( 0.0f, 0.0f, 0.0f );
 
     for( Vec3 f: forces )
-      force_sum = force_sum.add( f );
+      force_sum = Helper.add_high_precision( force_sum, f );
 
     forces.clear();
 
-    acceleration = force_sum.multiply( 1.0f / mass );
-    velocity = velocity.add( acceleration.multiply( delta_time_in_seconds ) );
-    position = velocity.add( velocity.multiply( delta_time_in_seconds ) );
+    Vec3 acceleration = Helper.multiply_high_precision( force_sum, 1.0f / mass );
+    velocity = Helper.add_high_precision( velocity, Helper.multiply_high_precision( acceleration, delta_time_in_seconds ) );
+    position = Helper.add_high_precision( position, Helper.multiply_high_precision( velocity, delta_time_in_seconds ) );
 
     if ( StageScene.class.isInstance( _scene ) )
     {
@@ -34,6 +35,16 @@ public class RigidBodyGameObject extends GameObject
       if ( position.getY() < s.death_height() )
         position = new Vec3( position.getX(), s.death_height(), position.getZ() );
     }
+
+    // #233 擬似的な摩擦の実装
+    //Log.d( "", ""+velocity.toString() );
+    final float pseudo_friction_factor_horizon  = 0.998f;
+    final float pseudo_friction_factor_vertical = 1.0f;
+    velocity = new Vec3
+      ( velocity.getX() * pseudo_friction_factor_horizon
+      , velocity.getY() * pseudo_friction_factor_vertical
+      , velocity.getZ() * pseudo_friction_factor_horizon
+      );
 
     super.update( delta_time_in_seconds );
   }

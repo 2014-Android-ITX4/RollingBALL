@@ -9,9 +9,12 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.util.Log;
 
+import com.hackoeur.jglm.Vec3;
+
 public class FieldGameObject extends GameObject
 {
-  private ArrayList< ArrayList< Float > > field_planes = new ArrayList< ArrayList< Float > >();
+  public ArrayList< ArrayList< Float > > field_planes = new ArrayList< ArrayList< Float > >();
+  static private float height_magnifier = 10.0f;
 
   public FieldGameObject( Scene scene, int arris_x, int arris_z )
   {
@@ -40,9 +43,9 @@ public class FieldGameObject extends GameObject
       for ( int z = 0; z < arris_z; ++z )
       {
         if ( x == 0 || x == arris_x - 1 )
-          field_line.add( 1.0f );
+          field_line.add( height_magnifier * 31.0f / 255.0f );
         else if (z == 0 || z == arris_z - 1 )
-          field_line.add( 1.0f );
+          field_line.add( height_magnifier * 31.0f / 255.0f );
         else
           field_line.add( 0.0f );
       }
@@ -62,7 +65,7 @@ public class FieldGameObject extends GameObject
 
     ArrayList< Float > field_line = new ArrayList< Float >(  );
 
-    float normalize_factor = 1.0f / 255.0f;
+    float normalize_factor = height_magnifier / 255.0f;
 
     for ( int x = 0; x < bitmap.getWidth(); ++x )
     {
@@ -95,4 +98,13 @@ public class FieldGameObject extends GameObject
   // see more: #123 https://github.com/2014-Android-ITX4/RollingBALL/issues/123
   //@Override
   //public void draw() { }
+
+  public float length_x()
+  { return field_planes.size(); }
+
+  public float length_z()
+  { return field_planes.get(0).size(); }
+
+  public float y( final int x, final int z )
+  { return field_planes.get( x ).get( z ); }
 }

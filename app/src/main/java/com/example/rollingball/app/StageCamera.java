@@ -12,13 +12,15 @@ import com.hackoeur.jglm.Vec4;
 public class StageCamera extends Camera
 {
   // プレイヤーゲームオブジェクトを基準に方位角θ、仰角φ、距離distanceを保持
-  private float _distance = 20.0f; //r
+  private float _distance = 10.0f; //r
   private float _theta    =  -(float)Math.PI * 3.0f / 4.0f; //θ
-  private float _phi      =  (float)Math.PI / 3.0f; //φ
+  private float _phi      =  +(float)Math.PI / 3.0f; //φ
 
   // 最小 distance 、 最大 distance
   private final float _min_distance =  5.0f;
   private final float _max_distance = 30.0f;
+
+  private float _update_swipe_wait = 0.0f;
 
   // プレイヤーゲームオブジェクトを保持しておく
   private PlayerGameObject _player_game_object = null;
@@ -44,19 +46,20 @@ public class StageCamera extends Camera
   @Override
   public void update( float delta_time_in_seconds )
   {
-    update_swipe( delta_time_in_seconds );
+    distance( distance() - scene.input_manager.result_scale );
 
-    distance(distance() - scene.input_manager.result_scale);
+    // # 235 ピンチでカメラ距離を操作した直後にスワイプ判定が意図せず動作する問題の対応
+    if ( scene.input_manager.result_scale != 0.0f )
+      _update_swipe_wait = 0.3f;
+    else if ( _update_swipe_wait > 0.0f )
+      _update_swipe_wait -= delta_time_in_seconds;
+    else
+      update_camera( delta_time_in_seconds );
 
     update_position();
 
     // override 元の親クラスの update も呼んでおく
     super.update( delta_time_in_seconds );
-  }
-
-  private void update_distance()
-  {
-
   }
 
   private  void update_position()
@@ -67,8 +70,8 @@ public class StageCamera extends Camera
       , (float)Math.sin( _phi )
       , (float)Math.cos( _theta ) * (float)Math.cos( _phi )
       ).multiply( _distance );
-    //Log.d( "x","="+delta_position.getX() );
-    //Log.d( "y","="+delta_position.getY() );
+    //Log.d( "x=","x="+delta_position.getX() );
+    //Log.d( "y=","y="+delta_position.getY() );
 
 //    Log.d("θ, φ", "" + _theta + " " + _phi + " " + delta_position.toString() );
 
@@ -88,7 +91,9 @@ public class StageCamera extends Camera
     eye = look_at.add( delta_position );
   }
 
-  private void update_swipe( float delta_time_in_seconds )
+  private Vec3 camera_velocity = Vec3.VEC3_ZERO;
+
+  private void update_camera( float delta_time_in_seconds )
   {
     Vec3 screen_size = new Vec3
       ( scene.scene_manager.view.screen_width()
@@ -98,10 +103,15 @@ public class StageCamera extends Camera
 
     //Log.d( "screen size" , screen_size.toString() );
 
-    Vec3 dp = scene.scene_manager.view.activity.swipe_delta_position();
-    Vec3 rotation_ratio = new Vec3( dp.getX() / screen_size.getX(), dp.getY() / screen_size.getY(), 0.0f );
+    Vec3 delta = scene.scene_manager.view.drag_delta();
+    if ( Helper.xy_length( delta ) > 0.0f )
+      camera_velocity = delta;
+    else
+      camera_velocity = camera_velocity.multiply( 0.95f );
 
-    if ( Math.abs( dp.getX() ) > Math.abs( dp.getY() ) )
+    Vec3 rotation_ratio = new Vec3( camera_velocity.getX() / screen_size.getX(), camera_velocity.getY() / screen_size.getY(), 0.0f );
+
+    if ( Math.abs( camera_velocity.getX() ) > Math.abs( camera_velocity.getY() ) )
     {
       final float rotation_magnifier = (float)Math.PI / 4.0f;
       _theta += rotation_magnifier * rotation_ratio.getX();
@@ -117,10 +127,9 @@ public class StageCamera extends Camera
       _phi = Math.min( Math.max( _phi, phi_min ), phi_max );
     }
 
-    //Log.d("θ, φ", "" + _theta + " " + _phi);
+    //camera_velocity.multiply( 0.3f );
 
-    scene.scene_manager.view.activity.attenuate_swipe_state();
-    //scene.scene_manager.view.activity.reset_swipe_state();
+    //Log.d("θ, φ", "" + _theta + " " + _phi);
   }
 
   // distance を一定値範囲内だけで設定可能とするためのプロパティーセッターアクセサー
@@ -142,4 +151,3 @@ public class StageCamera extends Camera
   public float phi()
   { return _phi; }
 }
-
