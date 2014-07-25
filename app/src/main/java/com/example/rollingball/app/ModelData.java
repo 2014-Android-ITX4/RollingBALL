@@ -27,8 +27,9 @@ public class ModelData
 
   // 再開用に頂点・インデックスの値を残しておくための変数
   private float[] _vertices;
-  private byte[] _indices_byte;
+  private byte[]  _indices_byte;
   private short[] _indices_short;
+  private int[]   _indices_int;
 
   public Material material = new Material();
 
@@ -43,12 +44,11 @@ public class ModelData
 
   public ModelData( float[] arg_vertices, byte[] arg_indices, int polygon_mode )
   {
-    _vertices = new float[0];
-    _indices_byte = new byte[0];
     _indices_short = new short[0];
+    _indices_int   = new int[0];
 
-    _vertices = arg_vertices;
-    _indices_byte = arg_indices;
+    _vertices      = arg_vertices;
+    _indices_byte  = arg_indices;
 
     _vertices_buffer_id  = generate_vertex_buffer( _vertices );
     _indices_buffer_id   = generate_index_buffer( _indices_byte );
@@ -64,11 +64,10 @@ public class ModelData
 
   public ModelData( float[] arg_vertices, short[] arg_indices, int polygon_mode )
   {
-    _vertices = new float[0];
-    _indices_byte = new byte[0];
-    _indices_short = new short[0];
+    _indices_byte  = new byte[0];
+    _indices_int   = new int[0];
 
-    _vertices = arg_vertices;
+    _vertices      = arg_vertices;
     _indices_short = arg_indices;
 
     _vertices_buffer_id  = generate_vertex_buffer( _vertices );
@@ -83,6 +82,26 @@ public class ModelData
     this(arg_vertices, arg_indices, GLES20.GL_TRIANGLES);
   }
 
+  public ModelData( float[] arg_vertices, int[] arg_indices, int polygon_mode )
+  {
+    _indices_byte  = new byte[0];
+    _indices_short = new short[0];
+
+    _vertices      = arg_vertices;
+    _indices_int   = arg_indices;
+
+    _vertices_buffer_id  = generate_vertex_buffer( _vertices );
+    _indices_buffer_id   = generate_index_buffer( _indices_int );
+    _number_of_indices   = arg_indices.length;
+    _indices_buffer_type = GLES20.GL_UNSIGNED_INT;
+    _polygon_mode        = polygon_mode;
+  }
+
+  public ModelData( float[] arg_vertices, int[] arg_indices )
+  {
+    this(arg_vertices, arg_indices, GLES20.GL_TRIANGLES);
+  }
+
   public void on_resume()
   {
     // 改めて頂点・インデックスを設定してidを取得
@@ -92,8 +111,10 @@ public class ModelData
     // 以前取得したインデックスがbyteかshortかを判別
     if ( _indices_byte.length != 0 )
       _indices_buffer_id = generate_index_buffer( _indices_byte );
-    else
+    else if ( _indices_short.length != 0 )
       _indices_buffer_id = generate_index_buffer( _indices_short );
+    else
+      _indices_buffer_id = generate_index_buffer( _indices_int );
 
 //    Log.d("ModelData on_resume()", String.valueOf( GLES20.glGetError() ));
 
@@ -119,21 +140,21 @@ public class ModelData
     return vertex_index;
   }
 
-  private static short[] indices_helper( short index_index, short base_index, short[] indices )
+  private static int[] indices_helper( int index_index, int base_index, int[] indices )
   {
     // triangle 1
-    indices[ index_index++ ] = (short)( base_index + 1 );
-    indices[ index_index++ ] = (short)( base_index + 0 );
-    indices[ index_index++ ] = (short)( base_index + 2 );
+    indices[ index_index++ ] = base_index + 1;
+    indices[ index_index++ ] = base_index + 0;
+    indices[ index_index++ ] = base_index + 2;
 
     // triangle 2
-    indices[ index_index++ ] = (short)( base_index + 1 );
-    indices[ index_index++ ] = (short)( base_index + 2 );
-    indices[ index_index++ ] = (short)( base_index + 3 );
+    indices[ index_index++ ] = base_index + 1;
+    indices[ index_index++ ] = base_index + 2;
+    indices[ index_index++ ] = base_index + 3;
 
-    base_index = ( short ) (base_index + 4);
+    base_index = base_index + 4;
 
-    short[] r = new short[2];
+    int[] r = new int[2];
     r[0] = index_index;
     r[1] = base_index;
 
@@ -164,10 +185,10 @@ public class ModelData
     final int number_of_indices     = field_area * vertices_per_triangle * triangles_per_cell;
 
     float[] vertices = new float[ number_of_vertices ];
-    short[] indices  = new short[ number_of_indices  ];
+    int[]   indices  = new int[ number_of_indices ];
 
-    int   vertex_index = 0;
-    short index_index  = 0;
+    int vertex_index = 0;
+    int index_index  = 0;
 
     Vec3[] yp_delta =
       { new Vec3( -0.5f, 0.0f, -0.5f )
@@ -230,7 +251,7 @@ public class ModelData
       , normal_zp, normal_zn
       };
 
-    short base_index = 0;
+    int base_index = 0;
 
     for ( int x = 0; x < field_size_x; ++x )
       for ( int z = 0; z < field_size_z; ++z )
@@ -281,7 +302,7 @@ public class ModelData
             }
             vertex_index = vertices_helper( vertex_index, vertices, position );
           }
-          short[] r   = indices_helper( index_index, base_index, indices );
+          int[] r = indices_helper( index_index, base_index, indices );
           index_index = r[0];
           base_index  = r[1];
         }
@@ -398,6 +419,23 @@ public class ModelData
     return new ModelData( vertices, indices );
   }
 
+  public static ModelData generate_board( float arris_length )
+  {
+    float vl = arris_length * 0.5f;
+
+    float[] vertices =
+      { -vl, +vl, 0.0f, 0.0f, 0.0f, 1.0f
+      , -vl, -vl, 0.0f, 0.0f, 0.0f, 1.0f
+      , +vl, +vl, 0.0f, 0.0f, 0.0f, 1.0f
+      , +vl, -vl, 0.0f, 0.0f, 0.0f, 1.0f
+      };
+
+    //インデックスバッファーの元データ配列を定義
+    byte[] indices = { 0, 1, 2, 2, 1, 3 };
+
+    return new ModelData( vertices, indices );
+  }
+
   public static ModelData generate_cube( )
   { return generate_cube( 1.0f ); }
 
@@ -500,7 +538,7 @@ public class ModelData
     return b;
   }
 
-  // ByteBuffer --> int ( generated id of vertex buffer object )
+  // ShortBuffer --> int ( generated id of vertex buffer object )
   private static int generate_index_buffer( ShortBuffer b )
   {
     int[] buffer_ids = new int[ 1 ];
@@ -515,5 +553,29 @@ public class ModelData
 
   private static int generate_index_buffer( short[] short_array )
   { return generate_index_buffer( create_buffer( short_array ) ); }
+
+  // int[] --> ShortBuffer
+  private static IntBuffer create_buffer( int[] int_array )
+  {
+    IntBuffer b = ByteBuffer.allocateDirect( int_array.length * 4 ).order( ByteOrder.nativeOrder( ) ).asIntBuffer();
+    b.put( int_array ).position( 0 );
+    return b;
+  }
+
+  // IntBuffer --> int ( generated id of vertex buffer object )
+  private static int generate_index_buffer( IntBuffer b )
+  {
+    int[] buffer_ids = new int[ 1 ];
+
+    GLES20.glGenBuffers( 1, buffer_ids, 0 );
+    GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, buffer_ids[ 0 ] );
+    GLES20.glBufferData( GLES20.GL_ELEMENT_ARRAY_BUFFER, b.capacity( ) * 4, b, GLES20.GL_STATIC_DRAW );
+    GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, 0 );
+
+    return buffer_ids[ 0 ];
+  }
+
+  private static int generate_index_buffer( int[] int_array )
+  { return generate_index_buffer( create_buffer( int_array ) ); }
 
 }

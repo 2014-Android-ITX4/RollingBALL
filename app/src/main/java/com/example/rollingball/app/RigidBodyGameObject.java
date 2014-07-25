@@ -35,9 +35,9 @@ public class RigidBodyGameObject extends GameObject
 
     forces.clear();
 
-    _acceleration = _force_sum.multiply( 1.0f / mass );
-    velocity = velocity.add( _acceleration.multiply( delta_time_in_seconds ) );
-    position = position.add( velocity.multiply( delta_time_in_seconds ) );
+    _acceleration = Helper.multiply_high_precision( _force_sum, 1.0f / mass );
+    velocity = Helper.add_high_precision( velocity, Helper.multiply_high_precision( _acceleration, delta_time_in_seconds ) );
+    position = Helper.add_high_precision( position, Helper.multiply_high_precision( velocity, delta_time_in_seconds ) );
 
     if ( StageScene.class.isInstance( _scene ) )
     {
@@ -47,7 +47,9 @@ public class RigidBodyGameObject extends GameObject
     }
 
     // #233 擬似的な摩擦の実装
-//    Log.d( "", ""+velocity.toString() );
+    //Log.d( "", ""+velocity.toString() );
+    final float pseudo_friction_factor_horizon  = 0.998f;
+    final float pseudo_friction_factor_vertical = 1.0f;
     velocity = new Vec3
       ( velocity.getX() * pseudo_friction_factor_horizon
       , velocity.getY() * pseudo_friction_factor_vertical

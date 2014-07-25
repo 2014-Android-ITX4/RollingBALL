@@ -27,7 +27,7 @@ public class BoundingSphere
   // return: 距離、0.0f以下なら接触またはめり込んでいる
   public float intersect( final BoundingSphere target )
   {
-    final float distance = target.position().subtract( position() ).getLength();
+    final float distance = Helper.subtract_high_precision( target.position(), position() ).getLength();
     final float border   = target.radius() + _radius;
     return  distance - border;
   }
@@ -49,7 +49,7 @@ public class BoundingSphere
   // return: 距離、0.0f以下なら接触またはめり込んでいる
   public float intersect_field( final Vec3 field_position, final Vec3 field_normal )
   {
-    final float distance = field_normal.dot( position().subtract( field_position ) ) / field_normal.getLength();
+    final float distance = (field_normal.dot( Helper.subtract_high_precision( position(), field_position ) ) / field_normal.getLength() ) - _radius;
     return distance;
   }
 
@@ -57,5 +57,7 @@ public class BoundingSphere
   public Vec3 center_diff() { return _center_diff; }
   public float radius() { return _radius; }
 
-  public Vec3 position() { return _master.position.add( _center_diff ); }
+  public Vec3 position() { return Helper.add_high_precision( _master.position, _center_diff ); }
+  public Vec3 floor() { return Helper.subtract_high_precision( position(), new Vec3( 0.0f, _radius, 0.0f ) ); }
+  public Vec3 ceil() { return Helper.add_high_precision( position(), new Vec3( 0.0f, _radius, 0.0f ) ); }
 }

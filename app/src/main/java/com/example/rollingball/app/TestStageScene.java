@@ -13,7 +13,8 @@ public class TestStageScene extends StageScene
   {
     super( s );
 
-    field( new FieldGameObject( this, 16, 16 ) );
+    //field( new FieldGameObject( this, 16, 16 ) );
+    field( new FieldGameObject( this, "test_1_64x64.png" ) );
 
     _player.position = new Vec3( _field.length_x() * 0.5f, 10.0f, _field.length_z() * 0.5f );
     _player.model = ModelData.generate_sphere();
@@ -42,6 +43,11 @@ public class TestStageScene extends StageScene
         ( (float)Math.random() * _field.length_x()
         , ( (float)Math.random() - 0.5f ) * _player.position.getY() + _player.position.getY()
         , (float)Math.random() * _field.length_z()
+        );
+      npc.velocity = new Vec3
+        ( (float)Math.random() * 10.0f - 5.0f
+        , (float)Math.random() * 10.0f - 5.0f
+        , (float)Math.random() * 10.0f - 5.0f
         );
       npc.model = ModelData.generate_sphere();
       npc.model.material.diffuse_color( new Vec3( 0.6f, 1.0f, 0.6f ) );
